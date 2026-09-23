@@ -3,26 +3,45 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import linprog
 
-# Configuración de la página
-st.set_page_config(page_title="NutriZacatecas Móvil", page_icon="🐄", layout="centered")
+# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL PROFESIONAL ---
+st.set_page_config(
+    page_title="NutriZacatecas Pro",
+    page_icon="🐄",
+    layout="centered",
+    initial_sidebar_state="expanded"
+)
 
-st.title("🐄 NutriZacatecas App")
-st.markdown("### Optimizador Comercial con Catálogo Personalizado")
+# Estilos CSS limpios para un diseño corporativo
+st.markdown("""
+    <style>
+    .main {
+        background-color: #f8f9fa;
+    }
+    .stMetric {
+        background-color: #ffffff;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        border-left: 4px solid #2e7d32;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-# --- 1. CARGA SEGURA DE LA BASE DE DATOS ---
+st.title("🐄 NutriZacatecas Pro")
+st.markdown("##### Sistema Inteligente de Optimización y Nutrición Bovina")
+
+# --- 2. CARGA DE LA BASE DE DATOS (CON RESPALDO) ---
 sheet_url = "https://docs.google.com/spreadsheets/d/1FQhA3ldcSJGOtAZLfQr4XA5gPutKULeR-F_eytfq1fY/export?format=csv"
 
 @st.cache_data(ttl=10)
 def cargar_datos(url):
     return pd.read_csv(url)
 
-# Intentamos cargar desde la nube; si falla, usamos datos locales de respaldo
 try:
     df_base = cargar_datos(sheet_url)
     source_status = "☁️ Conectado a Google Sheets (En vivo)"
-except Exception as e:
-    source_status = "⚠️ Usando base de datos local de emergencia (No se pudo conectar a la nube)"
-    # Datos de respaldo por si falla la red o los permisos
+except Exception:
+    source_status = "⚠️ Usando base de datos local de emergencia"
     data_respaldo = {
         "Nombre del Ingrediente": ["Rastrojo de maiz", "Harina de soya", "Grano de maiz", "Urea", "Ensilado de maiz", "Pasta de canola"],
         "Categoria": ["Forraje", "Concentrado", "Concentrado", "Suplemento", "Ensilado", "Concentrado"],
@@ -34,56 +53,13 @@ except Exception as e:
 
 st.caption(source_status)
 
-# --- 2. MÓDULO DE CATÁLOGO PERSONALIZADO (LABORATORIO Y PRECIOS) ---
-st.markdown("---")
-st.subheader("🧪 1. Ajuste de Ingredientes y Análisis de Laboratorio")
-st.markdown(
-    "Puedes modificar directamente los precios o los valores analíticos de laboratorio "
-    "de tu inventario actual, o incluso agregar nuevos ingredientes para esta corrida."
-)
-
-# Tabla interactiva para que el cliente modifique datos en tiempo real
-df_ingredientes = st.data_editor(
-    df_base, 
-    num_rows="dynamic", 
-    use_container_width=True,
-    key="editor_ingredientes"
-)
-
-st.markdown("---")
-
-# --- 3. EXTRACCIÓN Y VALIDACIÓN DE VECTORES ---
-try:
-    nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
-    c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
-    pc = df_ingredientes["Proteina Cruda (PC % MS)"].astype(float).values / 100.0  # Conversión a fracción
-    neg = df_ingredientes["NEg (Mcal/kg)"].astype(float).values
-except KeyError as err:
-    st.error(f"Falta una columna clave en la tabla: {err}. Revisa los nombres de las columnas en tu Google Sheet.")
-    st.stop()
-
-# Restricciones automáticas de inclusión inteligentes
-bounds = []
-for idx, row in df_ingredientes.iterrows():
-    nombre = str(row["Nombre del Ingrediente"]).lower()
-    cat = str(row.get("Categoria", "concentrado")).lower()
-    
-    if "urea" in nombre:
-        bounds.append((0.0, 0.012))  # Tope estricto de seguridad biológica (1.2%)
-    elif "forraje" in cat or "ensilado" in cat or "rastrojo" in nombre:
-        bounds.append((0.15, 0.60))  # Mínimo de forraje para salud ruminal
-    else:
-        bounds.append((0.0, 0.70))   # Concentrados y granos
-
-# --- 4. CONTROLES MÓVILES (BARRA LATERAL) ---
-st.sidebar.header("Parámetros del Lote")
+# --- 3. CONTROLES GENERALES (BARRA LATERAL) ---
+st.sidebar.header("⚙️ Parámetros del Lote")
 peso_actual = st.sidebar.slider("Peso Vivo Actual (kg)", min_value=200.0, max_value=450.0, value=250.0, step=10.0)
 gde = st.sidebar.slider("Ganancia Diaria Esperada (kg/día)", min_value=1.0, max_value=2.0, value=1.4, step=0.1)
 estacion = st.sidebar.selectbox("Temporada / Clima", ["Templado", "Invierno", "Verano"])
 
-st.info(f"Evaluando lote de **{peso_actual} kg** en temporada de **{estacion.lower()}**.")
-
-# --- 5. LÓGICA NUTRICIONAL POR FASE ---
+# Lógica nutricional por fase
 if peso_actual < 300:
     fase = "Crecimiento (Becerro Ligero)"
     meta_pc_min = 0.150  
@@ -97,9 +73,52 @@ else:
     meta_pc_min = 0.115  
     meta_neg_min = 1.15  
 
-st.write(f"**Etapa Detectada:** {fase}")
+# --- 4. INTERFAZ MODULAR POR PESTAÑAS (TABS) ---
+tab1, tab2, tab3 = st.tabs(["📋 1. Resumen del Lote", "🧪 2. Catálogo y Laboratorio", "📊 3. Resultados y Gráficas"])
 
-# --- 6. MOTOR DE PROGRAMACIÓN LINEAL ---
+with tab1:
+    st.subheader("Estado Actual del Lote")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Etapa Detectada", fase)
+        st.metric("Peso Vivo", f"{peso_actual:,.0f} kg")
+    with col2:
+        st.metric("Ganancia Esperada", f"{gde} kg/día")
+        st.metric("Temporada", estacion)
+    
+    st.info("💡 **Navegación:** Usa la barra lateral izquierda para modificar el peso o la temporada. Ve a la pestaña **Catálogo y Laboratorio** para ajustar precios o análisis de materias primas.")
+
+with tab2:
+    st.subheader("Gestión de Inventario y Análisis de Laboratorio")
+    st.markdown("Modifica precios o valores analíticos específicos de tu laboratorio local en tiempo real:")
+    df_ingredientes = st.data_editor(
+        df_base, 
+        num_rows="dynamic", 
+        use_container_width=True,
+        key="editor_ingredientes"
+    )
+
+# --- 5. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL ---
+try:
+    nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
+    c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
+    pc = df_ingredientes["Proteina Cruda (PC % MS)"].astype(float).values / 100.0  
+    neg = df_ingredientes["NEg (Mcal/kg)"].astype(float).values
+except KeyError as err:
+    st.error(f"Falta una columna clave en la tabla: {err}.")
+    st.stop()
+
+bounds = []
+for idx, row in df_ingredientes.iterrows():
+    nombre = str(row["Nombre del Ingrediente"]).lower()
+    cat = str(row.get("Categoria", "concentrado")).lower()
+    if "urea" in nombre:
+        bounds.append((0.0, 0.012))  # Tope biológico estricto (1.2%)
+    elif "forraje" in cat or "ensilado" in cat or "rastrojo" in nombre:
+        bounds.append((0.15, 0.60))  # Mínimo de forraje ruminal
+    else:
+        bounds.append((0.0, 0.70))   # Concentrados
+
 A_eq = np.ones((1, len(c)))
 b_eq = np.array([1.0])
 A_ub = np.array([-pc, -neg])
@@ -107,24 +126,41 @@ b_ub = np.array([-meta_pc_min, -meta_neg_min])
 
 resultado = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
 
-# --- 7. RESULTADOS EN PANTALLA ---
-st.markdown("---")
-st.subheader("📊 2. Resultado de la Optimización")
-
-if resultado.success:
-    st.success("¡Dieta optimizada con éxito utilizando tus parámetros personalizados!")
-    st.metric(label="Costo Óptimo por Tonelada", value=f"${resultado.fun:,.2f} MXN")
+with tab3:
+    st.subheader("Reporte Financiero y Nutricional")
     
-    st.markdown("#### 📋 Mezcla exacta para la batea (por tonelada):")
-    for i, ingrediente in enumerate(nombres):
-        porcentaje = resultado.x[i] * 100
-        kilos = resultado.x[i] * 1000
-        if porcentaje > 0.01:
-            st.write(f"- **{ingrediente}:** {porcentaje:.1f}% `({kilos:.1f} kg)`")
-            st.progress(float(resultado.x[i]))
-            
-    for i, ingrediente in enumerate(nombres):
-        if "urea" in str(nombres[i]).lower() and resultado.x[i] >= 0.0119:
-            st.warning("⚠️ Nota: La urea alcanzó su límite máximo de seguridad biológica (1.2%).")
-else:
-    st.error("No se encontró una solución factible con los precios o valores analíticos actuales. Revisa los límites o los aportes nutricionales ingresados.")
+    if resultado.success:
+        col_res1, col_res2 = st.columns(2)
+        with col_res1:
+            st.metric(label="Costo Óptimo por Tonelada", value=f"${resultado.fun:,.2f} MXN")
+        with col_res2:
+            st.metric(label="Estado del Proceso", value="Factible 🟢")
+        
+        st.markdown("#### 📋 Mezcla exacta para la batea (por tonelada):")
+        for i, ingrediente in enumerate(nombres):
+            porcentaje = resultado.x[i] * 100
+            kilos = resultado.x[i] * 1000
+            if porcentaje > 0.01:
+                st.write(f"- **{ingrediente}:** {porcentaje:.1f}% `({kilos:.1f} kg)`")
+                st.progress(float(resultado.x[i]))
+                
+        # --- VISUALIZACIÓN AVANZADA DE DATOS (GRÁFICA INTERACTIVA) ---
+        st.markdown("---")
+        st.subheader("📈 Aportes Nutricionales vs. Requerimientos Mínimos")
+        
+        aporte_pc = np.sum(resultado.x * pc) * 100
+        aporte_neg = np.sum(resultado.x * neg)
+        
+        df_chart = pd.DataFrame({
+            "Parámetro Nutricional": ["Proteína Cruda (%)", "Energía Neta (Mcal/kg)"],
+            "Aporte de la Dieta": [aporte_pc, aporte_neg],
+            "Requerimiento Mínimo": [meta_pc_min * 100, meta_neg_min]
+        }).set_index("Parámetro Nutricional")
+        
+        st.bar_chart(df_chart)
+        
+        for i, ingrediente in enumerate(nombres):
+            if "urea" in str(ingrediente).lower() and resultado.x[i] >= 0.0119:
+                st.warning("⚠️ Nota: La urea alcanzó su límite máximo de seguridad biológica (1.2%).")
+    else:
+        st.error("No se encontró una solución factible con los parámetros actuales. Revisa los precios o los límites analíticos en la pestaña 2.")
