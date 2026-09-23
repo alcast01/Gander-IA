@@ -3,10 +3,11 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import linprog
 import plotly.express as px
+from fpdf import FPDF
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL ---
 st.set_page_config(
-    page_title="Ganader-IA",
+    page_title="Ganader-IA Pro",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -27,10 +28,36 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🐄 Ganader-IA")
+# --- 2. SISTEMA DE SEGURIDAD Y CONTROL DE ACCESOS (MEMBRESÍAS / LICENCIAS) ---
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    st.title("🔐 Ganader-IA - Acceso Comercial")
+    st.markdown("##### Sistema Inteligente de Optimización y Nutrición Bovina")
+    st.info("Introduce tu clave de licencia comercial o membresía activa para acceder al sistema:")
+    
+    licencia_input = st.text_input("Clave de Licencia / Membresía", type="password")
+    
+    col_l1, col_l2 = st.columns(2)
+    with col_l1:
+        if st.button("Validar Acceso"):
+            # Licencia comercial de ejemplo (puedes cambiarla o conectarla a una BD de clientes)
+            if licencia_input == "GANADERIA-PRO-2026" or licencia_input == "demo":
+                st.session_state.authenticated = True
+                st.rerun()
+            else:
+                st.error("❌ Licencia inválida o membresía expirada. Contacta al administrador.")
+    with col_l2:
+        st.markdown("<br><small>🔑 <i>Usa la clave <b>demo</b> para pruebas.</i></small>", unsafe_allow_html=True)
+    
+    st.stop()
+
+# --- APLICACIÓN PRINCIPAL (POST-AUTENTICACIÓN) ---
+st.title("🐄 Ganader-IA Pro")
 st.markdown("##### Sistema Inteligente de Optimización y Predicción Nutricional Bovina")
 
-# --- 2. CARGA DE LA BASE DE DATOS DESDE GOOGLE SHEETS (V4) ---
+# --- 3. CARGA DE LA BASE DE DATOS DESDE GOOGLE SHEETS (V4) ---
 sheet_url = "https://docs.google.com/spreadsheets/d/1yCuTmDi1wEzdeMHoAbuxMewwo0Pe1neyjntMgAhMzhA/export?format=csv"
 
 @st.cache_data(ttl=10)
@@ -63,7 +90,7 @@ except Exception:
 
 st.caption(source_status)
 
-# --- 3. CONTROLES GENERALES Y PARÁMETROS PRODUCTIVOS EN LA BARRA LATERAL ---
+# --- 4. CONTROLES GENERALES Y PARÁMETROS PRODUCTIVOS EN LA BARRA LATERAL ---
 st.sidebar.header("⚙️ Parámetros del Lote")
 peso_actual = st.sidebar.slider("Peso Vivo Actual (kg)", min_value=200.0, max_value=450.0, value=250.0, step=10.0)
 peso_objetivo = st.sidebar.slider("Peso de Venta / Meta (kg)", min_value=450.0, max_value=600.0, value=520.0, step=10.0)
@@ -83,7 +110,7 @@ raza_seleccionada = st.sidebar.selectbox(
     ]
 )
 
-# --- MODELADO PREDICTIVO BIOLÓGICO (ZONA DE RESUMEN) ---
+# --- MODELADO PREDICTIVO BIOLÓGICO ---
 factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
 cms_estimado = peso_actual * 0.024 * factor_clima
 
@@ -119,22 +146,27 @@ else:
 meta_pc_min = meta_pc_base * factor_pc
 meta_neg_min = meta_neg_base * factor_neg
 
-# Créditos profesionales actualizados en la barra lateral
+# Botón para cerrar sesión en barra lateral
 st.sidebar.markdown("---")
+if st.sidebar.button("🔒 Cerrar Sesión / Licencia"):
+    st.session_state.authenticated = False
+    st.rerun()
+
+# Créditos profesionales
 st.sidebar.markdown(
     "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px;'>"
-    "<b>Ganader-IA</b><br>"
-    "Herramienta de nutrición animal creada por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
-    "Desarrollada para Nutriólogos Veterinarios, Técnicos en Nutrición Animal, Estudiantes Universitarios y Ganaderos."
+    "<b>Ganader-IA Pro</b><br>"
+    "Creado por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
+    "Para Nutriólogos, Técnicos, Estudiantes y Ganaderos."
     "</div>",
     unsafe_allow_html=True
 )
 
-# --- 4. INTERFAZ MODULAR POR PESTAÑAS (3 TABS) ---
+# --- 5. INTERFAZ MODULAR POR PESTAÑAS (3 TABS) ---
 tab1, tab2, tab3 = st.tabs([
     "📋 1. Resumen y Predicciones", 
     "🧪 2. Catálogo y Lab", 
-    "📊 3. Resultados y Gráficas"
+    "📊 3. Resultados y Reporte PDF"
 ])
 
 with tab1:
@@ -183,7 +215,7 @@ with tab2:
         key="editor_ingredientes"
     )
 
-# --- 5. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL (CON INCLUSIÓN FORZADA) ---
+# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL ---
 try:
     nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
     c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
@@ -215,17 +247,16 @@ b_ub = np.array([-meta_pc_min, -meta_neg_min])
 resultado = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
 
 with tab3:
-    st.subheader("Reporte Financiero y Nutricional Optimizado")
+    st.subheader("Reporte Financiero, Mezcla y Descarga de PDF")
     
     if resultado.success:
         col_res1, col_res2 = st.columns(2)
         with col_res1:
             st.metric(label="Costo Óptimo por Tonelada", value=f"${resultado.fun:,.2f} MXN")
         with col_res2:
-            st.metric(label="Estado del Processo", value="Factible (Máxima Eficiencia) 🟢")
+            st.metric(label="Estado del Proceso", value="Factible (Máxima Eficiencia) 🟢")
         
         st.markdown("#### 📋 Tabla de Ingredientes y Mezcla Exacta por Tonelada:")
-        st.markdown("Utiliza esta tabla para la carga precisa en la batea o mezcladora:")
         
         tabla_mezcla = []
         categorias_pie = {}
@@ -250,14 +281,86 @@ with tab3:
         df_mezcla_final = pd.DataFrame(tabla_mezcla)
         st.dataframe(df_mezcla_final, use_container_width=True, hide_index=True)
         
-        # --- GRÁFICA DE PASTEL DE LA COMPOSICIÓN DE LA DIETA ---
+        # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ---
+        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, p_act, p_obj, gain, dias):
+            pdf = FPDF()
+            pdf.add_page()
+            
+            # Encabezado
+            pdf.set_font("Arial", "B", 16)
+            pdf.cell(0, 10, "Ganader-IA Pro - Reporte Ejecutivo de Nutrición", 0, 1, "C")
+            pdf.set_font("Arial", "I", 10)
+            pdf.cell(0, 6, "Creado por el Dr. Alejandro Castañeda Correa", 0, 1, "C")
+            pdf.ln(5)
+            
+            # Datos del Lote
+            pdf.set_font("Arial", "B", 11)
+            pdf.cell(0, 7, "1. Parametros y Predicciones del Lote", 0, 1)
+            pdf.set_font("Arial", "", 10)
+            pdf.cell(0, 6, f"Fisiologia: {etapa} | Genetica: {raza_L}", 0, 1)
+            pdf.cell(0, 6, f"Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE Esperada: {gain} kg/dia", 0, 1)
+            pdf.cell(0, 6, f"Dias Proyectados a Venta: {dias:.0f} dias", 0, 1)
+            pdf.ln(4)
+            
+            # Corrida Financiera
+            pdf.set_font("Arial", "B", 11)
+            pdf.cell(0, 7, "2. Corrida Financiera", 0, 1)
+            pdf.set_font("Arial", "", 10)
+            pdf.cell(0, 6, f"Costo Optimo por Tonelada de Alimento: ${costo_ton:,.2f} MXN", 0, 1)
+            pdf.ln(4)
+            
+            # Tabla de ingredientes
+            pdf.set_font("Arial", "B", 11)
+            pdf.cell(0, 7, "3. Orden Exacta de Ingredientes por Tonelada (1,000 kg)", 0, 1)
+            pdf.set_font("Arial", "B", 9)
+            pdf.cell(80, 7, "Ingrediente", 1)
+            pdf.cell(30, 7, "Inclusion (%)", 1)
+            pdf.cell(35, 7, "Kg / Tonelada", 1)
+            pdf.cell(45, 7, "Costo Parcial ($)", 1)
+            pdf.ln()
+            
+            pdf.set_font("Arial", "", 9)
+            for _, row in df_resumen.iterrows():
+                pdf.cell(80, 6, str(row["Ingrediente"]), 1)
+                pdf.cell(30, 6, f"{row['Inclusión (%)']}%", 1)
+                pdf.cell(35, 6, f"{row['Kg por Tonelada (1,000 kg)']}", 1)
+                pdf.cell(45, 6, str(row['Aporte al Costo Total ($)']), 1)
+                pdf.ln()
+                
+            pdf.ln(5)
+            # Instrucciones para operarios
+            pdf.set_font("Arial", "B", 11)
+            pdf.cell(0, 7, "4. Instrucciones de Mezclado para los Operarios del Corral", 0, 1)
+            pdf.set_font("Arial", "", 9)
+            pdf.multi_cell(0, 5, 
+                "1. Orden de carga en la batea: Agregar primero los forrajes secos y ensilados.\n"
+                "2. Incorporar los granos energeticos, concentrados proteicos y subproductos.\n"
+                "3. Agregar con precision los aditivos especiales (Sales Minerales, Grasa de paso Lactomil y Urea).\n"
+                "4. Verter la melaza liquida al final junto con el agua de batea para asegurar palatabilidad y evitar polvos.\n"
+                "5. Tiempo de mezcla recomendado: 8 a 10 minutos posteriores a la adicion del ultimo ingrediente."
+            )
+            return pdf.output(dest='S').encode('latin1')
+
+        pdf_data = generar_pdf_ejecutivo(df_mezcla_final, resultado.fun, fase, raza_seleccionada, peso_actual, peso_objetivo, gde, dias_a_meta)
+        
         st.markdown("---")
-        st.subheader("🥧 Composición Porcentual de la Dieta por Categoría de Ingrediente")
+        st.subheader("📥 Descarga de Reporte Ejecutivo PDF")
+        st.markdown("Haz clic en el siguiente botón para generar y descargar el reporte oficial con la receta de batea y corrida financiera:")
+        
+        st.download_button(
+            label="📄 Descargar Reporte Ejecutivo PDF (Operarios y Corrida Financiera)",
+            data=pdf_data,
+            file_name=f"Reporte_GanaderIA_{fase.replace(' ', '_')}.pdf",
+            mime="application/pdf"
+        )
+        
+        # --- GRÁFICAS DE PASTEL Y BARRAS ---
+        st.markdown("---")
+        st.subheader("🥧 Composición Porcentual de la Dieta por Categoría")
         df_pie = pd.DataFrame(list(categorias_pie.items()), columns=["Categoría", "Porcentaje"])
         fig_pie = px.pie(df_pie, names="Categoría", values="Porcentaje", hole=0.4, title="Distribución de Insumos en la Mezcla")
         st.plotly_chart(fig_pie, use_container_width=True)
                 
-        # --- VISUALIZACIÓN AVANZADA DE DATOS (GRÁFICA DE BARRAS) ---
         st.markdown("---")
         st.subheader("📈 Aportes Nutricionales vs. Requerimientos Raciales Ajustados")
         
@@ -272,14 +375,6 @@ with tab3:
         
         st.bar_chart(df_chart)
         
-        for i, ingrediente in enumerate(nombres):
-            ing_lower = str(ingrediente).lower()
-            if "urea" in ing_lower and resultado.x[i] >= 0.014:
-                st.warning("⚠️ Nota: La urea alcanzó su límite máximo de seguridad biológica (1.5%).")
-            elif ("mineral" in ing_lower or "sal" in ing_lower) and resultado.x[i] >= 0.029:
-                st.warning("⚠️ Nota: Las sales minerales alcanzaron su límite máximo recomendado (3%).")
-            elif ("grasa" in ing_lower or "lactomil" in ing_lower) and resultado.x[i] >= 0.029:
-                st.warning("⚠️ Nota: La grasa de paso alcanzó su límite máximo restringido (3%).")
     else:
         st.error(
             "⚠️ **Aviso del Optimizador:** Con los precios actuales o metas extremas introducidas, no se encontró una solución matemática 100% factible. "
