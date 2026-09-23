@@ -119,13 +119,13 @@ else:
 meta_pc_min = meta_pc_base * factor_pc
 meta_neg_min = meta_neg_base * factor_neg
 
-# Créditos profesionales en barra lateral
+# Créditos profesionales actualizados en la barra lateral
 st.sidebar.markdown("---")
 st.sidebar.markdown(
     "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px;'>"
     "<b>Ganader-IA</b><br>"
     "Herramienta de nutrición animal creada por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
-    "Desarrollada para Nutriólogos Veterinarios, Técnicos en Nutrición Animal y Ganaderos."
+    "Desarrollada para Nutriólogos Veterinarios, Técnicos en Nutrición Animal, Estudiantes Universitarios y Ganaderos."
     "</div>",
     unsafe_allow_html=True
 )
@@ -193,18 +193,17 @@ except KeyError as err:
     st.error(f"Falta una columna clave en la tabla: {err}.")
     st.stop()
 
-# LÍMITES INTELIGENTES Y FORZADOS: Aseguran presencia de minerales, melaza y grasa de paso
 bounds = []
 for idx, row in df_ingredientes.iterrows():
     nombre = str(row["Nombre del Ingrediente"]).lower()
     if "urea" in nombre:
         bounds.append((0.0, 0.015))    # Urea: 0% a 1.5% máx
     elif "mineral" in nombre or "sal" in nombre:
-        bounds.append((0.01, 0.03))   # Minerales: Mínimo 1% y máximo 3% (Forzado en dieta)
+        bounds.append((0.01, 0.03))   # Minerales: Mínimo 1% y máximo 3%
     elif "grasa" in nombre or "lactomil" in nombre:
-        bounds.append((0.01, 0.03))   # Grasa de paso: Mínimo 1% y máximo 3% (Forzado en dieta)
+        bounds.append((0.01, 0.03))   # Grasa de paso: Mínimo 1% y máximo 3%
     elif "melaza" in nombre:
-        bounds.append((0.02, 0.06))   # Melaza: Mínimo 2% y máximo 6% (Forzado por palatabilidad)
+        bounds.append((0.02, 0.06))   # Melaza: Mínimo 2% y máximo 6%
     else:
         bounds.append((0.0, 1.0))      # Resto de forrajes y concentrados (0% al 100%)
 
@@ -223,7 +222,7 @@ with tab3:
         with col_res1:
             st.metric(label="Costo Óptimo por Tonelada", value=f"${resultado.fun:,.2f} MXN")
         with col_res2:
-            st.metric(label="Estado del Proceso", value="Factible (Máxima Eficiencia) 🟢")
+            st.metric(label="Estado del Processo", value="Factible (Máxima Eficiencia) 🟢")
         
         st.markdown("#### 📋 Tabla de Ingredientes y Mezcla Exacta por Tonelada:")
         st.markdown("Utiliza esta tabla para la carga precisa en la batea o mezcladora:")
