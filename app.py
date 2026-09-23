@@ -74,15 +74,12 @@ raza_seleccionada = st.sidebar.selectbox(
 )
 
 # --- MODELADO PREDICTIVO BIOLÓGICO (ZONA DE RESUMEN) ---
-# Predicción de Consumo de Materia Seca (CMS aprox 2.4% del peso vivo ajustado por clima)
 factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
 cms_estimado = peso_actual * 0.024 * factor_clima
 
-# Días proyectados a meta
 kg_por_ganar = max(0.0, peso_objetivo - peso_actual)
 dias_a_meta = kg_por_ganar / gde if gde > 0 else 0
 
-# Lógica nutricional base por fase y peso
 if peso_actual < 300:
     fase = "Crecimiento (Becerro Ligero)"
     meta_pc_base = 0.150  
@@ -96,7 +93,6 @@ else:
     meta_pc_base = 0.115  
     meta_neg_base = 1.15  
 
-# Factores de ajuste zootécnico según la raza
 if "Británicas" in raza_seleccionada:
     factor_pc = 1.02
     factor_neg = 1.05
@@ -149,9 +145,8 @@ with tab1:
     st.markdown("---")
     st.subheader("📈 Curva de Comportamiento y Proyección de Peso en el Tiempo")
     
-    # Generar tabla de comportamiento temporal (semana a semana hasta la meta)
     semanas = int(np.ceil(dias_a_meta / 7)) if dias_a_meta > 0 else 1
-    semanas = max(semanas, 4) # mínimo 4 semanas para mostrar gráfico decente
+    semanas = max(semanas, 4)
     
     df_proyeccion = pd.DataFrame({
         "Semana": [f"Semana {i}" for i in range(semanas + 1)],
@@ -178,7 +173,7 @@ with tab2:
         key="editor_ingredientes"
     )
 
-# --- 5. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL ---
+# --- 5. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL (CON LÍMITES FLEXIBLES) ---
 try:
     nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
     c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
@@ -188,16 +183,14 @@ except KeyError as err:
     st.error(f"Falta una columna clave en la tabla: {err}.")
     st.stop()
 
+# LÍMITES FLEXIBLES: Libertad total de inclusión (0% a 100%) excepto urea (tope estricto de seguridad)
 bounds = []
 for idx, row in df_ingredientes.iterrows():
     nombre = str(row["Nombre del Ingrediente"]).lower()
-    cat = str(row.get("Categoria", "concentrado")).lower()
     if "urea" in nombre:
-        bounds.append((0.0, 0.012))  # Tope biológico estricto (1.2%)
-    elif "forraje" in cat or "ensilado" in cat or "rastrojo" in nombre:
-        bounds.append((0.15, 0.60))  # Minimum forrage
+        bounds.append((0.0, 0.015))  # Tope biológico de seguridad para urea (1.5%)
     else:
-        bounds.append((0.0, 0.70))   # Concentrados
+        bounds.append((0.0, 1.0))    # Máxima flexibilidad matemática (0% al 100%)
 
 A_eq = np.ones((1, len(c)))
 b_eq = np.array([1.0])
@@ -236,7 +229,6 @@ with tab3:
                     "Aporte al Costo Total ($)": f"${costo_parcial:,.2f}"
                 })
                 
-                # Agrupar para gráfica de pastel
                 cat_ing = str(df_ingredientes.iloc[i].get("Categoria", "Otros"))
                 categorias_pie[cat_ing] = categorias_pie.get(cat_ing, 0) + porcentaje
         
@@ -266,11 +258,11 @@ with tab3:
         st.bar_chart(df_chart)
         
         for i, ingrediente in enumerate(nombres):
-            if "urea" in str(ingrediente).lower() and resultado.x[i] >= 0.0119:
-                st.warning("⚠️ Nota: La urea alcanzó su límite máximo de seguridad biológica (1.2%).")
+            if "urea" in str(ingrediente).lower() and resultado.x[i] >= 0.014:
+                st.warning("⚠️ Nota: La urea alcanzó su límite máximo de seguridad biológica (1.5%).")
     else:
         st.error(
-            "⚠️ **Aviso del Optimizador:** Con los precios actuales o límites estrictos introducidos, no se encontró una solución matemática 100% factible. "
-            "Sin embargo, **las predicciones de parámetros productivos y consumo en la Pestaña 1 siguen vigentes**. "
-            "Revisa los precios de mercado o los rangos analíticos en la pestaña **Catálogo y Lab** para relajar las restricciones."
+            "⚠️ **Aviso del Optimizador:** Con los precios actuales o metas extremas introducidas, no se encontró una solución matemática 100% factible. "
+            "Sin embargo, **las predicciones de parámetros productivos y consumo en la Pestaña 1 siguen vigentes y operativas**. "
+            "Revisa los precios o valores analíticos en la pestaña **Catálogo y Lab**."
         )
