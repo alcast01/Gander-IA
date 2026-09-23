@@ -50,13 +50,14 @@ except Exception:
             "Urea", 
             "Ensilado de maiz", 
             "Canola (pasta)", 
+            "Melaza liquida",
             "Sales Minerales (Cañón de Tlaltenango)", 
             "Grasa de paso Lactomil"
         ],
-        "Categoria": ["Forraje", "Suplemento Proteico", "Grano Energetico", "Suplemento NPN", "Forraje Humedo", "Suplemento Proteico", "Suplemento Mineral", "Suplemento Energetico"],
-        "Precio Estimado (MXN/ton)": [2500.0, 12500.0, 5800.0, 16000.0, 1200.0, 8500.0, 18000.0, 32000.0],
-        "Proteina Cruda (PC % MS)": [5.5, 48.0, 8.5, 281.0, 8.0, 38.0, 0.0, 1.0],
-        "NEg (Mcal/kg)": [0.35, 1.48, 1.55, 0.0, 0.85, 1.15, 0.0, 1.65]
+        "Categoria": ["Forraje", "Suplemento Proteico", "Grano Energetico", "Suplemento NPN", "Forraje Humedo", "Suplemento Proteico", "Subproducto / Energetico", "Suplemento Mineral", "Suplemento Energetico"],
+        "Precio Estimado (MXN/ton)": [2500.0, 12500.0, 5800.0, 16000.0, 1200.0, 8500.0, 4800.0, 18000.0, 32000.0],
+        "Proteina Cruda (PC % MS)": [5.5, 48.0, 8.5, 281.0, 8.0, 38.0, 4.8, 0.0, 1.0],
+        "NEg (Mcal/kg)": [0.35, 1.48, 1.55, 0.0, 0.85, 1.15, 1.22, 0.0, 1.65]
     }
     df_base = pd.DataFrame(data_respaldo)
 
@@ -182,7 +183,7 @@ with tab2:
         key="editor_ingredientes"
     )
 
-# --- 5. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL (CON LÍMITES FISIOLÓGICOS) ---
+# --- 5. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL (CON INCLUSIÓN FORZADA) ---
 try:
     nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
     c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
@@ -192,18 +193,20 @@ except KeyError as err:
     st.error(f"Falta una columna clave en la tabla: {err}.")
     st.stop()
 
-# LÍMITES INTELIGENTES: Control estricto en aditivos/suplementos y grasa restringida al 3%
+# LÍMITES INTELIGENTES Y FORZADOS: Aseguran presencia de minerales, melaza y grasa de paso
 bounds = []
 for idx, row in df_ingredientes.iterrows():
     nombre = str(row["Nombre del Ingrediente"]).lower()
     if "urea" in nombre:
-        bounds.append((0.0, 0.015))  # Tope biológico estricto para urea (1.5%)
+        bounds.append((0.0, 0.015))    # Urea: 0% a 1.5% máx
     elif "mineral" in nombre or "sal" in nombre:
-        bounds.append((0.0, 0.03))   # Tope máximo seguro para sales minerales (3%)
+        bounds.append((0.01, 0.03))   # Minerales: Mínimo 1% y máximo 3% (Forzado en dieta)
     elif "grasa" in nombre or "lactomil" in nombre:
-        bounds.append((0.0, 0.03))   # Tope máximo estricto para grasa de paso (3%)
+        bounds.append((0.01, 0.03))   # Grasa de paso: Mínimo 1% y máximo 3% (Forzado en dieta)
+    elif "melaza" in nombre:
+        bounds.append((0.02, 0.06))   # Melaza: Mínimo 2% y máximo 6% (Forzado por palatabilidad)
     else:
-        bounds.append((0.0, 1.0))    # Flexibilidad completa para forrajes y concentrados (0% al 100%)
+        bounds.append((0.0, 1.0))      # Resto de forrajes y concentrados (0% al 100%)
 
 A_eq = np.ones((1, len(c)))
 b_eq = np.array([1.0])
