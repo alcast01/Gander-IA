@@ -85,7 +85,7 @@ else:
     meta_pc_base = 0.115  
     meta_neg_base = 1.15  
 
-# Factores de ajuste zootécnico según la raza seleccionada en la barra lateral
+# Factores de ajuste zootécnico según la raza
 if "Británicas" in raza_seleccionada:
     factor_pc = 1.02
     factor_neg = 1.05
@@ -99,7 +99,6 @@ else:
     factor_pc = 1.00
     factor_neg = 1.00
 
-# Metas nutricionales finales ajustadas por genética
 meta_pc_min = meta_pc_base * factor_pc
 meta_neg_min = meta_neg_base * factor_neg
 
@@ -168,15 +167,29 @@ with tab3:
         with col_res1:
             st.metric(label="Costo Óptimo por Tonelada", value=f"${resultado.fun:,.2f} MXN")
         with col_res2:
-            st.metric(label="Estado del Proceso", value="Factible 🟢")
+            st.metric(label="Estado del Proceso", value="Factible (Máxima Eficiencia) 🟢")
         
-        st.markdown("#### 📋 Mezcla exacta para la batea (por tonelada):")
+        st.markdown("#### 📋 Tabla de Ingredientes y Mezcla Exacta por Tonelada:")
+        st.markdown("Utiliza esta tabla para la carga en la batea o mezcladora:")
+        
+        # Construcción de la tabla ejecutiva para el ganadero
+        tabla_mezcla = []
         for i, ingrediente in enumerate(nombres):
-            porcentaje = resultado.x[i] * 100
-            kilos = resultado.x[i] * 1000
+            fraccion = resultado.x[i]
+            porcentaje = fraccion * 100
+            kilos = fraccion * 1000
             if porcentaje > 0.01:
-                st.write(f"- **{ingrediente}:** {porcentaje:.1f}% `({kilos:.1f} kg)`")
-                st.progress(float(resultado.x[i]))
+                costo_parcial = fraccion * c[i]
+                tabla_mezcla.append({
+                    "Ingrediente": ingrediente,
+                    "Inclusión (%)": round(porcentaje, 1),
+                    "Kg por Tonelada (1,000 kg)": round(kilos, 2),
+                    "Costo Unitario ($/ton)": f"${c[i]:,.2f}",
+                    "Aporte al Costo Total ($)": f"${costo_parcial:,.2f}"
+                })
+        
+        df_mezcla_final = pd.DataFrame(tabla_mezcla)
+        st.dataframe(df_mezcla_final, use_container_width=True, hide_index=True)
                 
         # --- VISUALIZACIÓN AVANZADA DE DATOS (GRÁFICA) ---
         st.markdown("---")
