@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 from scipy.optimize import linprog
+import plotly.express as px
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL ---
 st.set_page_config(
@@ -27,7 +28,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("🐄 Ganader-IA")
-st.markdown("##### Sistema Inteligente de Optimización y Nutrición Bovina")
+st.markdown("##### Sistema Inteligente de Optimización y Predicción Nutricional Bovina")
 
 # --- 2. CARGA DE LA BASE DE DATOS (CON RESPALDO) ---
 sheet_url = "https://docs.google.com/spreadsheets/d/1FQhA3ldcSJGOtAZLfQr4XA5gPutKULeR-F_eytfq1fY/export?format=csv"
@@ -52,10 +53,11 @@ except Exception:
 
 st.caption(source_status)
 
-# --- 3. CONTROLES GENERALES Y RAZA EN LA BARRA LATERAL ---
+# --- 3. CONTROLES GENERALES Y PARÁMETROS PRODUCTIVOS EN LA BARRA LATERAL ---
 st.sidebar.header("⚙️ Parámetros del Lote")
 peso_actual = st.sidebar.slider("Peso Vivo Actual (kg)", min_value=200.0, max_value=450.0, value=250.0, step=10.0)
-gde = st.sidebar.slider("Ganancia Diaria Esperada (kg/día)", min_value=1.0, max_value=2.0, value=1.4, step=0.1)
+peso_objetivo = st.sidebar.slider("Peso de Venta / Meta (kg)", min_value=450.0, max_value=600.0, value=520.0, step=10.0)
+gde = st.sidebar.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=1.0, max_value=2.0, value=1.4, step=0.1)
 estacion = st.sidebar.selectbox("Temporada / Clima", ["Templado", "Invierno", "Verano"])
 
 st.sidebar.markdown("---")
@@ -70,6 +72,15 @@ raza_seleccionada = st.sidebar.selectbox(
         "Ganado Criollo / Local"
     ]
 )
+
+# --- MODELADO PREDICTIVO BIOLÓGICO (ZONA DE RESUMEN) ---
+# Predicción de Consumo de Materia Seca (CMS aprox 2.4% del peso vivo ajustado por clima)
+factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
+cms_estimado = peso_actual * 0.024 * factor_clima
+
+# Días proyectados a meta
+kg_por_ganar = max(0.0, peso_objetivo - peso_actual)
+dias_a_meta = kg_por_ganar / gde if gde > 0 else 0
 
 # Lógica nutricional base por fase y peso
 if peso_actual < 300:
@@ -102,7 +113,7 @@ else:
 meta_pc_min = meta_pc_base * factor_pc
 meta_neg_min = meta_neg_base * factor_neg
 
-# --- LEYENDA Y CRÉDITOS PROFESIONALES EN EL FIN DE LA BARRA LATERAL ---
+# Créditos profesionales en barra lateral
 st.sidebar.markdown("---")
 st.sidebar.markdown(
     "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px;'>"
@@ -115,22 +126,47 @@ st.sidebar.markdown(
 
 # --- 4. INTERFAZ MODULAR POR PESTAÑAS (3 TABS) ---
 tab1, tab2, tab3 = st.tabs([
-    "📋 1. Resumen del Lote", 
+    "📋 1. Resumen y Predicciones", 
     "🧪 2. Catálogo y Lab", 
     "📊 3. Resultados y Gráficas"
 ])
 
 with tab1:
-    st.subheader("Estado Actual del Lote y Perfil Genético")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Etapa Detectada", fase)
-        st.metric("Peso Vivo", f"{peso_actual:,.0f} kg")
-    with col2:
-        st.metric("Ganancia Esperada", f"{gde} kg/día")
-        st.metric("Genética Seleccionada", raza_seleccionada.split("(")[0].strip())
+    st.subheader("Predicciones de Parámetros Productivos y Crecimiento")
+    st.markdown("Proyecciones biológicas del lote basadas en peso actual, genética y condiciones ambientales:")
     
-    st.info("💡 **Guía:** Configura los parámetros del lote y la predominancia racial en la **barra lateral izquierda**. Ve a la pestaña **Catálogo y Lab** para ajustar precios o análisis de laboratorio.")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Etapa Fisiológica", fase)
+        st.metric("Ganancia Esperada (GDE)", f"{gde} kg/día")
+    with col2:
+        st.metric("Consumo MS Estimado", f"{cms_estimado:.2f} kg/día")
+        st.metric("Días Proyectados a Meta", f"{dias_a_meta:.0f} días")
+    with col3:
+        st.metric("Ganancia Total Esperada", f"{kg_por_ganar:.1f} kg")
+        st.metric("Genética", raza_seleccionada.split("(")[0].strip())
+    
+    st.markdown("---")
+    st.subheader("📈 Curva de Comportamiento y Proyección de Peso en el Tiempo")
+    
+    # Generar tabla de comportamiento temporal (semana a semana hasta la meta)
+    semanas = int(np.ceil(dias_a_meta / 7)) if dias_a_meta > 0 else 1
+    semanas = max(semanas, 4) # mínimo 4 semanas para mostrar gráfico decente
+    
+    df_proyeccion = pd.DataFrame({
+        "Semana": [f"Semana {i}" for i in range(semanas + 1)],
+        "Peso Proyectado (kg)": [min(peso_objetivo, peso_actual + (i * 7 * gde)) for i in range(semanas + 1)]
+    })
+    
+    fig_line = px.line(
+        df_proyeccion, 
+        x="Semana", 
+        y="Peso Proyectado (kg)", 
+        markers=True,
+        title="Trayectoria de Engorda del Lote hacia el Peso Objetivo"
+    )
+    fig_line.update_layout(plot_bgcolor="#ffffff", paper_bgcolor="#ffffff")
+    st.plotly_chart(fig_line, use_container_width=True)
 
 with tab2:
     st.subheader("Gestión de Inventario y Análisis de Laboratorio")
@@ -159,7 +195,7 @@ for idx, row in df_ingredientes.iterrows():
     if "urea" in nombre:
         bounds.append((0.0, 0.012))  # Tope biológico estricto (1.2%)
     elif "forraje" in cat or "ensilado" in cat or "rastrojo" in nombre:
-        bounds.append((0.15, 0.60))  # Mínimo de forraje ruminal
+        bounds.append((0.15, 0.60))  # Minimum forrage
     else:
         bounds.append((0.0, 0.70))   # Concentrados
 
@@ -171,7 +207,7 @@ b_ub = np.array([-meta_pc_min, -meta_neg_min])
 resultado = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
 
 with tab3:
-    st.subheader("Reporte Financiero y Nutricional")
+    st.subheader("Reporte Financiero y Nutricional Optimizado")
     
     if resultado.success:
         col_res1, col_res2 = st.columns(2)
@@ -181,10 +217,11 @@ with tab3:
             st.metric(label="Estado del Proceso", value="Factible (Máxima Eficiencia) 🟢")
         
         st.markdown("#### 📋 Tabla de Ingredientes y Mezcla Exacta por Tonelada:")
-        st.markdown("Utiliza esta tabla para la carga en la batea o mezcladora:")
+        st.markdown("Utiliza esta tabla para la carga precisa en la batea o mezcladora:")
         
-        # Construcción de la tabla ejecutiva para el ganadero
         tabla_mezcla = []
+        categorias_pie = {}
+        
         for i, ingrediente in enumerate(nombres):
             fraccion = resultado.x[i]
             porcentaje = fraccion * 100
@@ -198,11 +235,22 @@ with tab3:
                     "Costo Unitario ($/ton)": f"${c[i]:,.2f}",
                     "Aporte al Costo Total ($)": f"${costo_parcial:,.2f}"
                 })
+                
+                # Agrupar para gráfica de pastel
+                cat_ing = str(df_ingredientes.iloc[i].get("Categoria", "Otros"))
+                categorias_pie[cat_ing] = categorias_pie.get(cat_ing, 0) + porcentaje
         
         df_mezcla_final = pd.DataFrame(tabla_mezcla)
         st.dataframe(df_mezcla_final, use_container_width=True, hide_index=True)
+        
+        # --- GRÁFICA DE PASTEL DE LA COMPOSICIÓN DE LA DIETA ---
+        st.markdown("---")
+        st.subheader("🥧 Composición Porcentual de la Dieta por Categoría de Ingrediente")
+        df_pie = pd.DataFrame(list(categorias_pie.items()), columns=["Categoría", "Porcentaje"])
+        fig_pie = px.pie(df_pie, names="Categoría", values="Porcentaje", hole=0.4, title="Distribución de Insumos en la Mezcla")
+        st.plotly_chart(fig_pie, use_container_width=True)
                 
-        # --- VISUALIZACIÓN AVANZADA DE DATOS (GRÁFICA) ---
+        # --- VISUALIZACIÓN AVANZADA DE DATOS (GRÁFICA DE BARRAS) ---
         st.markdown("---")
         st.subheader("📈 Aportes Nutricionales vs. Requerimientos Raciales Ajustados")
         
@@ -221,4 +269,8 @@ with tab3:
             if "urea" in str(ingrediente).lower() and resultado.x[i] >= 0.0119:
                 st.warning("⚠️ Nota: La urea alcanzó su límite máximo de seguridad biológica (1.2%).")
     else:
-        st.error("No se encontró una solución factible con los parámetros actuales. Revisa los precios o los límites analíticos en la pestaña de Catálogo.")
+        st.error(
+            "⚠️ **Aviso del Optimizador:** Con los precios actuales o límites estrictos introducidos, no se encontró una solución matemática 100% factible. "
+            "Sin embargo, **las predicciones de parámetros productivos y consumo en la Pestaña 1 siguen vigentes**. "
+            "Revisa los precios de mercado o los rangos analíticos en la pestaña **Catálogo y Lab** para relajar las restricciones."
+        )
