@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import linprog
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL PROFESIONAL ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL ---
 st.set_page_config(
     page_title="NutriZacatecas Pro",
     page_icon="🐄",
@@ -11,7 +11,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Estilos CSS limpios para un diseño corporativo
 st.markdown("""
     <style>
     .main {
@@ -59,22 +58,27 @@ peso_actual = st.sidebar.slider("Peso Vivo Actual (kg)", min_value=200.0, max_va
 gde = st.sidebar.slider("Ganancia Diaria Esperada (kg/día)", min_value=1.0, max_value=2.0, value=1.4, step=0.1)
 estacion = st.sidebar.selectbox("Temporada / Clima", ["Templado", "Invierno", "Verano"])
 
-# Lógica nutricional por fase
+# Lógica nutricional base por fase y peso
 if peso_actual < 300:
     fase = "Crecimiento (Becerro Ligero)"
-    meta_pc_min = 0.150  
-    meta_neg_min = 0.88  
+    meta_pc_base = 0.150  
+    meta_neg_base = 0.88  
 elif peso_actual < 380:
     fase = "Desarrollo / Transición"
-    meta_pc_min = 0.135  
-    meta_neg_min = 0.95  
+    meta_pc_base = 0.135  
+    meta_neg_base = 0.95  
 else:
     fase = "Finalización (Engorda Pesada)"
-    meta_pc_min = 0.115  
-    meta_neg_min = 1.15  
+    meta_pc_base = 0.115  
+    meta_neg_base = 1.15  
 
-# --- 4. INTERFAZ MODULAR POR PESTAÑAS (TABS) ---
-tab1, tab2, tab3 = st.tabs(["📋 1. Resumen del Lote", "🧪 2. Catálogo y Laboratorio", "📊 3. Resultados y Gráficas"])
+# --- 4. INTERFAZ MODULAR POR PESTAÑAS (4 TABS) ---
+tab1, tab2, tab3, tab4 = st.tabs([
+    "📋 1. Resumen", 
+    "🧬 2. Raza y Genética", 
+    "🧪 3. Catálogo y Lab", 
+    "📊 4. Resultados"
+])
 
 with tab1:
     st.subheader("Estado Actual del Lote")
@@ -86,11 +90,48 @@ with tab1:
         st.metric("Ganancia Esperada", f"{gde} kg/día")
         st.metric("Temporada", estacion)
     
-    st.info("💡 **Navegación:** Usa la barra lateral izquierda para modificar el peso o la temporada. Ve a la pestaña **Catálogo y Laboratorio** para ajustar precios o análisis de materias primas.")
+    st.info("💡 **Guía:** Configura la predominancia racial en la pestaña **Raza y Genética** para calibrar los requerimientos nutricionales exactos de tu lote.")
 
 with tab2:
+    st.subheader("Selección de Tipo Racial y Requerimientos Específicos")
+    st.markdown("Los perfiles metabólicos varían según la genética. Selecciona la predominancia racial del lote para aplicar los factores de ajuste correspondientes:")
+    
+    raza_seleccionada = st.selectbox(
+        "Predominancia Racial del Ganado",
+        [
+            "Beefmaster / Brangus (Compuestas / Adaptadas)",
+            "Angus / Hereford (Británicas - Alta exigencia energética)",
+            "Charolais / Simmental (Continentales - Alto potencial muscular)",
+            "Cebú / Suizo / Cruzas tropicales (Bos indicus)",
+            "Ganado Criollo / Local"
+        ]
+    )
+    
+    # Factores de ajuste zootécnico según la raza
+    if "Británicas" in raza_seleccionada:
+        factor_pc = 1.02
+        factor_neg = 1.05
+        st.success("🧬 **Perfil Genético (Británico):** Se incrementa un 5% la exigencia de energía neta debido a su propensión natural a depositar grasa de cobertura a menor peso.")
+    elif "Continentales" in raza_seleccionada:
+        factor_pc = 1.05
+        factor_neg = 1.08
+        st.success("🧬 **Perfil Genético (Continental):** Se ajustan los requerimientos al alza (+8% energía, +5% proteína) para soportar su alto potencial de ganancia muscular magra.")
+    elif "Bos indicus" in raza_seleccionada:
+        factor_pc = 0.98
+        factor_neg = 0.93
+        st.success("🧬 **Perfil Genético (Cebuíno / Tropical):** Se aplica una ligera modulación (-7% energía de mantenimiento) acorde a su menor tasa metabólica basal.")
+    else:
+        factor_pc = 1.00
+        factor_neg = 1.00
+        st.success("🧬 **Perfil Genético (Compuesto / Local):** Se mantienen los estándares nutricionales de referencia base.")
+
+# Aplicación final de los factores raciales sobre las metas nutricionales
+meta_pc_min = meta_pc_base * factor_pc
+meta_neg_min = meta_neg_base * factor_neg
+
+with tab3:
     st.subheader("Gestión de Inventario y Análisis de Laboratorio")
-    st.markdown("Modifica precios o valores analíticos específicos de tu laboratorio local en tiempo real:")
+    st.markdown("Modifica precios o valores analíticos específicos de tus materias primas en tiempo real:")
     df_ingredientes = st.data_editor(
         df_base, 
         num_rows="dynamic", 
@@ -126,7 +167,7 @@ b_ub = np.array([-meta_pc_min, -meta_neg_min])
 
 resultado = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
 
-with tab3:
+with tab4:
     st.subheader("Reporte Financiero y Nutricional")
     
     if resultado.success:
@@ -144,9 +185,9 @@ with tab3:
                 st.write(f"- **{ingrediente}:** {porcentaje:.1f}% `({kilos:.1f} kg)`")
                 st.progress(float(resultado.x[i]))
                 
-        # --- VISUALIZACIÓN AVANZADA DE DATOS (GRÁFICA INTERACTIVA) ---
+        # --- VISUALIZACIÓN AVANZADA DE DATOS (GRÁFICA) ---
         st.markdown("---")
-        st.subheader("📈 Aportes Nutricionales vs. Requerimientos Mínimos")
+        st.subheader("📈 Aportes Nutricionales vs. Requerimientos Raciales Ajustados")
         
         aporte_pc = np.sum(resultado.x * pc) * 100
         aporte_neg = np.sum(resultado.x * neg)
@@ -154,7 +195,7 @@ with tab3:
         df_chart = pd.DataFrame({
             "Parámetro Nutricional": ["Proteína Cruda (%)", "Energía Neta (Mcal/kg)"],
             "Aporte de la Dieta": [aporte_pc, aporte_neg],
-            "Requerimiento Mínimo": [meta_pc_min * 100, meta_neg_min]
+            "Requerimiento Ajustado": [meta_pc_min * 100, meta_neg_min]
         }).set_index("Parámetro Nutricional")
         
         st.bar_chart(df_chart)
@@ -163,4 +204,4 @@ with tab3:
             if "urea" in str(ingrediente).lower() and resultado.x[i] >= 0.0119:
                 st.warning("⚠️ Nota: La urea alcanzó su límite máximo de seguridad biológica (1.2%).")
     else:
-        st.error("No se encontró una solución factible con los parámetros actuales. Revisa los precios o los límites analíticos en la pestaña 2.")
+        st.error("No se encontró una solución factible con los parámetros actuales. Revisa los precios o los límites analíticos en la pestaña de Catálogo.")
