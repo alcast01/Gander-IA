@@ -30,7 +30,7 @@ st.markdown("""
 st.title("🐄 Ganader-IA")
 st.markdown("##### Sistema Inteligente de Optimización y Predicción Nutricional Bovina")
 
-# --- 2. CARGA DE LA BASE DE DATOS (CON RESPALDO) ---
+# --- 2. CARGA DE LA BASE DE DATOS (CON INSUMOS REGIONALES Y DE PASO) ---
 sheet_url = "https://docs.google.com/spreadsheets/d/1FQhA3ldcSJGOtAZLfQr4XA5gPutKULeR-F_eytfq1fY/export?format=csv"
 
 @st.cache_data(ttl=10)
@@ -43,11 +43,20 @@ try:
 except Exception:
     source_status = "⚠️ Usando base de datos local de emergencia"
     data_respaldo = {
-        "Nombre del Ingrediente": ["Rastrojo de maiz", "Harina de soya", "Grano de maiz", "Urea", "Ensilado de maiz", "Pasta de canola"],
-        "Categoria": ["Forraje", "Concentrado", "Concentrado", "Suplemento", "Ensilado", "Concentrado"],
-        "Precio Estimado (MXN/ton)": [2500.0, 12500.0, 5800.0, 16000.0, 1200.0, 8500.0],
-        "Proteina Cruda (PC % MS)": [4.675, 42.72, 7.31, 278.1, 2.8, 33.82],
-        "NEg (Mcal/kg)": [0.2975, 1.3172, 1.333, 0.0, 0.2975, 1.0235]
+        "Nombre del Ingrediente": [
+            "Rastrojo de maiz", 
+            "Harina de soya", 
+            "Grano de maiz", 
+            "Urea", 
+            "Ensilado de maiz", 
+            "Pasta de canola", 
+            "Sales Minerales (Cañón de Tlaltenango)", 
+            "Grasa de paso Lactomil"
+        ],
+        "Categoria": ["Forraje", "Concentrado", "Concentrado", "Suplemento", "Ensilado", "Concentrado", "Suplemento", "Suplemento"],
+        "Precio Estimado (MXN/ton)": [2500.0, 12500.0, 5800.0, 16000.0, 1200.0, 8500.0, 18000.0, 32000.0],
+        "Proteina Cruda (PC % MS)": [4.675, 42.72, 7.31, 278.1, 2.8, 33.82, 0.0, 1.0],
+        "NEg (Mcal/kg)": [0.2975, 1.3172, 1.333, 0.0, 0.2975, 1.0235, 0.0, 1.65]
     }
     df_base = pd.DataFrame(data_respaldo)
 
@@ -173,7 +182,7 @@ with tab2:
         key="editor_ingredientes"
     )
 
-# --- 5. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL (CON LÍMITES FLEXIBLES) ---
+# --- 5. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL (CON LÍMITES FISIOLÓGICOS) ---
 try:
     nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
     c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
@@ -183,14 +192,18 @@ except KeyError as err:
     st.error(f"Falta una columna clave en la tabla: {err}.")
     st.stop()
 
-# LÍMITES FLEXIBLES: Libertad total de inclusión (0% a 100%) excepto urea (tope estricto de seguridad)
+# LÍMITES INTELIGENTES: Control estricto en aditivos/suplementos y grasa restringida al 3%
 bounds = []
 for idx, row in df_ingredientes.iterrows():
     nombre = str(row["Nombre del Ingrediente"]).lower()
     if "urea" in nombre:
-        bounds.append((0.0, 0.015))  # Tope biológico de seguridad para urea (1.5%)
+        bounds.append((0.0, 0.015))  # Tope biológico estricto para urea (1.5%)
+    elif "mineral" in nombre or "sal" in nombre:
+        bounds.append((0.0, 0.03))   # Tope máximo seguro para sales minerales (3%)
+    elif "grasa" in nombre or "lactomil" in nombre:
+        bounds.append((0.0, 0.03))   # Tope máximo estricto para grasa de paso (3%)
     else:
-        bounds.append((0.0, 1.0))    # Máxima flexibilidad matemática (0% al 100%)
+        bounds.append((0.0, 1.0))    # Flexibilidad completa para forrajes y concentrados (0% al 100%)
 
 A_eq = np.ones((1, len(c)))
 b_eq = np.array([1.0])
@@ -258,8 +271,13 @@ with tab3:
         st.bar_chart(df_chart)
         
         for i, ingrediente in enumerate(nombres):
-            if "urea" in str(ingrediente).lower() and resultado.x[i] >= 0.014:
+            ing_lower = str(ingrediente).lower()
+            if "urea" in ing_lower and resultado.x[i] >= 0.014:
                 st.warning("⚠️ Nota: La urea alcanzó su límite máximo de seguridad biológica (1.5%).")
+            elif ("mineral" in ing_lower or "sal" in ing_lower) and resultado.x[i] >= 0.029:
+                st.warning("⚠️ Nota: Las sales minerales alcanzaron su límite máximo recomendado (3%).")
+            elif ("grasa" in ing_lower or "lactomil" in ing_lower) and resultado.x[i] >= 0.029:
+                st.warning("⚠️ Nota: La grasa de paso alcanzó su límite máximo restringido (3%).")
     else:
         st.error(
             "⚠️ **Aviso del Optimizador:** Con los precios actuales o metas extremas introducidas, no se encontró una solución matemática 100% factible. "
