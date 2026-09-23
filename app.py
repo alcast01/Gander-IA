@@ -5,7 +5,7 @@ from scipy.optimize import linprog
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL ---
 st.set_page_config(
-    page_title="NutriZacatecas Pro",
+    page_title="Ganader-IA",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -26,7 +26,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🐄 NutriZacatecas Pro")
+st.title("🐄 Ganader-IA")
 st.markdown("##### Sistema Inteligente de Optimización y Nutrición Bovina")
 
 # --- 2. CARGA DE LA BASE DE DATOS (CON RESPALDO) ---
@@ -52,11 +52,24 @@ except Exception:
 
 st.caption(source_status)
 
-# --- 3. CONTROLES GENERALES (BARRA LATERAL) ---
+# --- 3. CONTROLES GENERALES Y RAZA EN LA BARRA LATERAL ---
 st.sidebar.header("⚙️ Parámetros del Lote")
 peso_actual = st.sidebar.slider("Peso Vivo Actual (kg)", min_value=200.0, max_value=450.0, value=250.0, step=10.0)
 gde = st.sidebar.slider("Ganancia Diaria Esperada (kg/día)", min_value=1.0, max_value=2.0, value=1.4, step=0.1)
 estacion = st.sidebar.selectbox("Temporada / Clima", ["Templado", "Invierno", "Verano"])
+
+st.sidebar.markdown("---")
+st.sidebar.header("🧬 Genética y Raza")
+raza_seleccionada = st.sidebar.selectbox(
+    "Predominancia Racial",
+    [
+        "Compuestas / Adaptadas (Beefmaster/Brangus)",
+        "Británicas (Angus/Hereford)",
+        "Continentales (Charolais/Simmental)",
+        "Cebú / Tropicales (Bos indicus)",
+        "Ganado Criollo / Local"
+    ]
+)
 
 # Lógica nutricional base por fase y peso
 if peso_actual < 300:
@@ -72,64 +85,44 @@ else:
     meta_pc_base = 0.115  
     meta_neg_base = 1.15  
 
-# --- 4. INTERFAZ MODULAR POR PESTAÑAS (4 TABS) ---
-tab1, tab2, tab3, tab4 = st.tabs([
-    "📋 1. Resumen", 
-    "🧬 2. Raza y Genética", 
-    "🧪 3. Catálogo y Lab", 
-    "📊 4. Resultados"
+# Factores de ajuste zootécnico según la raza seleccionada en la barra lateral
+if "Británicas" in raza_seleccionada:
+    factor_pc = 1.02
+    factor_neg = 1.05
+elif "Continentales" in raza_seleccionada:
+    factor_pc = 1.05
+    factor_neg = 1.08
+elif "Cebú" in raza_seleccionada:
+    factor_pc = 0.98
+    factor_neg = 0.93
+else:
+    factor_pc = 1.00
+    factor_neg = 1.00
+
+# Metas nutricionales finales ajustadas por genética
+meta_pc_min = meta_pc_base * factor_pc
+meta_neg_min = meta_neg_base * factor_neg
+
+# --- 4. INTERFAZ MODULAR POR PESTAÑAS (3 TABS) ---
+tab1, tab2, tab3 = st.tabs([
+    "📋 1. Resumen del Lote", 
+    "🧪 2. Catálogo y Lab", 
+    "📊 3. Resultados y Gráficas"
 ])
 
 with tab1:
-    st.subheader("Estado Actual del Lote")
+    st.subheader("Estado Actual del Lote y Perfil Genético")
     col1, col2 = st.columns(2)
     with col1:
         st.metric("Etapa Detectada", fase)
         st.metric("Peso Vivo", f"{peso_actual:,.0f} kg")
     with col2:
         st.metric("Ganancia Esperada", f"{gde} kg/día")
-        st.metric("Temporada", estacion)
+        st.metric("Genética Seleccionada", raza_seleccionada.split("(")[0].strip())
     
-    st.info("💡 **Guía:** Configura la predominancia racial en la pestaña **Raza y Genética** para calibrar los requerimientos nutricionales exactos de tu lote.")
+    st.info("💡 **Guía:** Configura los parámetros del lote y la predominancia racial en la **barra lateral izquierda**. Ve a la pestaña **Catálogo y Lab** para ajustar precios o análisis de laboratorio.")
 
 with tab2:
-    st.subheader("Selección de Tipo Racial y Requerimientos Específicos")
-    st.markdown("Los perfiles metabólicos varían según la genética. Selecciona la predominancia racial del lote para aplicar los factores de ajuste correspondientes:")
-    
-    raza_seleccionada = st.selectbox(
-        "Predominancia Racial del Ganado",
-        [
-            "Beefmaster / Brangus (Compuestas / Adaptadas)",
-            "Angus / Hereford (Británicas - Alta exigencia energética)",
-            "Charolais / Simmental (Continentales - Alto potencial muscular)",
-            "Cebú / Suizo / Cruzas tropicales (Bos indicus)",
-            "Ganado Criollo / Local"
-        ]
-    )
-    
-    # Factores de ajuste zootécnico según la raza
-    if "Británicas" in raza_seleccionada:
-        factor_pc = 1.02
-        factor_neg = 1.05
-        st.success("🧬 **Perfil Genético (Británico):** Se incrementa un 5% la exigencia de energía neta debido a su propensión natural a depositar grasa de cobertura a menor peso.")
-    elif "Continentales" in raza_seleccionada:
-        factor_pc = 1.05
-        factor_neg = 1.08
-        st.success("🧬 **Perfil Genético (Continental):** Se ajustan los requerimientos al alza (+8% energía, +5% proteína) para soportar su alto potencial de ganancia muscular magra.")
-    elif "Bos indicus" in raza_seleccionada:
-        factor_pc = 0.98
-        factor_neg = 0.93
-        st.success("🧬 **Perfil Genético (Cebuíno / Tropical):** Se aplica una ligera modulación (-7% energía de mantenimiento) acorde a su menor tasa metabólica basal.")
-    else:
-        factor_pc = 1.00
-        factor_neg = 1.00
-        st.success("🧬 **Perfil Genético (Compuesto / Local):** Se mantienen los estándares nutricionales de referencia base.")
-
-# Aplicación final de los factores raciales sobre las metas nutricionales
-meta_pc_min = meta_pc_base * factor_pc
-meta_neg_min = meta_neg_base * factor_neg
-
-with tab3:
     st.subheader("Gestión de Inventario y Análisis de Laboratorio")
     st.markdown("Modifica precios o valores analíticos específicos de tus materias primas en tiempo real:")
     df_ingredientes = st.data_editor(
@@ -167,7 +160,7 @@ b_ub = np.array([-meta_pc_min, -meta_neg_min])
 
 resultado = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
 
-with tab4:
+with tab3:
     st.subheader("Reporte Financiero y Nutricional")
     
     if resultado.success:
