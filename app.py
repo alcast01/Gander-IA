@@ -1,3 +1,12 @@
+Aquí tienes el código actualizado con la leyenda profesional integrada en la barra lateral, otorgándole el respaldo de tu autoría y perfil especializado para los usuarios y clientes del software.
+
+---
+
+### Código Actualizado para `app.py` (`Ganader-IA` con Créditos y Perfil Profesional)
+
+Sustituye todo el contenido de tu archivo `app.py` en GitHub por esta versión definitiva:
+
+```python
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -101,6 +110,17 @@ else:
 
 meta_pc_min = meta_pc_base * factor_pc
 meta_neg_min = meta_neg_base * factor_neg
+
+# --- LEYENDA Y CRÉDITOS PROFESIONALES EN EL FIN DE LA BARRA LATERAL ---
+st.sidebar.markdown("---")
+st.sidebar.markdown(
+    "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px;'>"
+    "<b>Ganader-IA</b><br>"
+    "Herramienta de nutrición animal creada por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
+    "Desarrollada para Nutriólogos Veterinarios, Técnicos en Nutrición Animal y Ganaderos."
+    "</div>",
+    unsafe_allow_html=True
+)
 
 # --- 4. INTERFAZ MODULAR POR PESTAÑAS (3 TABS) ---
 tab1, tab2, tab3 = st.tabs([
@@ -211,3 +231,7 @@ with tab3:
                 st.warning("⚠️ Nota: La urea alcanzó su límite máximo de seguridad biológica (1.2%).")
     else:
         st.error("No se encontró una solución factible con los parámetros actuales. Revisa los precios o los límites analíticos en la pestaña de Catálogo.")
+
+```
+
+Actualiza este código en GitHub y tu aplicación quedará lista con identidad de marca, control dinámico de inventarios de laboratorio, ajuste por razas, tabla ejecutiva de mezcla y tu autoría profesional visible. ¡Un software robusto y listo para operar!
