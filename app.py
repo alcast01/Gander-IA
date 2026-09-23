@@ -1,12 +1,3 @@
-Aquí tienes el código actualizado con la leyenda profesional integrada en la barra lateral, otorgándole el respaldo de tu autoría y perfil especializado para los usuarios y clientes del software.
-
----
-
-### Código Actualizado para `app.py` (`Ganader-IA` con Créditos y Perfil Profesional)
-
-Sustituye todo el contenido de tu archivo `app.py` en GitHub por esta versión definitiva:
-
-```python
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -231,7 +222,3 @@ with tab3:
                 st.warning("⚠️ Nota: La urea alcanzó su límite máximo de seguridad biológica (1.2%).")
     else:
         st.error("No se encontró una solución factible con los parámetros actuales. Revisa los precios o los límites analíticos en la pestaña de Catálogo.")
-
-```
-
-Actualiza este código en GitHub y tu aplicación quedará lista con identidad de marca, control dinámico de inventarios de laboratorio, ajuste por razas, tabla ejecutiva de mezcla y tu autoría profesional visible. ¡Un software robusto y listo para operar!
