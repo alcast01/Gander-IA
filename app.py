@@ -30,8 +30,8 @@ st.markdown("""
 st.title("🐄 Ganader-IA")
 st.markdown("##### Sistema Inteligente de Optimización y Predicción Nutricional Bovina")
 
-# --- 2. CARGA DE LA BASE DE DATOS (CON INSUMOS REGIONALES Y DE PASO) ---
-sheet_url = "https://docs.google.com/spreadsheets/d/1FQhA3ldcSJGOtAZLfQr4XA5gPutKULeR-F_eytfq1fY/export?format=csv"
+# --- 2. CARGA DE LA BASE DE DATOS DESDE GOOGLE SHEETS (V4) ---
+sheet_url = "https://docs.google.com/spreadsheets/d/1yCuTmDi1wEzdeMHoAbuxMewwo0Pe1neyjntMgAhMzhA/export?format=csv"
 
 @st.cache_data(ttl=10)
 def cargar_datos(url):
@@ -39,24 +39,24 @@ def cargar_datos(url):
 
 try:
     df_base = cargar_datos(sheet_url)
-    source_status = "☁️ Conectado a Google Sheets (En vivo)"
+    source_status = "☁️ Conectado a Google Sheets (Base V4 en Vivo)"
 except Exception:
     source_status = "⚠️ Usando base de datos local de emergencia"
     data_respaldo = {
         "Nombre del Ingrediente": [
-            "Rastrojo de maiz", 
+            "Rastrojo de maiz molido", 
             "Harina de soya", 
-            "Grano de maiz", 
+            "Grano de maiz molido", 
             "Urea", 
             "Ensilado de maiz", 
-            "Pasta de canola", 
+            "Canola (pasta)", 
             "Sales Minerales (Cañón de Tlaltenango)", 
             "Grasa de paso Lactomil"
         ],
-        "Categoria": ["Forraje", "Concentrado", "Concentrado", "Suplemento", "Ensilado", "Concentrado", "Suplemento", "Suplemento"],
+        "Categoria": ["Forraje", "Suplemento Proteico", "Grano Energetico", "Suplemento NPN", "Forraje Humedo", "Suplemento Proteico", "Suplemento Mineral", "Suplemento Energetico"],
         "Precio Estimado (MXN/ton)": [2500.0, 12500.0, 5800.0, 16000.0, 1200.0, 8500.0, 18000.0, 32000.0],
-        "Proteina Cruda (PC % MS)": [4.675, 42.72, 7.31, 278.1, 2.8, 33.82, 0.0, 1.0],
-        "NEg (Mcal/kg)": [0.2975, 1.3172, 1.333, 0.0, 0.2975, 1.0235, 0.0, 1.65]
+        "Proteina Cruda (PC % MS)": [5.5, 48.0, 8.5, 281.0, 8.0, 38.0, 0.0, 1.0],
+        "NEg (Mcal/kg)": [0.35, 1.48, 1.55, 0.0, 0.85, 1.15, 0.0, 1.65]
     }
     df_base = pd.DataFrame(data_respaldo)
 
