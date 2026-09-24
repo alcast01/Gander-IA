@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from fpdf import FPDF
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO VANGUARDISTA ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO VANGUARDISTA SAAS ---
 st.set_page_config(
     page_title="Ganader-IA Elite 360 | Nutrición y Alta Rentabilidad",
     page_icon="🐄",
@@ -17,81 +17,101 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
     html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif !important;
-        color: #1f2421;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        color: #0f172a;
     }
     
     .main {
-        background-color: #f8f6f0;
+        background-color: #f8fafc;
     }
     
-    /* Tarjetas de Métricas Optimizadas para Ajuste Perfecto */
+    /* Tarjetas de Métricas Estilo Neo-AgTech SaaS */
     .stMetric {
-        background: linear-gradient(145deg, #ffffff 0%, #fcfbf9 100%);
-        padding: 8px 10px !important;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(45, 90, 39, 0.07);
-        border-left: 4px solid #2d5a27;
-        border-top: 1px solid #eae5df;
-        border-right: 1px solid #eae5df;
-        border-bottom: 1px solid #eae5df;
-        margin-bottom: 6px !important;
-        transition: transform 0.2s ease;
+        background: #ffffff;
+        padding: 12px 14px !important;
+        border-radius: 14px;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+        border: 1px solid #e2e8f0;
+        border-left: 5px solid #059669;
+        margin-bottom: 8px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden;
     }
     
     .stMetric:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(45, 90, 39, 0.12);
+        transform: translateY(-3px);
+        box-shadow: 0 20px 30px -10px rgba(5, 150, 105, 0.12);
+        border-color: #059669;
     }
     
     .stMetric label {
-        font-size: 0.68rem !important;
-        color: #555555 !important;
-        font-weight: 600 !important;
+        font-size: 0.7rem !important;
+        color: #64748b !important;
+        font-weight: 700 !important;
         text-transform: uppercase;
-        letter-spacing: 0.3px;
+        letter-spacing: 0.8px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
     
     .stMetric [data-testid="stMetricValue"] {
-        font-size: 0.92rem !important;
-        color: #1f2421 !important;
-        font-weight: 700 !important;
+        font-size: 1.05rem !important;
+        color: #0f172a !important;
+        font-weight: 800 !important;
         word-break: break-word;
     }
     
     h1, h2, h3, h4 {
-        color: #1f2421;
-        font-family: 'Inter', sans-serif !important;
+        color: #0f172a;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
         font-weight: 700;
+        letter-spacing: -0.5px;
     }
 
     p, span, label {
-        font-family: 'Inter', sans-serif !important;
-        color: #333333;
-        line-height: 1.5;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        color: #334155;
+        line-height: 1.6;
+    }
+    
+    /* Estilización de pestañas */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: #f1f5f9;
+        padding: 6px;
+        border-radius: 12px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 8px;
+        font-weight: 600;
+        color: #475569;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background-color: #ffffff !important;
+        color: #059669 !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
     </style>
 """, unsafe_allow_html=True)
 
 # --- 2. LOGOTIPO Y ENCABEZADO COMERCIAL DE ALTO IMPACTO ---
 st.markdown("""
-    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #1b4332 0%, #2d5a27 50%, #bc6c25 100%); padding: 22px; border-radius: 16px; box-shadow: 0 8px 25px rgba(27,67,50,0.25); margin-bottom: 20px; color: white; flex-wrap: wrap; gap: 15px;">
-        <div style="flex-shrink: 0; background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; backdrop-filter: blur(5px);">
-            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #0f172a 0%, #064e3b 50%, #059669 100%); padding: 26px; border-radius: 20px; box-shadow: 0 20px 35px -10px rgba(6,78,59,0.3); margin-bottom: 24px; color: white; flex-wrap: wrap; gap: 18px;">
+        <div style="flex-shrink: 0; background: rgba(255, 255, 255, 0.12); padding: 12px; border-radius: 16px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="#ffffff"/>
-                <circle cx="12" cy="12" r="3" fill="#dda15e"/>
+                <circle cx="12" cy="12" r="3" fill="#fbbf24"/>
             </svg>
         </div>
         <div style="flex-grow: 1; min-width: 220px;">
-            <h1 style="margin: 0; font-size: 1.85em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.55em; vertical-align: middle; font-weight: 800;">ELITE 360</span></h1>
-            <p style="margin: 4px 0 0 0; font-size: 0.9em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Plataforma SaaS de Precisión Nutricional, Economía y Sostenibilidad Pecuaria</p>
+            <h1 style="margin: 0; font-size: 1.9em; color: #ffffff; letter-spacing: -0.5px; font-family: 'Plus Jakarta Sans', sans-serif;">Ganader-IA <span style="background-color: #fbbf24; color: #0f172a; padding: 2px 10px; border-radius: 8px; font-size: 0.55em; vertical-align: middle; font-weight: 800; letter-spacing: 0.5px;">ELITE 360</span></h1>
+            <p style="margin: 6px 0 0 0; font-size: 0.92em; color: #e2e8f0; font-weight: 400; font-family: 'Plus Jakarta Sans', sans-serif;">Plataforma SaaS de Precisión Nutricional, Economía y Sostenibilidad Pecuaria</p>
         </div>
     </div>
 """, unsafe_allow_html=True)
@@ -280,7 +300,7 @@ meta_neg_min = meta_neg_base * factor_neg * factor_sexo_neg * factor_marco * fac
 
 st.sidebar.markdown("---")
 st.sidebar.markdown(
-    "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px; font-family: Inter, sans-serif;'>"
+    "<div style='text-align: center; color: #64748b; font-size: 0.85em; padding: 5px; font-family: Plus Jakarta Sans, sans-serif;'>"
     "<b>Ganader-IA Elite 360</b><br>"
     "Creado por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
     "SaaS de Nutrición, Precisión y Sostenibilidad."
@@ -330,11 +350,11 @@ with tab1:
         lista_cms.append(round(cms_proy, 2))
     
     fig_comportamiento = make_subplots(specs=[[{"secondary_y": True}]])
-    fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_pesos, name="Peso Proyectado (kg)", mode="lines+markers", line=dict(color="#2d5a27", width=3.5)), secondary_y=False)
-    fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_cms, name="Consumo Materia Seca (kg/día)", mode="lines+markers", line=dict(color="#bc6c25", width=3, dash="dash")), secondary_y=True)
-    fig_comportamiento.update_layout(title=dict(text=f"Dinámica de Engorda ({perfil_aa[:18]} | GDE: {gde} kg/d)", font=dict(family="Inter", size=13), x=0.5), plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Inter", color="#2b2d42"), legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5), margin=dict(l=20, r=20, t=60, b=70))
-    fig_comportamiento.update_yaxes(title_text="<b>Peso Vivo del Animal (kg)</b>", secondary_y=False, color="#2d5a27")
-    fig_comportamiento.update_yaxes(title_text="<b>Consumo de Materia Seca (kg/día)</b>", secondary_y=True, color="#bc6c25")
+    fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_pesos, name="Peso Proyectado (kg)", mode="lines+markers", line=dict(color="#059669", width=3.5)), secondary_y=False)
+    fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_cms, name="Consumo Materia Seca (kg/día)", mode="lines+markers", line=dict(color="#d97706", width=3, dash="dash")), secondary_y=True)
+    fig_comportamiento.update_layout(title=dict(text=f"Dinámica de Engorda ({perfil_aa[:18]} | GDE: {gde} kg/d)", font=dict(family="Plus Jakarta Sans", size=13), x=0.5), plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Plus Jakarta Sans", color="#0f172a"), legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5), margin=dict(l=20, r=20, t=60, b=70))
+    fig_comportamiento.update_yaxes(title_text="<b>Peso Vivo del Animal (kg)</b>", secondary_y=False, color="#059669")
+    fig_comportamiento.update_yaxes(title_text="<b>Consumo de Materia Seca (kg/día)</b>", secondary_y=True, color="#d97706")
     st.plotly_chart(fig_comportamiento, use_container_width=True)
 
 with tab2:
@@ -667,9 +687,9 @@ with tab4:
         st.markdown("---")
         st.subheader("🥧 Composición Porcentual de la Dieta por Categoría")
         df_pie = pd.DataFrame(list(categorias_pie.items()), columns=["Categoría", "Porcentaje"])
-        colores_campo = ['#1b4332', '#2d5a27', '#bc6c25', '#dda15e', '#606c38', '#e76f51']
+        colores_campo = ['#0f172a', '#059669', '#d97706', '#fbbf24', '#3b82f6', '#ec4899']
         fig_pie = px.pie(df_pie, names="Categoría", values="Porcentaje", hole=0.4, title="Distribución de Insumos Seleccionados en la Mezcla", color_discrete_sequence=colores_campo)
-        fig_pie.update_layout(font=dict(family="Inter", color="#2b2d42"))
+        fig_pie.update_layout(font=dict(family="Plus Jakarta Sans", color="#0f172a"))
         st.plotly_chart(fig_pie, use_container_width=True)
     else:
         st.warning("⚠️ Genere un balance factible en la Pestaña 3 para desbloquear los cálculos económicos y el Reporte PDF.")
