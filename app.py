@@ -108,8 +108,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y PLANES DE SUSCRIPCIÓN (+20%) ---
-USERS_FILE = "usuarios_ganaderia_elite_planes_uniform.json"
+# --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y PLANES DE SUSCRIPCIÓN COMERCIALES (+40%) ---
+USERS_FILE = "usuarios_ganaderia_elite_planes_40pc.json"
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -126,14 +126,14 @@ def cargar_usuarios_persistentes():
             "password": hash_password("1234"),
             "email": "admin@ganaderiaelite.com",
             "subscription_active": True,
-            "plan": "Anual (12 Meses) - $5,400 MXN",
+            "plan": "Anual (12 Meses) - $7,560 MXN | $630.00/mes (⭐ Ahorro Total de $378.00/mes y 37.5% vs. Trimestral)",
             "fecha_registro": "2026-01-01"
         },
         "alejandro": {
             "password": hash_password("elite360"),
             "email": "alejandro.castaneda@ganaderiaelite.com",
             "subscription_active": True,
-            "plan": "Anual (12 Meses) - $5,400 MXN",
+            "plan": "Anual (12 Meses) - $7,560 MXN | $630.00/mes (⭐ Ahorro Total de $378.00/mes y 37.5% vs. Trimestral)",
             "fecha_registro": "2026-01-01"
         }
     }
@@ -202,15 +202,15 @@ if not st.session_state.authenticated:
                 st.error("Usuario o contraseña incorrectos. Verifica tus datos.")
 
     with tab_register:
-        st.markdown("### 🌟 Selección de Plan y Alta de Cuenta")
-        st.markdown("Elige el esquema de suscripción que mejor se adapte a la escala productiva de tu rancho:")
+        st.markdown("### 🌟 Inversión Estratégica para tu Rancho")
+        st.markdown("Selecciona el periodo que mejor se alinee con tu ciclo biológico y comercial. **Asegura el máximo rendimiento con el Plan Anual:**")
         
         plan_elegido = st.radio(
-            "Planes de Suscripción Elite:",
+            "Planes de Suscripción Elite Disponibles:",
             [
-                "Trimestral (3 Meses) - $2,160 MXN",
-                "Semestral (6 Meses) - $3,000 MXN",
-                "Anual (12 Meses) - $5,400 MXN"
+                "Trimestral (3 Meses) - $3,024 MXN | $1,008.00/mes (Tarifa Estándar)",
+                "Semestral (6 Meses) - $4,200 MXN | $700.00/mes (Ahorro de $308.00/mes vs. Trimestral)",
+                "Anual (12 Meses) - $7,560 MXN | $630.00/mes (⭐ Ahorro Total de $378.00/mes y 37.5% vs. Trimestral)"
             ],
             index=2
         )
@@ -238,11 +238,11 @@ if not st.session_state.authenticated:
         st.markdown("")
         
         if "Trimestral" in plan_elegido:
-            costo_str = "$2,160 MXN"
+            costo_str = "$3,024 MXN"
         elif "Semestral" in plan_elegido:
-            costo_str = "$3,000 MXN"
+            costo_str = "$4,200 MXN"
         else:
-            costo_str = "$5,400 MXN"
+            costo_str = "$7,560 MXN"
         
         if st.button(f"💳 Pagar {costo_str} y Activar Licencia Elite", use_container_width=True):
             db_usuarios = cargar_usuarios_persistentes()
@@ -750,7 +750,6 @@ with tab1:
         lista_pesos.append(peso_proy)
         lista_cms.append(round(cms_proy, 2))
     
-    # Gráfica Plotly con tipografía uniforme Calibri
     fig_comportamiento = make_subplots(specs=[[{"secondary_y": True}]])
     fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_pesos, name="Peso Proyectado (kg)", mode="lines+markers", line=dict(color="#059669", width=3.5)), secondary_y=False)
     fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_cms, name="Consumo Materia Seca (kg/día)", mode="lines+markers", line=dict(color="#d97706", width=3, dash="dash")), secondary_y=True)
@@ -1015,7 +1014,6 @@ with tab5:
     
     df_pivot = df_simulacion.pivot(index="Peso Compra (kg)", columns="Peso Venta (kg)", values="Utilidad Neta (MXN)")
     
-    # Mapa de calor con tipografía unificada Calibri
     fig_heat = px.imshow(
         df_pivot, 
         labels=dict(x="Peso Venta al Mercado (kg)", y="Peso Compra del Becerro (kg)", color="Utilidad ($)"),
