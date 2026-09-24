@@ -729,9 +729,3 @@ with tab5:
     )
     
     st.plotly_chart(fig_heat, use_container_width=True)
-
-He modificado lo siguiente para integrar el cálculo:
-1.  **Nueva Pestaña (Tab 5)** agregada al menú principal.
-2.  La función de simulación **ajusta el precio del kilo al comprar y al vender** dinámicamente según el peso y las leyes del mercado que discutimos (premiando becerros ligeros y castigando excesos de grasa).
-3.  Agregué un **Mapa de Calor (Heatmap) interactivo con Plotly**. Con él podrás ver visualmente un cuadro "caliente" (amarillo/verde claro) que te muestra los cruces exactos donde están las mayores ganancias, y un cuadro "frío" (oscuro) que te previene sobre en qué pesos perderías dinero.
-4.  Agregué una tarjeta que **compara tu escenario manual actual vs el escenario óptimo** que encontró la inteligencia artificial para que veas cuánto dinero extra podrías estar haciendo.
