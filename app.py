@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from fpdf import FPDF
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL LIMPIO ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL BLINDADO ---
 st.set_page_config(
     page_title="Ganader-IA Elite 360 | Nutrición y Economía",
     page_icon="🐄",
@@ -28,15 +28,22 @@ st.markdown("""
         background-color: #fcfbf9;
     }
     
-    /* Estilo limpio para los títulos de los expanders de la barra lateral (sin texto residual) */
-    [data-testid="stSidebar"] .streamlit-expanderHeader {
-        font-size: 0.82rem !important;
+    /* Estilo moderno y limpio para los expanders de la barra lateral (sin solapamientos ni textos fantasma) */
+    [data-testid="stSidebar"] [data-testid="stExpander"] {
+        border: 1px solid #e6e2dd !important;
+        border-radius: 8px !important;
+        margin-bottom: 10px !important;
+        background-color: #ffffff !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    
+    [data-testid="stSidebar"] [data-testid="stExpanderSummary"] {
+        font-size: 0.85rem !important;
         font-weight: 600 !important;
         color: #2d5a27 !important;
         background-color: #f4f1de !important;
         border-radius: 6px !important;
-        padding: 6px 10px !important;
-        margin-bottom: 8px !important;
+        padding: 8px 12px !important;
     }
     
     /* Métricas compactas protegidas contra recortes y empalmes */
@@ -66,7 +73,6 @@ st.markdown("""
         font-weight: 700 !important;
     }
     
-    /* Celdas de tablas sin solapamiento */
     dataframe, .stDataFrame, div[data-baseweb="input"] {
         font-size: 0.85rem !important;
     }
@@ -135,40 +141,40 @@ data_respaldo = {
 }
 df_base = pd.DataFrame(data_respaldo)
 
-# --- 4. PANEL DE CONTROL LATERAL ORGANIZADO Y LIMPIO ---
+# --- 4. PANEL DE CONTROL LATERAL CON CLAVES ÚNICAS (BLINDADO) ---
 st.sidebar.markdown("### Parámetros de Configuración")
 
 with st.sidebar.expander("Población y Lote", expanded=True):
-    cantidad_animales = st.number_input("Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
-    peso_actual = st.slider("Peso Actual / Compra (kg)", min_value=200.0, max_value=650.0, value=250.0, step=10.0)
-    peso_objetivo = st.slider("Peso Venta / Meta (kg)", min_value=400.0, max_value=750.0, value=520.0, step=10.0)
-    gde = st.slider("Ganancia Diaria (GDE kg/d)", min_value=0.8, max_value=2.2, value=1.4, step=0.1)
+    cantidad_animales = st.number_input("Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10, key="input_cabezas")
+    peso_actual = st.slider("Peso Actual / Compra (kg)", min_value=200.0, max_value=650.0, value=250.0, step=10.0, key="slider_peso_actual")
+    peso_objetivo = st.slider("Peso Venta / Meta (kg)", min_value=400.0, max_value=750.0, value=520.0, step=10.0, key="slider_peso_objetivo")
+    gde = st.slider("Ganancia Diaria (GDE kg/d)", min_value=0.8, max_value=2.2, value=1.4, step=0.1, key="slider_gde")
 
 with st.sidebar.expander("Economía y Mercado"):
-    precio_compra_kg = st.number_input("Precio Compra ($/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
-    precio_venta_kg = st.number_input("Precio Venta ($/kg)", min_value=30.0, max_value=100.0, value=50.0, step=1.0)
-    costo_sanidad_fijo = st.number_input("Sanidad/Manejo ($/cab)", min_value=0.0, max_value=2000.0, value=350.0, step=50.0)
-    costo_mano_obra_fijo = st.number_input("Mano de Obra ($/cab)", min_value=0.0, max_value=3000.0, value=450.0, step=50.0)
+    precio_compra_kg = st.number_input("Precio Compra ($/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0, key="num_p_compra")
+    precio_venta_kg = st.number_input("Precio Venta ($/kg)", min_value=30.0, max_value=100.0, value=50.0, step=1.0, key="num_p_venta")
+    costo_sanidad_fijo = st.number_input("Sanidad/Manejo ($/cab)", min_value=0.0, max_value=2000.0, value=350.0, step=50.0, key="num_c_sanidad")
+    costo_mano_obra_fijo = st.number_input("Mano de Obra ($/cab)", min_value=0.0, max_value=3000.0, value=450.0, step=50.0, key="num_c_mano")
 
 with st.sidebar.expander("Sistema y Pastoreo"):
-    sistema_produccion = st.selectbox("Sistema Productivo", ["Corral / Feedlot", "Semi-estabulado", "Pastoreo"])
-    condiciones_pastoreo = st.selectbox("Condición Pradera", ["N/A (Feedlot)", "Riego (Alta)", "Temporal", "Árido (Caminata)", "Silvopastoril"])
-    estado_pasto = st.selectbox("Fenología Pasto", ["N/A (Feedlot)", "Vegetativo Temprano", "Vegetativo Tardío", "Floración / Madurez", "Lignificado / Seco"])
-    estacion = st.selectbox("Temporada Clima", ["Templado", "Invierno", "Verano"])
+    sistema_produccion = st.selectbox("Sistema Productivo", ["Corral / Feedlot", "Semi-estabulado", "Pastoreo"], key="sel_sis_prod")
+    condiciones_pastoreo = st.selectbox("Condición Pradera", ["N/A (Feedlot)", "Riego (Alta)", "Temporal", "Árido (Caminata)", "Silvopastoril"], key="sel_cond_pradera")
+    estado_pasto = st.selectbox("Fenología Pasto", ["N/A (Feedlot)", "Vegetativo Temprano", "Vegetativo Tardío", "Floración / Madurez", "Lignificado / Seco"], key="sel_fen_pasto")
+    estacion = st.selectbox("Temporada Clima", ["Templado", "Invierno", "Verano"], key="sel_estacion")
 
 with st.sidebar.expander("Genética y Sexo"):
-    raza_seleccionada = st.selectbox("Predominancia Racial", ["Compuestas / Adaptadas", "Británicas", "Continentales", "Cebú / Tropicales", "Criollo / Local"])
-    sexo_lote = st.selectbox("Categoría Zootécnica", ["Novillos", "Toros Enteros", "Vaquillas", "Vacas de Desecho"])
-    marco_lote = st.selectbox("Tamaño de Marco", ["Mediano (Standard)", "Precoz", "Grande (Continental)"])
+    raza_seleccionada = st.selectbox("Predominancia Racial", ["Compuestas / Adaptadas", "Británicas", "Continentales", "Cebú / Tropicales", "Criollo / Local"], key="sel_raza")
+    sexo_lote = st.selectbox("Categoría Zootécnica", ["Novillos", "Toros Enteros", "Vaquillas", "Vacas de Desecho"], key="sel_sexo")
+    marco_lote = st.selectbox("Tamaño de Marco", ["Mediano (Standard)", "Precoz", "Grande (Continental)"], key="sel_marco")
 
 with st.sidebar.expander("Avanzadas y Vanguardia JDS"):
-    condicion_corporal = st.slider("Condición Corporal (1-5)", min_value=1.0, max_value=5.0, value=2.5, step=0.5)
-    nivel_thi = st.selectbox("Estrés Térmico (THI)", ["Confort (<74)", "Moderado (74-78)", "Severo (>78)"])
-    perfil_aa = st.selectbox("Modelo Aminoácidos", ["Estándar", "Avanzado (Lis:Met)"])
-    aditivo_ruminal = st.selectbox("Aditivos Zootécnicos", ["Ninguno", "Ionóforos", "Buffer", "Ambos"])
-    historial_nutricional = st.selectbox("Historial Nutricional", ["Continuo (Normal)", "Compensatorio"])
-    promotor_crecimiento = st.selectbox("Promotor Crecimiento", ["Ninguno", "Implante Hormonal", "Agonista β"])
-    condicion_lodo = st.selectbox("Condición de Corral", ["Seco y Confortable", "Lodo Moderado", "Lodo Severo"])
+    condicion_corporal = st.slider("Condición Corporal (1-5)", min_value=1.0, max_value=5.0, value=2.5, step=0.5, key="slider_cc")
+    nivel_thi = st.selectbox("Estrés Térmico (THI)", ["Confort (<74)", "Moderado (74-78)", "Severo (>78)"], key="sel_thi")
+    perfil_aa = st.selectbox("Modelo Aminoácidos", ["Estándar", "Avanzado (Lis:Met)"], key="sel_aa")
+    aditivo_ruminal = st.selectbox("Aditivos Zootécnicos", ["Ninguno", "Ionóforos", "Buffer", "Ambos"], key="sel_aditivos")
+    historial_nutricional = st.selectbox("Historial Nutricional", ["Continuo (Normal)", "Compensatorio"], key="sel_historial")
+    promotor_crecimiento = st.selectbox("Promotor Crecimiento", ["Ninguno", "Implante Hormonal", "Agonista β"], key="sel_promotor")
+    condicion_lodo = st.selectbox("Condición de Corral", ["Seco y Confortable", "Lodo Moderado", "Lodo Severo"], key="sel_lodo")
 
 # --- MODELADO PREDICTIVO BIOLÓGICO AVANZADO ---
 factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
@@ -355,10 +361,10 @@ with tab2:
             "Min Inclusión (%)": st.column_config.NumberColumn("Min (%)", min_value=0.0, max_value=100.0, step=0.5),
             "Max Inclusión (%)": st.column_config.NumberColumn("Max (%)", min_value=0.0, max_value=100.0, step=0.5),
         },
-        key="editor_ingredientes"
+        key="editor_ingredientes_v14"
     )
 
-# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL (CON AUTO-RECUPERACIÓN Y TOLERANCIA) ---
+# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL ---
 try:
     nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
     c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
@@ -395,7 +401,7 @@ b_eq = np.array([1.0])
 resultado = None
 modo_tolerancia_activo = False
 
-# Intento 1: Restricciones ideales (Ca:P 1.5-2.0, metas exactas)
+# Intento 1: Restricciones ideales
 row_ca_p_min = -ca + 1.5 * p_min_ing
 row_ca_p_max = ca - 2.0 * p_min_ing
 A_ub = np.array([-pc, -neg, -fnd, -pendf, -pdr, -pnd, -ca, -p_min_ing, row_ca_p_min, row_ca_p_max])
@@ -403,7 +409,7 @@ b_ub = np.array([-meta_pc_min, -meta_neg_min, -meta_fnd_min, -meta_pendf_min, -m
 
 resultado = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
 
-# Intento 2: Si falla, relajar Ca:P a 1.2-2.5
+# Intento 2: Relajar Ca:P a 1.2-2.5
 if not resultado.success:
     row_ca_p_min_rel = -ca + 1.2 * p_min_ing
     row_ca_p_max_rel = ca - 2.5 * p_min_ing
@@ -412,7 +418,7 @@ if not resultado.success:
     if resultado.success:
         modo_tolerancia_activo = True
 
-# Intento 3: Si aún falla, relajar metas nutricionales en un 10% (Auto-recuperación total)
+# Intento 3: Relajar metas nutricionales en un 10%
 if not resultado.success:
     meta_pc_min_rel = meta_pc_min * 0.90
     meta_neg_min_rel = meta_neg_min * 0.90
@@ -428,7 +434,6 @@ with tab3:
         if modo_tolerancia_activo:
             st.warning("⚠️ **Aviso de Auto-Recuperación Elite:** El sistema ajustó automáticamente los márgenes de tolerancia de minerales y energía para garantizar una solución factible.")
         
-        # --- CÁLCULOS ECONÓMICOS DETALLADOS ---
         costo_ton_alimento = resultado.fun
         consumo_total_ciclo_cab = cms_estimado * dias_a_meta
         costo_alimentacion_cab = (consumo_total_ciclo_cab / 1000.0) * costo_ton_alimento
@@ -441,7 +446,6 @@ with tab3:
         roi_cab = (utilidad_neta_cab / costo_total_cab) * 100 if costo_total_cab > 0 else 0
         
         costo_por_kg_ganado = costo_alimentacion_cab / kg_por_ganar if kg_por_ganar > 0 else 0
-        
         status_rentabilidad = "🟢 Rentable" if utilidad_neta_cab > 0 else "🔴 Negativo"
         
         col_ec1, col_ec2, col_ec3, col_ec4 = st.columns(4)
@@ -496,7 +500,7 @@ with tab3:
         df_mezcla_final = pd.DataFrame(tabla_mezcla_con_totales)
         st.dataframe(df_mezcla_final, use_container_width=True, hide_index=True)
         
-        # --- CÁLCULOS DE SOSTENIBILIDAD Y CARBONO ---
+        # CÁLCULOS DE SOSTENIBILIDAD
         aporte_pc = np.sum(resultado.x * pc) * 100
         aporte_neg = np.sum(resultado.x * neg)
         aporte_fnd = np.sum(resultado.x * fnd) * 100
@@ -544,10 +548,7 @@ with tab3:
             st.metric("Lípidos", f"{aporte_lipidos:.1f}%", "Mitigador")
 
     else:
-        st.error(
-            "⚠️ **Aviso del Optimizador Elite 360:** Las restricciones son demasiado restrictivas para los ingredientes habilitados. "
-            "Asegúrate de tener marcadas como disponibles al menos una fuente de forraje, un grano energético, una fuente proteica y una sal mineral en la Pestaña 2."
-        )
+        st.error("⚠️ **Aviso del Optimizador Elite 360:** Las restricciones son demasiado restrictivas para los ingredientes habilitados.")
 
 with tab4:
     st.subheader("🚜 Bunk Management y Gestión Logística de Alimento")
@@ -573,50 +574,48 @@ with tab4:
             "1. **Paso 1 (Forrajes Secos / Fibra Larga):** Cargar rastrojos o harinas fibrosas al inicio para asegurar el peNDF y evitar acidosis metabólica.\n"
             "2. **Paso 2 (Ingredientes Húmedos / Ensilados):** Agregar ensilados o subproductos húmedos calculando la corrección por materia seca.\n"
             "3. **Paso 3 (Granos Energéticos y Proteicos):** Incorporar maíz molido, pasta de soya y canola.\n"
-            "4. **Paso 4 (Núcleos, Minerales y Urea):** Agregar las sales minerales especializadas de Tlaltenango y la urea (previa dilución o mezclado homogéneo).\n"
+            "4. **Paso 4 (Núcleos, Minerales y Urea):** Agregar las sales minerales especializadas de Tlaltenango y la urea.\n"
             "5. **Paso 5 (Aditivos / Buffers):** Incorporar buffers (bicarbonato) y aditivos si están seleccionados.\n"
-            "6. **Paso 6 (Líquidos):** Verter la melaza líquida con un chorro de agua al final para garantizar adherencia, evitar polvaderas y elevar la palatabilidad.\n"
+            "6. **Paso 6 (Líquidos):** Verter la melaza líquida con un chorro de agua al final para garantizar adherencia.\n"
             "7. **Tiempo de Mezclado:** Operar el carro mezclador de 8 a 10 minutos continuos antes de la distribución en comederos."
         )
 
-        # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ELITE ---
         def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, sistema_prod, cond_past, est_pasto, perf_aa, raza_L, sexo_L, marco_L, cc_val, thi_val, adit_val, p_act, p_obj, gain, dias, cabezas, util_neta, roi_c, c_kg_ganado, a_ca, a_p, r_cap, a_fnd, a_pendf, ch4_d, co2e, bonos, cost_lote, tons_lote):
             pdf = FPDF()
             pdf.add_page()
-            
             pdf.set_font("Arial", "B", 14)
             pdf.cell(0, 7, "Ganader-IA Elite 360 - Reporte Económico y Ejecutivo", 0, 1, "C")
             pdf.set_font("Arial", "I", 8)
-            pdf.cell(0, 4, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
+            pdf.cell(0, 4, "Creado por el Dr. Alejandro Castañeda Correa", 0, 1, "C")
             pdf.ln(2)
             
             pdf.set_font("Arial", "B", 9)
-            pdf.cell(0, 5, "1. Evaluacion Economica y Rentabilidad del Negocio", 0, 1)
+            pdf.cell(0, 5, "1. Evaluación Económica y Rentabilidad del Negocio", 0, 1)
             pdf.set_font("Arial", "", 8)
             pdf.cell(0, 4, f"Utilidad Neta por Animal: ${util_neta:,.2f} MXN | ROI del Ciclo: {roi_c:.2f}%", 0, 1)
             pdf.cell(0, 4, f"Costo por kg Ganado: ${c_kg_ganado:,.2f} MXN/kg | Costo Alimento Ton: ${costo_ton:,.2f} MXN", 0, 1)
             pdf.ln(2)
             
             pdf.set_font("Arial", "B", 9)
-            pdf.cell(0, 5, "2. Parametros Biologicos y Poblacionales del Lote", 0, 1)
+            pdf.cell(0, 5, "2. Parámetros Biológicos y Poblacionales del Lote", 0, 1)
             pdf.set_font("Arial", "", 8)
-            pdf.cell(0, 4, f"Fisiologia: {etapa} | Sistema: {sistema_prod} | Perfil AA: {perf_aa}", 0, 1)
+            pdf.cell(0, 4, f"Fisiología: {etapa} | Sistema: {sistema_prod} | Perfil AA: {perf_aa}", 0, 1)
             pdf.cell(0, 4, f"Cabezas: {cabezas} | Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE: {gain} kg/d", 0, 1)
             pdf.ln(2)
             
             pdf.set_font("Arial", "B", 9)
             pdf.cell(0, 5, "3. Balance Mineral, Salud Ruminal y Sostenibilidad (IPCC)", 0, 1)
             pdf.set_font("Arial", "", 8)
-            pdf.cell(0, 4, f"Calcio (Ca): {a_ca:.2f}% | Fosforo (P): {a_p:.2f}% | Relacion Ca:P: {r_cap:.2f}:1", 0, 1)
-            pdf.cell(0, 4, f"Fibra peNDF: {a_pendf:.1f}% | Emision CH4: {ch4_d:.1f} g/dia", 0, 1)
-            pdf.cell(0, 4, f"Valor Potencial Bonos de Carbono: ${bonos:,.2f} MXN por animal/ano", 0, 1)
+            pdf.cell(0, 4, f"Calcio (Ca): {a_ca:.2f}% | Fósforo (P): {a_p:.2f}% | Relación Ca:P: {r_cap:.2f}:1", 0, 1)
+            pdf.cell(0, 4, f"Fibra peNDF: {a_pendf:.1f}% | Emisión CH4: {ch4_d:.1f} g/día", 0, 1)
+            pdf.cell(0, 4, f"Valor Potencial Bonos de Carbono: ${bonos:,.2f} MXN por animal/año", 0, 1)
             pdf.ln(2)
             
             pdf.set_font("Arial", "B", 9)
             pdf.cell(0, 5, "4. Mezcla Exacta por Tonelada (1,000 kg)", 0, 1)
             pdf.set_font("Arial", "B", 7)
             pdf.cell(80, 5, "Ingrediente", 1)
-            pdf.cell(30, 5, "Inclusion (%)", 1)
+            pdf.cell(30, 5, "Inclusión (%)", 1)
             pdf.cell(35, 5, "Kg / Tonelada", 1)
             pdf.cell(45, 5, "Costo Parcial ($)", 1)
             pdf.ln()
@@ -625,12 +624,12 @@ with tab4:
             for _, row in df_resumen.iterrows():
                 if row["Ingrediente"] != "TOTALES / MEZCLA FINAL":
                     pdf.cell(80, 4, str(row["Ingrediente"]), 1)
-                    pdf.cell(30, 4, f"{row['Inclusion (%)']}%", 1)
+                    pdf.cell(30, 4, f"{row['Inclusión (%)']}%", 1)
                     pdf.cell(35, 4, f"{row['Kg por Tonelada (1,000 kg)']}", 1)
                     pdf.cell(45, 4, str(row['Aporte al Costo Total ($)']), 1)
                     pdf.ln()
             
-            tot_inc = df_resumen[df_resumen["Ingrediente"] != "TOTALES / MEZCLA FINAL"]['Inclusion (%)'].sum()
+            tot_inc = df_resumen[df_resumen["Ingrediente"] != "TOTALES / MEZCLA FINAL"]['Inclusión (%)'].sum()
             tot_kg = df_resumen[df_resumen["Ingrediente"] != "TOTALES / MEZCLA FINAL"]['Kg por Tonelada (1,000 kg)'].sum()
             pdf.set_font("Arial", "B", 7)
             pdf.cell(80, 4, "TOTALES / MEZCLA FINAL", 1)
@@ -649,8 +648,6 @@ with tab4:
         
         st.markdown("---")
         st.subheader("📥 Descarga de Reporte Ejecutivo y Económico PDF")
-        st.markdown("Haz clic en el botón para descargar el reporte oficial con la evaluación económica completa, rentabilidad y mezcla óptima:")
-        
         st.download_button(
             label="📄 Descargar Reporte Económico y Ejecutivo PDF",
             data=pdf_data,
