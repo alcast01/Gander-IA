@@ -473,7 +473,7 @@ def generar_pdf_reporte():
 # --- 5. INTERFAZ MODULAR POR PESTAÑAS (6 TABS ELITE) ---
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "📋 1. Resumen", 
-    "🧪 2. Nutrición", 
+    "🧪 2. Nutrición & Multietapa", 
     "📊 3. Economía", 
     "🚜 4. Manejo",
     "🔮 5. Simulador Compra-Venta",
@@ -539,6 +539,43 @@ with tab2:
         },
         key="editor_ingredientes"
     )
+    
+    st.markdown("---")
+    st.subheader("⚖️ Estrategia Comparativa: ¿1 Dieta Única vs. Sistema Multietapa (3 Fases)?")
+    st.markdown(
+        "Fisiológica y económicamente, utilizar **3 o más dietas** a lo largo de la engorda optimiza drásticamente los costos "
+        "al reducir ingredientes caros (como la proteína) cuando el animal ya no los requiere, evitando desperdicios metabólicos. "
+        "A continuación se comparan los requerimientos y costos teóricos de las 3 fases clave:"
+    )
+    
+    # Función auxiliar para calcular costo de una fase específica
+    def resolver_fase_multietapa(pc_req, neg_req, fnd_req, pendf_req):
+        m_pc = pc_req * factor_pc
+        m_neg = neg_req * factor_neg
+        m_fnd = fnd_req
+        m_pendf = pendf_req
+        
+        row_cp_min = -ca + 1.5 * p_min_ing
+        row_cp_max = ca - 2.0 * p_min_ing
+        A_f = np.array([-pc, -neg, -fnd, -pendf, -ca, -p_min_ing, row_cp_min, row_cp_max])
+        b_f = np.array([-m_pc, -m_neg, -m_fnd, -m_pendf, -0.0045, -0.0028, 0.0, 0.0])
+        res_f = linprog(c, A_ub=A_f, b_ub=b_f, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
+        return res_f.fun if res_f.success else 0.0, res_f.success
+
+    costo_f1, ok_f1 = resolver_fase_multietapa(0.140, 0.75, 0.32, 0.24)
+    costo_f2, ok_f2 = resolver_fase_multietapa(0.120, 0.88, 0.29, 0.21)
+    costo_f3, ok_f3 = resolver_fase_multietapa(0.105, 1.05, 0.25, 0.18)
+    
+    col_mULT1, col_mULT2, col_mULT3 = st.columns(3)
+    with col_mULT1:
+        st.metric("Fase 1: Recepción (200-300kg)", f"${costo_f1:,.2f} /ton" if ok_f1 else "N/A")
+        st.caption("Alta proteína (14%), fibra efectiva alta y protección ruminal.")
+    with col_mULT2:
+        st.metric("Fase 2: Crecimiento (300-400kg)", f"${costo_f2:,.2f} /ton" if ok_f2 else "N/A")
+        st.caption("Proteína intermedia (12%), mayor energía neta de ganancia.")
+    with col_mULT3:
+        st.metric("Fase 3: Finalización (>400kg)", f"${costo_f3:,.2f} /ton" if ok_f3 else "N/A")
+        st.caption("Proteína optimizada (10.5%), máxima densidad energética ($NE_g$).")
 
 with tab3:
     st.subheader("📊 Evaluación Económica Financiera y Rentabilidad del Negocio")
@@ -808,4 +845,4 @@ with tab6:
         )
         st.success("¡El reporte PDF se ha generado correctamente con los datos actuales del lote y formulación lineal!")
     else:
-        st.warning("⚠️ Resuelve las restricciones nutricionales en la pestaña **Nutrición** para habilitar la descarga del reporte PDF.")
+        st.warning("⚠️ Resuelve las restricciones nutricionales en la pestaña **Nutrición & Multietapa** para habilitar la descarga del reporte PDF.")
