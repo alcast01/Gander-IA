@@ -9,7 +9,7 @@ from fpdf import FPDF
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (CAMPO Y GANADERÍA) ---
 st.set_page_config(
-    page_title="Ganader-IA Elite | Nutrición de Precisión y Bonos de Carbono",
+    page_title="Ganader-IA Elite | Optimización de Costos y Nutrición de Precisión",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -66,13 +66,13 @@ st.markdown("""
         </div>
         <div style="flex-grow: 1; min-width: 250px;">
             <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">ELITE 360</span></h1>
-            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Nutrición de Precisión, Bonos de Carbono y Ca:P Automático</p>
+            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización Máxima de Costos, Bonos de Carbono y Ca:P Automático</p>
             <p style="margin: 6px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
-# --- 3. BASE DE DATOS INICIAL CON MINERALES DE TLALTENANGO (Min 0% para flexibilidad) ---
+# --- 3. BASE DE DATOS INICIAL CON MÍNIMO 0% PARA LIBRE COMPETENCIA DE PRECIOS ---
 data_respaldo = {
     "Nombre del Ingrediente": [
         "Rastrojo de maiz molido", 
@@ -87,7 +87,7 @@ data_respaldo = {
         "Grasa de paso Lactomil"
     ],
     "Categoria": ["Forraje", "Suplemento Proteico", "Grano Energetico", "Suplemento NPN", "Forraje Humedo", "Suplemento Proteico", "Subproducto / Energetico", "Suplemento Mineral", "Suplemento Mineral", "Suplemento Energetico"],
-    "Disponible": [True, True, True, True, False, True, True, True, True, True],
+    "Disponible": [True, True, True, True, True, True, True, True, True, True],
     "Precio Estimado (MXN/ton)": [2500.0, 12500.0, 5800.0, 16000.0, 1200.0, 8500.0, 4800.0, 19000.0, 18500.0, 32000.0],
     "Proteina Cruda (PC % MS)": [5.5, 48.0, 8.5, 281.0, 8.0, 38.0, 4.8, 0.0, 0.0, 1.0],
     "NEg (Mcal/kg)": [0.35, 1.48, 1.55, 0.0, 0.85, 1.15, 1.22, 0.0, 0.0, 1.65],
@@ -100,8 +100,8 @@ data_respaldo = {
     "Sodio (Na %)": [0.02, 0.03, 0.02, 0.0, 0.02, 0.05, 0.10, 10.0, 9.0, 0.0],
     "Magnesio (Mg %)": [0.15, 0.28, 0.12, 0.0, 0.18, 0.50, 0.40, 2.0, 2.5, 0.0],
     "Lípidos / Extracto Etéreo (%)": [1.5, 1.8, 3.8, 0.0, 3.0, 3.5, 0.5, 0.0, 0.0, 99.0],
-    "Min Inclusión (%)": [20.0, 5.0, 10.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0],
-    "Max Inclusión (%)": [60.0, 35.0, 50.0, 1.5, 0.0, 30.0, 6.0, 3.0, 3.0, 3.0]
+    "Min Inclusión (%)": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "Max Inclusión (%)": [100.0, 100.0, 100.0, 1.5, 100.0, 100.0, 100.0, 5.0, 5.0, 5.0]
 }
 df_base = pd.DataFrame(data_respaldo)
 
@@ -270,7 +270,7 @@ with tab2:
     st.subheader("🧪 Laboratorio de Nutrición y Base de Datos en Google Sheets")
     st.markdown(
         "**Personaliza por completo los perfiles nutricionales y de minerales de tus materias primas.** "
-        "Incluye sales minerales especializadas de la región de **Tlaltenango (Purina Mineral Tech y Malta Cleyton Ganafos)**. "
+        "Sin restricciones mínimas forzadas para garantizar el **costo mínimo absoluto** en la optimización lineal. "
         "Puedes acceder, editar o respaldar esta tabla directamente en tu nube de Google Drive:"
     )
     
@@ -292,7 +292,7 @@ with tab2:
         key="editor_ingredientes"
     )
 
-# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL (CON BALANCE AUTOMÁTICO Ca:P) ---
+# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL (OPTIMIZACIÓN MÁXIMA DE COSTO) ---
 try:
     nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
     c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
@@ -340,9 +340,9 @@ with tab3:
     if resultado.success:
         col_res1, col_res2 = st.columns(2)
         with col_res1:
-            st.metric(label="Costo Óptimo por Tonelada", value=f"${resultado.fun:,.2f} MXN")
+            st.metric(label="Costo Óptimo Mínimo por Tonelada", value=f"${resultado.fun:,.2f} MXN")
         with col_res2:
-            st.metric(label="Estado del Proceso", value="Factible (Elite 360) 🟢")
+            st.metric(label="Estado del Proceso", value="Factible (Costo Mínimo Elite) 🟢")
         
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("#### 📋 Tabla de Ingredientes y Mezcla Exacta por Tonelada:")
@@ -431,8 +431,7 @@ with tab3:
     else:
         st.error(
             "⚠️ **Aviso del Optimizador Elite 360:** Con los ingredientes seleccionados o restricciones muy cerradas, no se encontró una solución matemática factible "
-            "que cumpla simultáneamente con energía, proteína, fibra y la proporción automática Ca:P de 1.5 a 2.0. "
-            "Asegúrate de tener activa una sal mineral especializada (como Purina Mineral Tech o Malta Cleyton Ganafos) en la Pestaña 2."
+            "que cumpla simultáneamente con energía, proteína, fibra y la proporción automática Ca:P de 1.5 a 2.0."
         )
 
 with tab4:
