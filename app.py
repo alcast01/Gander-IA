@@ -132,14 +132,12 @@ condicion_lodo = st.sidebar.selectbox("Condición de Corral / Lodo", ["Seco y Co
 # --- MODELADO PREDICTIVO BIOLÓGICO AVANZADO ---
 factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
 
-# Factor de lodo: Incrementa requerimiento energético por esfuerzo físico y termorregulación
 factor_lodo = 1.00 if condicion_lodo == "Seco y Confortable" else (1.12 if "Moderado" in condicion_lodo else 1.25)
 cms_estimado = peso_actual * 0.024 * factor_clima / (factor_lodo if "Severo" in condicion_lodo else 1.0)
 
 kg_por_ganar = max(0.0, peso_objetivo - peso_actual)
 dias_a_meta = kg_por_ganar / gde if gde > 0 else 0
 
-# Fases fisiológicas base
 if peso_actual < 300:
     fase = "Crecimiento (Becerro Ligero)"
     meta_pc_base = 0.130 + (gde * 0.015)
@@ -171,7 +169,6 @@ else:
     meta_ca_min = 0.0045
     meta_p_min = 0.0028
 
-# Ajustes por Raza
 if "Británicas" in raza_seleccionada:
     factor_pc = 1.02
     factor_neg = 1.05
@@ -185,18 +182,16 @@ else:
     factor_pc = 1.00
     factor_neg = 1.00
 
-# Ajustes por Tipo Sexual (Sexo)
 if sexo_lote == "Toros Enteros":
     factor_sexo_pc = 1.08
     factor_sexo_neg = 1.04
 elif sexo_lote == "Vaquillas":
     factor_sexo_pc = 0.96
-    factor_sexo_neg = 1.06 # Engrasan más rápido
+    factor_sexo_neg = 1.06
 else:
     factor_sexo_pc = 1.00
     factor_sexo_neg = 1.00
 
-# Ajustes por Tamaño de Marco
 if "Pequeño" in marco_lote:
     factor_marco = 1.05
 elif "Grande" in marco_lote:
@@ -204,13 +199,9 @@ elif "Grande" in marco_lote:
 else:
     factor_marco = 1.00
 
-# Ajustes por Promotores de Crecimiento
 factor_promotor = 1.08 if promotor_crecimiento == "Implante Hormonal" else (1.15 if "Agonista" in promotor_crecimiento else 1.00)
-
-# Ajustes por Crecimiento Compensatorio (Mejora eficiencia metabólica temporal)
 factor_compensatorio = 0.93 if "Compensatorio" in historial_nutricional else 1.00
 
-# Requerimientos mínimos finales ajustados con todas las variables
 meta_pc_min = meta_pc_base * factor_pc * factor_sexo_pc * factor_promotor
 meta_neg_min = meta_neg_base * factor_neg * factor_sexo_neg * factor_marco * factor_lodo * factor_compensatorio
 
@@ -426,7 +417,21 @@ with tab3:
                 cat_ing = str(df_ingredientes.iloc[i].get("Categoria", "Otros"))
                 categorias_pie[cat_ing] = categorias_pie.get(cat_ing, 0) + porcentaje
         
-        df_mezcla_final = pd.DataFrame(tabla_mezcla)
+        # --- CÁLCULO DE TOTALES PARA LA TABLA ---
+        total_porcentaje = sum([row["Inclusion (%)"] for row in tabla_mezcla])
+        total_kilos = sum([row["Kg por Tonelada (1,000 kg)"] for row in tabla_mezcla])
+        total_costo = resultado.fun
+
+        tabla_mezcla_con_totales = tabla_mezcla.copy()
+        tabla_mezcla_con_totales.append({
+            "Ingrediente": "TOTALES / MEZCLA FINAL",
+            "Inclusion (%)": round(total_porcentaje, 1),
+            "Kg por Tonelada (1,000 kg)": round(total_kilos, 1),
+            "Costo Unitario ($/ton)": "-",
+            "Aporte al Costo Total ($)": f"${total_costo:,.2f}"
+        })
+
+        df_mezcla_final = pd.DataFrame(tabla_mezcla_con_totales)
         st.dataframe(df_mezcla_final, use_container_width=True, hide_index=True)
         
         # --- CÁLCULOS AVANZADOS ---
@@ -526,6 +531,16 @@ with tab3:
                 pdf.cell(35, 5, f"{row['Kg por Tonelada (1,000 kg)']}", 1)
                 pdf.cell(45, 5, str(row['Aporte al Costo Total ($)']), 1)
                 pdf.ln()
+            
+            # Fila de totales en el PDF
+            tot_inc = df_resumen['Inclusion (%)'].sum()
+            tot_kg = df_resumen['Kg por Tonelada (1,000 kg)'].sum()
+            pdf.set_font("Arial", "B", 8)
+            pdf.cell(80, 5, "TOTALES / MEZCLA FINAL", 1)
+            pdf.cell(30, 5, f"{tot_inc:.1f}%", 1)
+            pdf.cell(35, 5, f"{tot_kg:.1f} kg", 1)
+            pdf.cell(45, 5, f"${costo_ton:,.2f}", 1)
+            pdf.ln()
                 
             pdf.ln(3)
             pdf.set_font("Arial", "B", 10)
@@ -540,8 +555,9 @@ with tab3:
             )
             return bytes(pdf.output())
 
+        df_mezcla_pdf = pd.DataFrame(tabla_mezcla)
         pdf_data = generar_pdf_ejecutivo(
-            df_mezcla_final, resultado.fun, fase, raza_seleccionada, sexo_lote, marco_lote, peso_actual, peso_objetivo, gde, dias_a_meta,
+            df_mezcla_pdf, resultado.fun, fase, raza_seleccionada, sexo_lote, marco_lote, peso_actual, peso_objetivo, gde, dias_a_meta,
             aporte_pc, aporte_neg, aporte_ca, aporte_p, aporte_na, aporte_mg, relacion_ca_p, aporte_fnd, aporte_pendf,
             ch4_g_dia, co2e_anual
         )
