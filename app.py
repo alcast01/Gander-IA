@@ -28,7 +28,7 @@ st.markdown("""
         background-color: #fcfbf9;
     }
     
-    /* Estilo limpio para los títulos de los expanders de la barra lateral */
+    /* Estilo limpio para los títulos de los expanders de la barra lateral (sin texto residual) */
     [data-testid="stSidebar"] .streamlit-expanderHeader {
         font-size: 0.82rem !important;
         font-weight: 600 !important;
@@ -39,32 +39,38 @@ st.markdown("""
         margin-bottom: 8px !important;
     }
     
-    /* Métricas compactas protegidas contra recortes */
+    /* Métricas compactas protegidas contra recortes y empalmes */
     .stMetric {
         background-color: #ffffff;
-        padding: 6px 8px !important;
+        padding: 8px 10px !important;
         border-radius: 8px;
         box-shadow: 0 2px 6px rgba(45, 90, 39, 0.05);
         border-left: 3px solid #2d5a27;
         border-top: 1px solid #e6e2dd;
         border-right: 1px solid #e6e2dd;
         border-bottom: 1px solid #e6e2dd;
-        margin-bottom: 6px !important;
+        margin-bottom: 8px !important;
     }
     
     .stMetric label {
-        font-size: 0.65rem !important;
+        font-size: 0.68rem !important;
         color: #555555 !important;
         white-space: normal !important;
-        line-height: 1.1 !important;
+        line-height: 1.2 !important;
+        font-weight: 500 !important;
     }
     
     .stMetric [data-testid="stMetricValue"] {
-        font-size: 0.9rem !important;
+        font-size: 0.95rem !important;
         color: #1f2421 !important;
         font-weight: 700 !important;
     }
     
+    /* Celdas de tablas sin solapamiento */
+    dataframe, .stDataFrame, div[data-baseweb="input"] {
+        font-size: 0.85rem !important;
+    }
+
     h1, h2, h3, h4 {
         color: #1f2421;
         font-family: 'Inter', sans-serif !important;
@@ -335,7 +341,7 @@ with tab2:
     )
     
     st.markdown(
-        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V12)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
+        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V13)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
         unsafe_allow_html=True
     )
     st.markdown("<br>", unsafe_allow_html=True)
