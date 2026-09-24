@@ -5,7 +5,7 @@ from scipy.optimize import linprog
 import plotly.express as px
 from fpdf import FPDF
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL CORPORATIVO ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (CAMPO Y GANADERÍA) ---
 st.set_page_config(
     page_title="Ganader-IA Pro | Nutrición Bovina Inteligente",
     page_icon="🐄",
@@ -15,10 +15,16 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-    /* Estilos generales del fondo y tipografía */
+    /* Importación de tipografía moderna y uniforme (Inter) */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif !important;
+        color: #2b2d42;
+    }
+    
     .main {
-        background-color: #f4f6f9;
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        background-color: #fcfbf9; /* Fondo arena cálida / campo */
     }
     
     /* Contenedores de tarjetas métricas ejecutivas */
@@ -26,18 +32,27 @@ st.markdown("""
         background-color: #ffffff;
         padding: 18px;
         border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-        border-left: 5px solid #1b5e20;
+        box-shadow: 0 4px 12px rgba(45, 90, 39, 0.08);
+        border-left: 5px solid #2d5a27; /* Verde pastura */
+        border-top: 1px solid #e6e2dd;
+        border-right: 1px solid #e6e2dd;
+        border-bottom: 1px solid #e6e2dd;
         transition: transform 0.2s ease;
     }
     .stMetric:hover {
         transform: translateY(-2px);
     }
     
-    /* Encabezados y títulos */
-    h1, h2, h3 {
-        color: #1a252c;
+    /* Encabezados y títulos uniformes */
+    h1, h2, h3, h4 {
+        color: #1f2421;
+        font-family: 'Inter', sans-serif !important;
         font-weight: 700;
+    }
+
+    p, span, label {
+        font-family: 'Inter', sans-serif !important;
+        color: #333333;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -50,8 +65,8 @@ if not st.session_state.authenticated:
     st.markdown("<br><br>", unsafe_allow_html=True)
     col_c1, col_c2, col_c3 = st.columns([1, 2, 1])
     with col_c2:
-        st.markdown("<h2 style='text-align: center;'>🔐 Ganader-IA Pro</h2>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #666;'>Plataforma Inteligente de Optimización y Nutrición Bovina</p>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: center; color: #2d5a27;'>🔐 Ganader-IA Pro</h2>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; color: #666;'>Sistema Inteligente de Optimización y Nutrición Bovina</p>", unsafe_allow_html=True)
         st.markdown("---")
         
         st.info("Introduce tu clave de licencia comercial o membresía institucional para acceder:")
@@ -65,21 +80,21 @@ if not st.session_state.authenticated:
             else:
                 st.error("❌ Licencia inválida o membresía expirada.")
                 
-        st.markdown("<div style='text-align: center; margin-top: 15px;'><small>🔑 <i>Usa la clave <b>demo</b> para pruebas académicas.</i></small></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center; margin-top: 15px;'><small>🔑 <i>Usa la clave <b>demo</b> para pruebas académicas y profesionales.</i></small></div>", unsafe_allow_html=True)
     st.stop()
 
-# --- 3. LOGOTIPO VECTORIAL DE VANGUARDIA (CABECERA PRINCIPAL) ---
+# --- 3. LOGOTIPO VECTORIAL DE VANGUARDIA (PALETA CAMPO Y GANADERÍA) ---
 st.markdown("""
-    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #1b5e20 0%, #0288d1 100%); padding: 25px; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); margin-bottom: 25px; color: white;">
+    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #2d5a27 0%, #bc6c25 100%); padding: 25px; border-radius: 16px; box-shadow: 0 6px 20px rgba(45,90,39,0.15); margin-bottom: 25px; color: white;">
         <div style="flex-shrink: 0; margin-right: 20px;">
             <svg width="70" height="70" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="#ffffff"/>
-                <circle cx="12" cy="12" r="3" fill="#aed581"/>
+                <circle cx="12" cy="12" r="3" fill="#dda15e"/>
             </svg>
         </div>
         <div>
-            <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px;">Ganader-IA <span style="background-color: #aed581; color: #1b5e20; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">PRO</span></h1>
-            <p style="margin: 5px 0 0 0; font-size: 1.05em; color: #e0f2f1; font-weight: 300;">Sistema Inteligente de Optimización, Costos y Predicción Nutricional Bovina</p>
+            <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">PRO</span></h1>
+            <p style="margin: 5px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Plataforma de Precisión Zootécnica y Optimización de Raciones</p>
         </div>
     </div>
 """, unsafe_allow_html=True)
@@ -182,7 +197,7 @@ if st.sidebar.button("🔒 Cerrar Sesión", use_container_width=True):
 # Créditos profesionales institucionales
 st.sidebar.markdown("---")
 st.sidebar.markdown(
-    "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px;'>"
+    "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px; font-family: Inter, sans-serif;'>"
     "<b>Ganader-IA Pro</b><br>"
     "Creado por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
     "Diseñado para Nutriólogos, Técnicos, Estudiantes Universitarios y Ganaderos."
@@ -230,7 +245,12 @@ with tab1:
         markers=True,
         title="Trayectoria de Engorda del Lote hacia el Peso Objetivo"
     )
-    fig_line.update_layout(plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Helvetica"))
+    fig_line.update_traces(line_color="#2d5a27", marker=dict(size=8, color="#bc6c25"))
+    fig_line.update_layout(
+        plot_bgcolor="#ffffff", 
+        paper_bgcolor="#ffffff", 
+        font=dict(family="Inter", color="#2b2d42")
+    )
     st.plotly_chart(fig_line, use_container_width=True)
 
 with tab2:
@@ -317,9 +337,9 @@ with tab3:
             
             # Encabezado
             pdf.set_font("Arial", "B", 16)
-            pdf.cell(0, 10, "Ganader-IA Pro - Reporte Ejecutivo de Nutrición", 0, 1, "C")
+            pdf.cell(0, 10, "Ganader-IA Pro - Reporte Ejecutivo de Nutricion", 0, 1, "C")
             pdf.set_font("Arial", "I", 10)
-            pdf.cell(0, 6, "Creado por el Dr. Alejandro Castañeda Correa", 0, 1, "C")
+            pdf.cell(0, 6, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
             pdf.ln(5)
             
             # Datos del Lote
@@ -384,12 +404,21 @@ with tab3:
             use_container_width=True
         )
         
-        # --- GRÁFICAS DE PASTEL Y BARRAS ---
+        # --- GRÁFICAS DE PASTEL Y BARRAS (PALETA CAMPO) ---
         st.markdown("---")
         st.subheader("🥧 Composición Porcentual de la Dieta por Categoría")
         df_pie = pd.DataFrame(list(categorias_pie.items()), columns=["Categoría", "Porcentaje"])
-        fig_pie = px.pie(df_pie, names="Categoría", values="Porcentaje", hole=0.4, title="Distribución de Insumos en la Mezcla")
-        fig_pie.update_layout(font=dict(family="Helvetica"))
+        
+        colores_campo = ['#2d5a27', '#bc6c25', '#dda15e', '#606c38', '#283618', '#e76f51']
+        fig_pie = px.pie(
+            df_pie, 
+            names="Categoría", 
+            values="Porcentaje", 
+            hole=0.4, 
+            title="Distribución de Insumos en la Mezcla",
+            color_discrete_sequence=colores_campo
+        )
+        fig_pie.update_layout(font=dict(family="Inter", color="#2b2d42"))
         st.plotly_chart(fig_pie, use_container_width=True)
                 
         st.markdown("---")
