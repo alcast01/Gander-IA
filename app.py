@@ -402,15 +402,11 @@ with tab3:
         relacion_ca_p = (aporte_ca / aporte_p) if aporte_p > 0 else 0
         
         # --- ESTIMACIÓN DE METANO ENTÉRICO ($CH_4$) SEGÚN MODELO NUTRICIONAL / IPCC ---
-        # Consumo de energía bruta (GE) aprox 18.4 MJ/kg MS
         ge_diaria = cms_estimado * 18.4 # MJ/día
-        # Factor de conversión de metano Ym (por defecto 6.5% para forrajes, reducido por alto grano/FND y adición de lípidos)
-        # Cada 1% de lípidos por encima de 3% reduce Ym en ~0.003
         reduccion_lipidica = max(0.0, (aporte_lipidos - 3.0) * 0.003)
         factor_fnd_ym = 0.035 + (aporte_fnd / 100.0) * 0.035
         ym_ajustado = max(0.030, factor_fnd_ym - reduccion_lipidica)
         
-        # Metano entérico en g/día = (GE * Ym / 55.65 MJ/kg CH4) * 1000
         ch4_g_dia = (ge_diaria * ym_ajustado / 55.65) * 1000
         ch4_g_kg_ganancia = ch4_g_dia / gde if gde > 0 else 0
         co2e_anual = (ch4_g_dia * 365 / 1000.0) * 28.0 # GWP100 = 28 para CH4
