@@ -311,7 +311,7 @@ st.sidebar.markdown(
 # --- 5. INTERFAZ MODULAR POR PESTAÑAS (4 TABS ELITE) ---
 tab1, tab2, tab3, tab4 = st.tabs([
     "📋 1. Resumen y Sensibilidad", 
-    "🧪 2. Laboratorio y Google Sheets", 
+    "🧪 2. Laboratorio de Nutrición", 
     "📊 3. Balance Económico, Mineral y Carbono", 
     "🚜 4. Bunk Management y Operarios"
 ])
@@ -358,15 +358,15 @@ with tab1:
     st.plotly_chart(fig_comportamiento, use_container_width=True)
 
 with tab2:
-    st.subheader("🧪 Laboratorio de Nutrición y Base de Datos en Google Sheets")
+    st.subheader("🧪 Laboratorio de Nutrición y Base de Datos de Ingredientes")
     st.markdown(
         "**Personaliza por completo los perfiles nutricionales y de minerales de tus materias primas.** "
         "Sin restricciones mínimas forzadas para garantizar el **costo mínimo absoluto** en la optimización lineal. "
-        "Puedes acceder, editar o respaldar esta tabla directamente en tu nube de Google Drive:"
+        "Puedes acceder, editar o respaldar esta tabla directamente desde la nube:"
     )
     
     st.markdown(
-        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V13)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
+        "🔗 **[Abrir Base de Datos de Ingredientes en la Nube (Versión V13)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
         unsafe_allow_html=True
     )
     st.markdown("<br>", unsafe_allow_html=True)
