@@ -9,7 +9,7 @@ from fpdf import FPDF
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (CAMPO Y GANADERÍA) ---
 st.set_page_config(
-    page_title="Ganader-IA Pro | Nutrición, Minerales y Sostenibilidad NASEM",
+    page_title="Ganader-IA Pro | Nutrición de Precisión y Variables Zootécnicas",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -65,14 +65,14 @@ st.markdown("""
             </svg>
         </div>
         <div style="flex-grow: 1; min-width: 250px;">
-            <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">PRO MINERAL</span></h1>
-            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Nutrición de Precisión, Minerales Mayores y Salud Ruminal</p>
+            <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">PRO 360</span></h1>
+            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Nutrición de Precisión, Factores Fisiológicos y Sostenibilidad</p>
             <p style="margin: 6px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
-# --- 3. BASE DE DATOS INICIAL CON MINERALES MAYORES Y PERFILES EDITABLES ---
+# --- 3. BASE DE DATOS INICIAL CON MINERALES Y NUTRIENTES EDITABLES ---
 data_respaldo = {
     "Nombre del Ingrediente": [
         "Rastrojo de maiz molido", 
@@ -104,15 +104,15 @@ data_respaldo = {
 }
 df_base = pd.DataFrame(data_respaldo)
 
-# --- 4. CONTROLES GENERALES Y PARÁMETROS PRODUCTIVOS EN LA BARRA LATERAL ---
-st.sidebar.header("⚙️ Parámetros del Lote")
+# --- 4. CONTROLES GENERALES Y VARIABLES AVANZADAS EN LA BARRA LATERAL ---
+st.sidebar.header("⚙️ Parámetros del Lote y Ambientales")
 peso_actual = st.sidebar.slider("Peso Vivo Actual (kg)", min_value=200.0, max_value=450.0, value=250.0, step=10.0)
 peso_objetivo = st.sidebar.slider("Peso de Venta / Meta (kg)", min_value=450.0, max_value=600.0, value=520.0, step=10.0)
 gde = st.sidebar.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=1.0, max_value=2.0, value=1.4, step=0.1)
 estacion = st.sidebar.selectbox("Temporada / Clima", ["Templado", "Invierno", "Verano"])
 
 st.sidebar.markdown("---")
-st.sidebar.header("🧬 Genética y Raza")
+st.sidebar.header("🧬 Genética, Sexo y Manejo")
 raza_seleccionada = st.sidebar.selectbox(
     "Predominancia Racial",
     [
@@ -123,14 +123,23 @@ raza_seleccionada = st.sidebar.selectbox(
         "Ganado Criollo / Local"
     ]
 )
+sexo_lote = st.sidebar.selectbox("Tipo Sexual", ["Novillos (Castrados)", "Toros Enteros", "Vaquillas"])
+marco_lote = st.sidebar.selectbox("Tamaño de Marco", ["Mediano (Standard)", "Pequeño (Precoz / Engrase rápido)", "Grande (Continental / Retrasado)"])
+historial_nutricional = st.sidebar.selectbox("Historial Nutricional", ["Desarrollo Continuo (Normal)", "Crecimiento Compensatorio (Post-restricción)"])
+promotor_crecimiento = st.sidebar.selectbox("Promotores de Crecimiento", ["Ninguno", "Implante Hormonal", "Agonista β-adrenérgico (Finalización)"])
+condicion_lodo = st.sidebar.selectbox("Condición de Corral / Lodo", ["Seco y Confortable", "Lodo Moderado (10-15 cm)", "Lodo Severo (>20 cm)"])
 
-# --- MODELADO PREDICTIVO BIOLÓGICO NASEM ---
+# --- MODELADO PREDICTIVO BIOLÓGICO AVANZADO ---
 factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
-cms_estimado = peso_actual * 0.024 * factor_clima
+
+# Factor de lodo: Incrementa requerimiento energético por esfuerzo físico y termorregulación
+factor_lodo = 1.00 if condicion_lodo == "Seco y Confortable" else (1.12 if "Moderado" in condicion_lodo else 1.25)
+cms_estimado = peso_actual * 0.024 * factor_clima / (factor_lodo if "Severo" in condicion_lodo else 1.0)
 
 kg_por_ganar = max(0.0, peso_objetivo - peso_actual)
 dias_a_meta = kg_por_ganar / gde if gde > 0 else 0
 
+# Fases fisiológicas base
 if peso_actual < 300:
     fase = "Crecimiento (Becerro Ligero)"
     meta_pc_base = 0.130 + (gde * 0.015)
@@ -162,6 +171,7 @@ else:
     meta_ca_min = 0.0045
     meta_p_min = 0.0028
 
+# Ajustes por Raza
 if "Británicas" in raza_seleccionada:
     factor_pc = 1.02
     factor_neg = 1.05
@@ -175,15 +185,41 @@ else:
     factor_pc = 1.00
     factor_neg = 1.00
 
-meta_pc_min = meta_pc_base * factor_pc
-meta_neg_min = meta_neg_base * factor_neg
+# Ajustes por Tipo Sexual (Sexo)
+if sexo_lote == "Toros Enteros":
+    factor_sexo_pc = 1.08
+    factor_sexo_neg = 1.04
+elif sexo_lote == "Vaquillas":
+    factor_sexo_pc = 0.96
+    factor_sexo_neg = 1.06 # Engrasan más rápido
+else:
+    factor_sexo_pc = 1.00
+    factor_sexo_neg = 1.00
+
+# Ajustes por Tamaño de Marco
+if "Pequeño" in marco_lote:
+    factor_marco = 1.05
+elif "Grande" in marco_lote:
+    factor_marco = 0.95
+else:
+    factor_marco = 1.00
+
+# Ajustes por Promotores de Crecimiento
+factor_promotor = 1.08 if promotor_crecimiento == "Implante Hormonal" else (1.15 if "Agonista" in promotor_crecimiento else 1.00)
+
+# Ajustes por Crecimiento Compensatorio (Mejora eficiencia metabólica temporal)
+factor_compensatorio = 0.93 if "Compensatorio" in historial_nutricional else 1.00
+
+# Requerimientos mínimos finales ajustados con todas las variables
+meta_pc_min = meta_pc_base * factor_pc * factor_sexo_pc * factor_promotor
+meta_neg_min = meta_neg_base * factor_neg * factor_sexo_neg * factor_marco * factor_lodo * factor_compensatorio
 
 st.sidebar.markdown("---")
 st.sidebar.markdown(
     "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px; font-family: Inter, sans-serif;'>"
-    "<b>Ganader-IA Pro MINERAL</b><br>"
+    "<b>Ganader-IA Pro 360</b><br>"
     "Creado por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
-    "Balance Mineral y Nutrición de Precisión."
+    "Modelo Integral Zootécnico."
     "</div>",
     unsafe_allow_html=True
 )
@@ -197,7 +233,7 @@ tab1, tab2, tab3 = st.tabs([
 
 with tab1:
     st.subheader("Predicciones de Parámetros Productivos y Crecimiento")
-    st.markdown("Proyecciones biológicas del lote basadas en peso actual, genética y condiciones ambientales:")
+    st.markdown("Proyecciones biológicas del lote ajustadas por genética, sexo, manejo y condiciones ambientales:")
     
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -208,7 +244,7 @@ with tab1:
         st.metric("Días Proyectados a Meta", f"{dias_a_meta:.0f} días")
     with col3:
         st.metric("Ganancia Total Esperada", f"{kg_por_ganar:.1f} kg")
-        st.metric("Genética", raza_seleccionada.split("(")[0].strip())
+        st.metric("Perfil Lote", f"{sexo_lote.split()[0]} | {raza_seleccionada.split()[0]}")
     
     st.markdown("---")
     st.subheader("📈 Gráfica de Comportamiento: Peso y Consumo de Materia Seca en el Tiempo")
@@ -257,8 +293,8 @@ with tab1:
 
     fig_comportamiento.update_layout(
         title=dict(
-            text=f"Dinámica de Engorda (GDE: {gde} kg/d | Clima: {estacion})", 
-            font=dict(family="Inter", size=14),
+            text=f"Dinámica de Engorda (GDE: {gde} kg/d | Clima: {estacion} | Lodo: {condicion_lodo.split()[0]})", 
+            font=dict(family="Inter", size=13),
             x=0.5,
             xanchor="center"
         ),
@@ -365,7 +401,7 @@ with tab3:
         with col_res1:
             st.metric(label="Costo Óptimo por Tonelada", value=f"${resultado.fun:,.2f} MXN")
         with col_res2:
-            st.metric(label="Estado del Proceso", value="Factible (Balance Óptimo) 🟢")
+            st.metric(label="Estado del Proceso", value="Factible (Optimización 360) 🟢")
         
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("#### 📋 Tabla de Ingredientes y Mezcla Exacta por Tonelada:")
@@ -393,7 +429,7 @@ with tab3:
         df_mezcla_final = pd.DataFrame(tabla_mezcla)
         st.dataframe(df_mezcla_final, use_container_width=True, hide_index=True)
         
-        # --- CÁLCULOS AVANZADOS NASEM, MINERALES Y METANO ---
+        # --- CÁLCULOS AVANZADOS ---
         aporte_pc = np.sum(resultado.x * pc) * 100
         aporte_neg = np.sum(resultado.x * neg)
         aporte_fnd = np.sum(resultado.x * fnd) * 100
@@ -436,23 +472,23 @@ with tab3:
             st.metric("Sodio (Na)", f"{aporte_na:.2f}%")
             st.metric("Magnesio (Mg)", f"{aporte_mg:.2f}%")
 
-        # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO CON MINERALES ---
-        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, p_act, p_obj, gain, dias, a_pc, a_neg, a_ca, a_p, a_na, a_mg, r_cap, a_fnd, a_pendf, ch4_d, co2e):
+        # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ---
+        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, sexo_L, marco_L, p_act, p_obj, gain, dias, a_pc, a_neg, a_ca, a_p, a_na, a_mg, r_cap, a_fnd, a_pendf, ch4_d, co2e):
             pdf = FPDF()
             pdf.add_page()
             
             # Encabezado
             pdf.set_font("Arial", "B", 15)
-            pdf.cell(0, 8, "Ganader-IA Pro MINERAL - Reporte Ejecutivo Nutricional", 0, 1, "C")
+            pdf.cell(0, 8, "Ganader-IA Pro 360 - Reporte Ejecutivo Nutricional", 0, 1, "C")
             pdf.set_font("Arial", "I", 9)
             pdf.cell(0, 5, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
             pdf.ln(3)
             
             # Datos del Lote
             pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "1. Parametros Biologicos y Predicciones del Lote", 0, 1)
+            pdf.cell(0, 6, "1. Parametros Biologicos, Sexo y Manejo del Lote", 0, 1)
             pdf.set_font("Arial", "", 9)
-            pdf.cell(0, 5, f"Fisiologia: {etapa} | Genetica: {raza_L}", 0, 1)
+            pdf.cell(0, 5, f"Fisiologia: {etapa} | Genetica: {raza_L} | Sexo: {sexo_L} | Marco: {marco_L}", 0, 1)
             pdf.cell(0, 5, f"Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE: {gain} kg/dia | Dias: {dias:.0f}", 0, 1)
             pdf.ln(3)
             
@@ -505,19 +541,19 @@ with tab3:
             return bytes(pdf.output())
 
         pdf_data = generar_pdf_ejecutivo(
-            df_mezcla_final, resultado.fun, fase, raza_seleccionada, peso_actual, peso_objetivo, gde, dias_a_meta,
+            df_mezcla_final, resultado.fun, fase, raza_seleccionada, sexo_lote, marco_lote, peso_actual, peso_objetivo, gde, dias_a_meta,
             aporte_pc, aporte_neg, aporte_ca, aporte_p, aporte_na, aporte_mg, relacion_ca_p, aporte_fnd, aporte_pendf,
             ch4_g_dia, co2e_anual
         )
         
         st.markdown("---")
-        st.subheader("📥 Descarga de Reporte Ejecutivo PDF MINERAL")
-        st.markdown("Haz clic en el botón para descargar el reporte oficial con el balance mineral, corrida financiera y protocolo de carga:")
+        st.subheader("📥 Descarga de Reporte Ejecutivo PDF 360")
+        st.markdown("Haz clic en el botón para descargar el reporte oficial con el balance mineral, corrida financiera, sexo/marco y protocolo de carga:")
         
         st.download_button(
-            label="📄 Descargar Reporte Ejecutivo PDF (Minerales, Sostenibilidad & Operarios)",
+            label="📄 Descargar Reporte Ejecutivo PDF (360, Minerales & Operarios)",
             data=pdf_data,
-            file_name=f"Reporte_GanaderIA_Mineral_{fase.replace(' ', '_')}.pdf",
+            file_name=f"Reporte_GanaderIA_360_{fase.replace(' ', '_')}.pdf",
             mime="application/pdf",
             use_container_width=True
         )
@@ -540,6 +576,6 @@ with tab3:
                 
     else:
         st.error(
-            "⚠️ **Aviso del Optimizador MINERAL:** Con los ingredientes seleccionados y los límites estrictos de minerales (Ca, P) o fibra, "
+            "⚠️ **Aviso del Optimizador 360:** Con los ingredientes seleccionados y los límites estrictos de minerales o fibra, "
             "no se encontró una solución matemática factible. Te sugerimos activar una fuente mineral especializada o ajustar los rangos de inclusión en la Pestaña 2."
         )
