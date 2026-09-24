@@ -214,7 +214,7 @@ with tab1:
         lista_pesos.append(peso_proy)
         lista_cms.append(round(cms_proy, 2))
     
-    # Construcción de gráfica de doble eje con Plotly (Peso vs Consumo de Materia Seca)
+    # Construcción de gráfica de doble eje con layout optimizado para evitar solapamientos
     fig_comportamiento = make_subplots(specs=[[{"secondary_y": True}]])
 
     fig_comportamiento.add_trace(
@@ -242,12 +242,24 @@ with tab1:
     )
 
     fig_comportamiento.update_layout(
-        title=dict(text=f"Dinámica de Engorda (GDE: {gde} kg/d | Clima: {estacion})", font=dict(family="Inter", size=15)),
+        title=dict(
+            text=f"Dinámica de Engorda (GDE: {gde} kg/d | Clima: {estacion})", 
+            font=dict(family="Inter", size=14),
+            x=0.5,
+            xanchor="center"
+        ),
         plot_bgcolor="#ffffff",
         paper_bgcolor="#ffffff",
         font=dict(family="Inter", color="#2b2d42"),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        margin=dict(l=20, r=20, t=50, b=20)
+        # Leyenda reubicada en la parte inferior para total separación respecto al título
+        legend=dict(
+            orientation="h", 
+            yanchor="top", 
+            y=-0.25, 
+            xanchor="center", 
+            x=0.5
+        ),
+        margin=dict(l=20, r=20, t=60, b=70)
     )
 
     fig_comportamiento.update_yaxes(title_text="<b>Peso Vivo del Animal (kg)</b>", secondary_y=False, color="#2d5a27")
