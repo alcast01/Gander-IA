@@ -9,7 +9,7 @@ from fpdf import FPDF
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (CAMPO Y GANADERÍA) ---
 st.set_page_config(
-    page_title="Ganader-IA Elite | Nutrición de Precisión y Costo Mínimo",
+    page_title="Ganader-IA Elite 360 | Nutrición y Vanguardia Científica",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -66,7 +66,7 @@ st.markdown("""
         </div>
         <div style="flex-grow: 1; min-width: 250px;">
             <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">ELITE 360</span></h1>
-            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización Máxima de Costos, Fenología del Pasto y Sostenibilidad</p>
+            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización Avanzada, Aminoácidos (JDS) y Sostenibilidad</p>
             <p style="margin: 6px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
         </div>
     </div>
@@ -154,9 +154,10 @@ sexo_lote = st.sidebar.selectbox("Tipo / Categoría Zootécnica", ["Novillos (Ca
 marco_lote = st.sidebar.selectbox("Tamaño de Marco", ["Mediano (Standard)", "Precoz / Engrase rápido", "Grande (Continental / Retrasado)"])
 
 st.sidebar.markdown("---")
-st.sidebar.header("🌡️ Variables Avanzadas (CC, THI & Aditivos)")
+st.sidebar.header("🌡️ Variables Avanzadas & Vanguardia JDS")
 condicion_corporal = st.sidebar.slider("Condición Corporal Inicial (CC 1.0 - 5.0)", min_value=1.0, max_value=5.0, value=2.5, step=0.5)
 nivel_thi = st.sidebar.selectbox("Estrés Térmico Ambiental (THI)", ["Confort Térmico (< 74)", "Estrés Moderado (74-78)", "Estrés Severo (> 78)"])
+perfil_aa = st.sidebar.selectbox("Modelo de Aminoácidos (JDS / NASEM)", ["Estándar (Proteína Cruda)", "Avanzado (Optimización Lisina:Metionina 3:1)"])
 aditivo_ruminal = st.sidebar.selectbox("Modificadores / Aditivos Zootécnicos", ["Ninguno", "Ionóforos (Monensina / Lasalocid)", "Buffer (Bicarbonato / Óxido Mg)", "Ambos (Ionóforo + Buffer)"])
 historial_nutricional = st.sidebar.selectbox("Historial Nutricional", ["Desarrollo Continuo (Normal)", "Crecimiento Compensatorio (Post-restricción)"])
 promotor_crecimiento = st.sidebar.selectbox("Promotores de Crecimiento", ["Ninguno", "Implante Hormonal", "Agonista β-adrenérgico (Finalización)"])
@@ -166,8 +167,8 @@ condicion_lodo = st.sidebar.selectbox("Condición de Corral / Lodo", ["Seco y Co
 factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
 factor_thi = 0.93 if "Moderado" in nivel_thi else (0.83 if "Severo" in nivel_thi else 1.00)
 factor_cc = 1.06 if condicion_corporal < 3.0 else 1.00 
+factor_aa = 1.04 if "Avanzado" in perfil_aa else 1.00
 
-# Factores de sistema, pastoreo y fenología del pasto
 factor_sistema_cms = 1.12 if "Pastoreo" in sistema_produccion else (1.06 if "Semi-estabulado" in sistema_produccion else 1.00)
 factor_sistema_energ = 1.10 if "Pastoreo" in sistema_produccion else (1.05 if "Semi-estabulado" in sistema_produccion else 1.00)
 
@@ -180,15 +181,14 @@ elif "Silvopastoril" in condiciones_pastoreo:
 else:
     factor_pastoreo_energia = 1.00
 
-# Ajuste fenológico del pasto sobre requerimientos nutricionales (pastos maduros exigen mayor proteína y energía en la suplementación)
 if "Lignificado" in estado_pasto or "Madurez" in estado_pasto:
-    factor_fenologia_pc = 1.15
+    factor_fenologia_pc = 1.15 * factor_aa
     factor_fenologia_energ = 1.10
 elif "Tardío" in estado_pasto:
-    factor_fenologia_pc = 1.08
+    factor_fenologia_pc = 1.08 * factor_aa
     factor_fenologia_energ = 1.05
 else:
-    factor_fenologia_pc = 1.00
+    factor_fenologia_pc = 1.00 * factor_aa
     factor_fenologia_energ = 1.00
 
 factor_lodo = 1.00 if condicion_lodo == "Seco y Confortable" else (1.12 if "Moderado" in condicion_lodo else 1.25)
@@ -287,7 +287,7 @@ tab1, tab2, tab3, tab4 = st.tabs([
 
 with tab1:
     st.subheader("Predicciones de Parámetros Productivos y Análisis de Sensibilidad")
-    st.markdown(f"Proyecciones biológicas del lote bajo **{sistema_produccion}** | Estado del pasto: *{estado_pasto}*:")
+    st.markdown(f"Proyecciones biológicas del lote bajo **{sistema_produccion}** | Perfil AA: *{perfil_aa}*:")
     
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -321,7 +321,7 @@ with tab1:
     fig_comportamiento = make_subplots(specs=[[{"secondary_y": True}]])
     fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_pesos, name="Peso Proyectado (kg)", mode="lines+markers", line=dict(color="#2d5a27", width=3.5)), secondary_y=False)
     fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_cms, name="Consumo Materia Seca (kg/día)", mode="lines+markers", line=dict(color="#bc6c25", width=3, dash="dash")), secondary_y=True)
-    fig_comportamiento.update_layout(title=dict(text=f"Dinámica de Engorda ({estado_pasto[:20]} | GDE: {gde} kg/d)", font=dict(family="Inter", size=13), x=0.5), plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Inter", color="#2b2d42"), legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5), margin=dict(l=20, r=20, t=60, b=70))
+    fig_comportamiento.update_layout(title=dict(text=f"Dinámica de Engorda ({perfil_aa[:18]} | GDE: {gde} kg/d)", font=dict(family="Inter", size=13), x=0.5), plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Inter", color="#2b2d42"), legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5), margin=dict(l=20, r=20, t=60, b=70))
     fig_comportamiento.update_yaxes(title_text="<b>Peso Vivo del Animal (kg)</b>", secondary_y=False, color="#2d5a27")
     fig_comportamiento.update_yaxes(title_text="<b>Consumo de Materia Seca (kg/día)</b>", secondary_y=True, color="#bc6c25")
     st.plotly_chart(fig_comportamiento, use_container_width=True)
@@ -335,7 +335,7 @@ with tab2:
     )
     
     st.markdown(
-        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V5)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
+        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V6)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
         unsafe_allow_html=True
     )
     st.markdown("<br>", unsafe_allow_html=True)
@@ -482,6 +482,9 @@ with tab3:
         relacion_ca_p = (aporte_ca / aporte_p) if aporte_p > 0 else 0
         status_ca_p = "🟢 Óptimo Automático"
         
+        # Indicador de Riesgo SARA basado en literatura (peNDF mínimo seguro >= 18-20%)
+        riesgo_sara = "🟢 Bajo (Seguro)" if aporte_pendf >= 18.0 else ("🟡 Moderado (Monitorear Buffer)" if aporte_pendf >= 14.0 else "🔴 Alto Riesgo SARA (Aumentar Fibra E.F.)")
+        
         ge_diaria = cms_estimado * 18.4 
         reduccion_lipidica = max(0.0, (aporte_lipidos - 3.0) * 0.003)
         reduccion_ionoforo = 0.06 if "Ionóforos" in aditivo_ruminal or "Ambos" in aditivo_ruminal else 0.0
@@ -498,15 +501,15 @@ with tab3:
         valor_bono_mxn = (ahorro_co2e_kg / 1000.0) * 350.0
         
         st.markdown("---")
-        st.subheader("🛡️ Validación Mineral, Salud Ruminal y Monetización Verde")
+        st.subheader("🛡️ Validación Mineral, Salud Ruminal (JDS) y Sostenibilidad")
         
         col_m1, col_m2, col_m3, col_m4 = st.columns(4)
         with col_m1:
             st.metric("Calcio (Ca)", f"{aporte_ca:.2f}%", "Mineral Mayor")
             st.metric("Relación Ca:P", f"{relacion_ca_p:.2f}:1", status_ca_p)
         with col_m2:
-            st.metric("Fósforo (P)", f"{aporte_p:.2f}%", "Mineral Mayor")
             st.metric("Fibra peNDF", f"{aporte_pendf:.1f}%", "Anti-acidosis")
+            st.metric("Riesgo SARA", riesgo_sara, "Salud Ruminal")
         with col_m3:
             st.metric("Emisión $CH_4$", f"{ch4_g_dia:.1f} g/día", f"IPCC Tier 2 ({aditivo_ruminal[:10]})")
             st.metric("Equivalente $CO_2e$", f"{co2e_anual:,.1f} kg/año")
@@ -540,7 +543,7 @@ with tab4:
         st.markdown("---")
         st.markdown("#### 📋 Protocolo y Orden de Carga en Batea para Operarios:")
         st.info(
-            f"**Lote Activo:** {cantidad_animales} animales | **Sistema:** {sistema_produccion} | **Pasto:** {estado_pasto} | **Duración:** {dias_a_meta:.0f} días\n\n"
+            f"**Lote Activo:** {cantidad_animales} animales | **Sistema:** {sistema_produccion} | **Perfil AA:** {perfil_aa} | **Duración:** {dias_a_meta:.0f} días\n\n"
             "1. **Paso 1 (Forrajes Secos / Fibra Larga):** Cargar rastrojos o harinas fibrosas al inicio para asegurar el peNDF y evitar acidosis metabólica.\n"
             "2. **Paso 2 (Ingredientes Húmedos / Ensilados):** Agregar ensilados o subproductos húmedos calculando la corrección por materia seca.\n"
             "3. **Paso 3 (Granos Energéticos y Proteicos):** Incorporar maíz molido, pasta de soya y canola.\n"
@@ -551,12 +554,12 @@ with tab4:
         )
 
         # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ELITE ---
-        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, sistema_prod, cond_past, est_pasto, raza_L, sexo_L, marco_L, cc_val, thi_val, adit_val, p_act, p_obj, gain, dias, cabezas, a_ca, a_p, r_cap, a_fnd, a_pendf, ch4_d, co2e, bonos, cost_lote, tons_lote):
+        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, sistema_prod, cond_past, est_pasto, perf_aa, raza_L, sexo_L, marco_L, cc_val, thi_val, adit_val, p_act, p_obj, gain, dias, cabezas, a_ca, a_p, r_cap, a_fnd, a_pendf, ch4_d, co2e, bonos, cost_lote, tons_lote):
             pdf = FPDF()
             pdf.add_page()
             
             pdf.set_font("Arial", "B", 15)
-            pdf.cell(0, 8, "Ganader-IA Elite 360 - Reporte Ejecutivo y Bonos de Carbono", 0, 1, "C")
+            pdf.cell(0, 8, "Ganader-IA Elite 360 - Reporte Ejecutivo y Vanguardia JDS", 0, 1, "C")
             pdf.set_font("Arial", "I", 9)
             pdf.cell(0, 5, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
             pdf.ln(3)
@@ -564,7 +567,7 @@ with tab4:
             pdf.set_font("Arial", "B", 10)
             pdf.cell(0, 6, "1. Parametros Biologicos y Poblacionales del Lote", 0, 1)
             pdf.set_font("Arial", "", 9)
-            pdf.cell(0, 5, f"Fisiologia: {etapa} | Sistema: {sistema_prod}", 0, 1)
+            pdf.cell(0, 5, f"Fisiologia: {etapa} | Sistema: {sistema_prod} | Perfil AA: {perf_aa}", 0, 1)
             pdf.cell(0, 5, f"Pastoreo: {cond_past} | Estado Pasto: {est_pasto}", 0, 1)
             pdf.cell(0, 5, f"Cabezas: {cabezas} | Genetica: {raza_L} | Categoria: {sexo_L}", 0, 1)
             pdf.cell(0, 5, f"Condicion Corporal (CC): {cc_val} | THI: {thi_val} | Aditivos: {adit_val}", 0, 1)
@@ -579,7 +582,7 @@ with tab4:
             pdf.ln(3)
             
             pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "3. Balance Mineral, Salud Ruminal y Sostenibilidad (IPCC)", 0, 1)
+            pdf.cell(0, 6, "3. Balance Mineral, Salud Ruminal (JDS) y Sostenibilidad (IPCC)", 0, 1)
             pdf.set_font("Arial", "", 9)
             pdf.cell(0, 5, f"Calcio (Ca): {a_ca:.2f}% | Fosforo (P): {a_p:.2f}% | Relacion Ca:P: {r_cap:.2f}:1", 0, 1)
             pdf.cell(0, 5, f"Fibra FND: {a_fnd:.1f}% | peNDF (Anti-acidosis): {a_pendf:.1f}%", 0, 1)
@@ -629,7 +632,7 @@ with tab4:
 
         df_mezcla_pdf = pd.DataFrame(tabla_mezcla_con_totales)
         pdf_data = generar_pdf_ejecutivo(
-            df_mezcla_pdf, resultado.fun, fase, sistema_produccion, condiciones_pastoreo, estado_pasto, raza_seleccionada, sexo_lote, marco_lote, condicion_corporal, nivel_thi, aditivo_ruminal, peso_actual, peso_objetivo, gde, dias_a_meta,
+            df_mezcla_pdf, resultado.fun, fase, sistema_produccion, condiciones_pastoreo, estado_pasto, perfil_aa, raza_seleccionada, sexo_lote, marco_lote, condicion_corporal, nivel_thi, aditivo_ruminal, peso_actual, peso_objetivo, gde, dias_a_meta,
             cantidad_animales, aporte_ca, aporte_p, relacion_ca_p, aporte_fnd, aporte_pendf,
             ch4_g_dia, co2e_anual, valor_bono_mxn, costo_total_lote, alimento_total_ciclo / 1000.0
         )
