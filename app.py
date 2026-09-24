@@ -318,15 +318,171 @@ factor_compensatorio = 0.93 if "Compensatorio" in historial_nutricional else 1.0
 meta_pc_min = meta_pc_base * factor_pc * factor_sexo_pc * factor_promotor
 meta_neg_min = meta_neg_base * factor_neg * factor_sexo_neg * factor_marco * factor_lodo * factor_compensatorio
 
+# --- EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL ---
+try:
+    nombres = df_base["Nombre del Ingrediente"].astype(str).values
+    c = df_base["Precio Estimado (MXN/ton)"].astype(float).values
+    pc = df_base["Proteina Cruda (PC % MS)"].astype(float).values / 100.0  
+    neg = df_base["NEg (Mcal/kg)"].astype(float).values
+    fnd = df_base["FND (% MS)"].astype(float).values / 100.0
+    pendf = df_base["peNDF (% MS)"].astype(float).values / 100.0
+    pdr = df_base["PDR (% MS)"].astype(float).values / 100.0
+    pnd = df_base["PND (% MS)"].astype(float).values / 100.0
+    ca = df_base["Calcio (Ca %)"].astype(float).values / 100.0
+    p_min_ing = df_base["Fosforo (P %)"].astype(float).values / 100.0
+    na = df_base["Sodio (Na %)"].astype(float).values / 100.0
+    mg = df_base["Magnesio (Mg %)"].astype(float).values / 100.0
+    lipidos = df_base["Lípidos / Extracto Etéreo (%)"].astype(float).values / 100.0
+    disponibles = df_base["Disponible"].astype(bool).values
+except KeyError as err:
+    st.error(f"Falta una columna clave en la tabla: {err}.")
+    st.stop()
+
+bounds = []
+for idx, row in df_base.iterrows():
+    if not row["Disponible"]:
+        bounds.append((0.0, 0.0))
+    else:
+        min_lim = max(0.0, float(row["Min Inclusión (%)"]) / 100.0)
+        max_lim = min(1.0, float(row["Max Inclusión (%)"]) / 100.0)
+        bounds.append((min_lim, max_lim))
+
+A_eq = np.ones((1, len(c)))
+b_eq = np.array([1.0])
+
+resultado = None
+modo_tolerancia_activo = False
+
+row_ca_p_min = -ca + 1.5 * p_min_ing
+row_ca_p_max = ca - 2.0 * p_min_ing
+A_ub = np.array([-pc, -neg, -fnd, -pendf, -pdr, -pnd, -ca, -p_min_ing, row_ca_p_min, row_ca_p_max])
+b_ub = np.array([-meta_pc_min, -meta_neg_min, -meta_fnd_min, -meta_pendf_min, -meta_pdr_min, -meta_pnd_min, -meta_ca_min, -meta_p_min, 0.0, 0.0])
+
+resultado = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
+
+if not resultado.success:
+    row_ca_p_min_rel = -ca + 1.2 * p_min_ing
+    row_ca_p_max_rel = ca - 2.5 * p_min_ing
+    A_ub_rel = np.array([-pc, -neg, -fnd, -pendf, -pdr, -pnd, -ca, -p_min_ing, row_ca_p_min_rel, row_ca_p_max_rel])
+    resultado = linprog(c, A_ub=A_ub_rel, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
+    if resultado.success:
+        modo_tolerancia_activo = True
+
+if not resultado.success:
+    meta_pc_min_rel = meta_pc_min * 0.90
+    meta_neg_min_rel = meta_neg_min * 0.90
+    b_ub_rel2 = np.array([-meta_pc_min_rel, -meta_neg_min_rel, -meta_fnd_min, -meta_pendf_min, -meta_pdr_min, -meta_pnd_min, -meta_ca_min, -meta_p_min, 0.0, 0.0])
+    resultado = linprog(c, A_ub=A_ub_rel, b_ub=b_ub_rel2, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
+    if resultado.success:
+        modo_tolerancia_activo = True
+
+costo_ton_optimizado = resultado.fun if resultado.success else 4500.0 
+
+# Cálculos económicos para reportes
+consumo_total_ciclo_cab = cms_estimado * dias_a_meta
+costo_alimentacion_cab = (consumo_total_ciclo_cab / 1000.0) * costo_ton_optimizado
+costo_compra_cab = peso_actual * precio_compra_kg
+costo_total_cab = costo_compra_cab + costo_alimentacion_cab + costo_sanidad_fijo + costo_mano_obra_fijo
+ingreso_venta_cab = peso_objetivo * precio_venta_kg
+utilidad_neta_cab = ingreso_venta_cab - costo_total_cab
+roi_cab = (utilidad_neta_cab / costo_total_cab) * 100 if costo_total_cab > 0 else 0
+
+# --- FUNCIÓN GENERADORA DE PDF ---
+class PDFReport(FPDF):
+    def header(self):
+        self.set_font('Arial', 'B', 12)
+        self.set_text_color(5, 150, 105)
+        self.cell(0, 10, 'Ganader-IA Elite 360 - Reporte Ejecutivo y Formula Optimizada', 0, 1, 'C')
+        self.ln(3)
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Arial', 'I', 8)
+        self.set_text_color(100, 100, 100)
+        self.cell(0, 10, f'Pagina {self.page_no()} | Creado por Dr. Alejandro Castaneda Correa', 0, 0, 'C')
+
+def generar_pdf_reporte():
+    pdf = PDFReport()
+    pdf.add_page()
+    
+    def safe_str(txt):
+        return str(txt).encode('latin-1', 'replace').decode('latin-1')
+
+    # Datos Generales
+    pdf.set_font('Arial', 'B', 11)
+    pdf.set_text_color(15, 23, 42)
+    pdf.cell(0, 8, safe_str("1. Resumen Zootecnico y Productivo"), 0, 1)
+    pdf.set_font('Arial', '', 10)
+    
+    resumen_dict = {
+        "Cabezas en el Lote": f"{cantidad_animales} animales",
+        "Etapa Fisiologica": fase,
+        "Peso Actual / Meta": f"{peso_actual} kg -> {peso_objetivo} kg",
+        "Ganancia Diaria Esperada (GDE)": f"{gde} kg/dia",
+        "Consumo Materia Seca (CMS)": f"{cms_estimado:.2f} kg/dia",
+        "Dias Proyectados al Objetivo": f"{dias_a_meta:.0f} dias"
+    }
+    
+    for k, v in resumen_dict.items():
+        pdf.cell(95, 7, safe_str(f"{k}:"), 0, 0)
+        pdf.cell(95, 7, safe_str(f"{v}"), 0, 1)
+        
+    pdf.ln(4)
+    pdf.set_font('Arial', 'B', 11)
+    pdf.cell(0, 8, safe_str("2. Evaluacion Financiera por Cabeza"), 0, 1)
+    pdf.set_font('Arial', '', 10)
+    
+    econ_dict = {
+        "Costo de Compra Becerro": f"${costo_compra_cab:,.2f} MXN",
+        "Costo Total de Alimentacion": f"${costo_alimentacion_cab:,.2f} MXN",
+        "Sanidad y Mano de Obra": f"${costo_sanidad_fijo + costo_mano_obra_fijo:,.2f} MXN",
+        "Costo Total de Produccion": f"${costo_total_cab:,.2f} MXN",
+        "Ingreso por Venta Ganado": f"${ingreso_venta_cab:,.2f} MXN",
+        "Utilidad Neta Esperada": f"${utilidad_neta_cab:,.2f} MXN",
+        "ROI del Ciclo": f"{roi_cab:.1f}%"
+    }
+    
+    for k, v in econ_dict.items():
+        pdf.cell(95, 7, safe_str(f"{k}:"), 0, 0)
+        pdf.cell(95, 7, safe_str(f"{v}"), 0, 1)
+
+    pdf.ln(4)
+    pdf.set_font('Arial', 'B', 11)
+    pdf.cell(0, 8, safe_str("3. Formula Optimizada (Costo Minimo)"), 0, 1)
+    
+    pdf.set_font('Arial', 'B', 9)
+    pdf.cell(100, 7, safe_str("Ingrediente"), 1, 0, 'L')
+    pdf.cell(45, 7, safe_str("Inclusion (%)"), 1, 0, 'C')
+    pdf.cell(45, 7, safe_str("Kg / Tonelada"), 1, 1, 'C')
+    
+    pdf.set_font('Arial', '', 9)
+    if resultado.success:
+        for i, ing in enumerate(nombres):
+            frac = resultado.x[i]
+            if frac > 0.0001:
+                pdf.cell(100, 6, safe_str(ing), 1, 0, 'L')
+                pdf.cell(45, 6, safe_str(f"{frac*100:.2f}%"), 1, 0, 'C')
+                pdf.cell(45, 6, safe_str(f"{frac*1000:.1f} kg"), 1, 1, 'C')
+        pdf.set_font('Arial', 'B', 9)
+        pdf.cell(100, 6, safe_str("COSTO TOTAL POR TONELADA"), 1, 0, 'L')
+        pdf.cell(90, 6, safe_str(f"${costo_ton_optimizado:,.2f} MXN"), 1, 1, 'C')
+
+    return pdf.output(dest='S').encode('latin1')
+
+# --- EXPORTACIÓN EN BARRA LATERAL ---
 st.sidebar.markdown("---")
-st.sidebar.markdown(
-    "<div style='text-align: center; color: #64748b; font-size: 0.85em; padding: 5px; font-family: Plus Jakarta Sans, sans-serif;'>"
-    "<b>Ganader-IA Elite 360</b><br>"
-    "Creado por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
-    "SaaS de Nutrición, Precisión y Sostenibilidad."
-    "</div>",
-    unsafe_allow_html=True
-)
+with st.sidebar.expander("📥 6. Reportes y Exportación", expanded=True):
+    if resultado.success:
+        pdf_bytes = generar_pdf_reporte()
+        st.download_button(
+            label="📄 Descargar Reporte PDF",
+            data=pdf_bytes,
+            file_name="GanaderIA_Elite_360_Reporte.pdf",
+            mime="application/pdf",
+            use_container_width=True
+        )
+    else:
+        st.warning("Resuelve las restricciones nutricionales para habilitar el reporte PDF.")
 
 # --- 5. INTERFAZ MODULAR POR PESTAÑAS (5 TABS ELITE) ---
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
@@ -397,72 +553,6 @@ with tab2:
         key="editor_ingredientes"
     )
 
-# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL (CON AUTO-RECUPERACIÓN Y TOLERANCIA) ---
-try:
-    nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
-    c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
-    pc = df_ingredientes["Proteina Cruda (PC % MS)"].astype(float).values / 100.0  
-    neg = df_ingredientes["NEg (Mcal/kg)"].astype(float).values
-    fnd = df_ingredientes["FND (% MS)"].astype(float).values / 100.0
-    pendf = df_ingredientes["peNDF (% MS)"].astype(float).values / 100.0
-    pdr = df_ingredientes["PDR (% MS)"].astype(float).values / 100.0
-    pnd = df_ingredientes["PND (% MS)"].astype(float).values / 100.0
-    ca = df_ingredientes["Calcio (Ca %)"].astype(float).values / 100.0
-    p_min_ing = df_ingredientes["Fosforo (P %)"].astype(float).values / 100.0
-    na = df_ingredientes["Sodio (Na %)"].astype(float).values / 100.0
-    mg = df_ingredientes["Magnesio (Mg %)"].astype(float).values / 100.0
-    lipidos = df_ingredientes["Lípidos / Extracto Etéreo (%)"].astype(float).values / 100.0
-    
-    disponibles = df_ingredientes["Disponible"].astype(bool).values
-except KeyError as err:
-    st.error(f"Falta una columna clave en la tabla: {err}.")
-    st.stop()
-
-bounds = []
-for idx, row in df_ingredientes.iterrows():
-    if not row["Disponible"]:
-        bounds.append((0.0, 0.0))
-    else:
-        min_lim = max(0.0, float(row["Min Inclusión (%)"]) / 100.0)
-        max_lim = min(1.0, float(row["Max Inclusión (%)"]) / 100.0)
-        bounds.append((min_lim, max_lim))
-
-A_eq = np.ones((1, len(c)))
-b_eq = np.array([1.0])
-
-# Estrategia de Auto-Recuperación por Niveles de Tolerancia
-resultado = None
-modo_tolerancia_activo = False
-
-# Intento 1: Restricciones ideales (Ca:P 1.5-2.0, metas exactas)
-row_ca_p_min = -ca + 1.5 * p_min_ing
-row_ca_p_max = ca - 2.0 * p_min_ing
-A_ub = np.array([-pc, -neg, -fnd, -pendf, -pdr, -pnd, -ca, -p_min_ing, row_ca_p_min, row_ca_p_max])
-b_ub = np.array([-meta_pc_min, -meta_neg_min, -meta_fnd_min, -meta_pendf_min, -meta_pdr_min, -meta_pnd_min, -meta_ca_min, -meta_p_min, 0.0, 0.0])
-
-resultado = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
-
-# Intento 2: Si falla, relajar Ca:P a 1.2-2.5
-if not resultado.success:
-    row_ca_p_min_rel = -ca + 1.2 * p_min_ing
-    row_ca_p_max_rel = ca - 2.5 * p_min_ing
-    A_ub_rel = np.array([-pc, -neg, -fnd, -pendf, -pdr, -pnd, -ca, -p_min_ing, row_ca_p_min_rel, row_ca_p_max_rel])
-    resultado = linprog(c, A_ub=A_ub_rel, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
-    if resultado.success:
-        modo_tolerancia_activo = True
-
-# Intento 3: Si aún falla, relajar metas nutricionales en un 10% (Auto-recuperación total)
-if not resultado.success:
-    meta_pc_min_rel = meta_pc_min * 0.90
-    meta_neg_min_rel = meta_neg_min * 0.90
-    b_ub_rel2 = np.array([-meta_pc_min_rel, -meta_neg_min_rel, -meta_fnd_min, -meta_pendf_min, -meta_pdr_min, -meta_pnd_min, -meta_ca_min, -meta_p_min, 0.0, 0.0])
-    resultado = linprog(c, A_ub=A_ub_rel, b_ub=b_ub_rel2, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
-    if resultado.success:
-        modo_tolerancia_activo = True
-
-# Guardamos el costo de la dieta para usarlo en la pestaña 5
-costo_ton_optimizado = resultado.fun if resultado.success else 4500.0 
-
 with tab3:
     st.subheader("📊 Evaluación Económica Financiera y Rentabilidad del Negocio")
     
@@ -470,10 +560,8 @@ with tab3:
         if modo_tolerancia_activo:
             st.warning("⚠️ **Aviso de Auto-Recuperación Elite:** El sistema ajustó automáticamente los márgenes de tolerancia de minerales y energía para garantizar una solución factible.")
         
-        # --- CÁLCULOS ECONÓMICOS DETALLADOS ---
-        costo_ton_alimento = costo_ton_optimizado
         consumo_total_ciclo_cab = cms_estimado * dias_a_meta
-        costo_alimentacion_cab = (consumo_total_ciclo_cab / 1000.0) * costo_ton_alimento
+        costo_alimentacion_cab = (consumo_total_ciclo_cab / 1000.0) * costo_ton_optimizado
         
         costo_compra_cab = peso_actual * precio_compra_kg
         costo_total_cab = costo_compra_cab + costo_alimentacion_cab + costo_sanidad_fijo + costo_mano_obra_fijo
@@ -519,7 +607,7 @@ with tab3:
                     "Costo Unitario ($/ton)": f"${c[i]:,.2f}",
                     "Aporte al Costo Total ($)": f"${costo_parcial:,.2f}"
                 })
-                cat_ing = str(df_ingredientes.iloc[i].get("Categoria", "Otros"))
+                cat_ing = str(df_base.iloc[i].get("Categoria", "Otros"))
                 categorias_pie[cat_ing] = categorias_pie.get(cat_ing, 0) + porcentaje
         
         total_porcentaje = sum([row["Inclusion (%)"] for row in tabla_mezcla])
@@ -538,7 +626,6 @@ with tab3:
         df_mezcla_final = pd.DataFrame(tabla_mezcla_con_totales)
         st.dataframe(df_mezcla_final, use_container_width=True, hide_index=True)
         
-        # --- CÁLCULOS DE SOSTENIBILIDAD Y CARBONO ---
         aporte_pc = np.sum(resultado.x * pc) * 100
         aporte_neg = np.sum(resultado.x * neg)
         aporte_fnd = np.sum(resultado.x * fnd) * 100
@@ -617,7 +704,6 @@ with tab4:
             "7. **Tiempo de Mezclado:** Operar el carro mezclador de 8 a 10 minutos continuos antes de la distribución en comederos."
         )
 
-# --- 7. NUEVA PESTAÑA: SIMULADOR DE COMPRA-VENTA ---
 with tab5:
     st.subheader("🔮 Simulador Estratégico de Compra y Venta")
     st.markdown("""
@@ -637,18 +723,15 @@ with tab5:
         matriz_resultados = []
         
         for wi in pesos_compra:
-            # Ajuste de mercado: Animales ligeros cuestan más por kg, animales pesados cuestan menos.
-            # Factor de corrección: -$0.04 por cada kg extra arriba de 250 kg.
             pc = precio_compra_base - ((wi - 250) * 0.04) 
             
             for wf in pesos_venta:
-                if wf <= wi + 50: # Evitar periodos absurdamente cortos
+                if wf <= wi + 50: 
                     continue
                 
                 kg_ganados = wf - wi
                 dias = kg_ganados / gde_fijo if gde_fijo > 0 else 1
                 
-                # Consumo estimado promedio
                 peso_promedio = (wi + wf) / 2.0
                 cms_ciclo = peso_promedio * 0.024 
                 
@@ -656,7 +739,6 @@ with tab5:
                 costo_compra = wi * pc
                 costo_total = costo_compra + costo_alimento + costo_fijos
                 
-                # Ajuste Venta: Castigo en precio si el animal se pasa de peso/engrasamiento (>540kg)
                 pv = precio_venta_base if wf <= 540 else precio_venta_base - ((wf - 540) * 0.05)
                 ingreso_venta = wf * pv
                 
@@ -681,7 +763,6 @@ with tab5:
                     
         return optimo, pd.DataFrame(matriz_resultados)
     
-    # Ejecutar simulación
     resultado_optimo, df_simulacion = calcular_peso_optimo_financiero(
         precio_compra_base=precio_compra_kg, 
         precio_venta_base=precio_venta_kg,
@@ -710,7 +791,6 @@ with tab5:
     st.markdown("### 🗺️ Mapa de Calor de Rentabilidad (Zonas de Utilidad)")
     st.markdown("Visualiza cómo cambia la ganancia dependiendo del peso al que compras (Eje Y) y al peso que vendes (Eje X). **Las zonas amarillas son de alta rentabilidad; las moradas/oscuras generan pérdidas.**")
     
-    # Pivotar dataframe para el mapa de calor
     df_pivot = df_simulacion.pivot(index="Peso Compra (kg)", columns="Peso Venta (kg)", values="Utilidad Neta (MXN)")
     
     fig_heat = px.imshow(
