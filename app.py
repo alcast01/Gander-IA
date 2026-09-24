@@ -28,18 +28,19 @@ st.markdown("""
         background-color: #f8f6f0;
     }
     
-    /* Tarjetas de Métricas de Alta Conversión */
+    /* Tarjetas de Métricas Optimizadas para Ajuste Perfecto */
     .stMetric {
         background: linear-gradient(145deg, #ffffff 0%, #fcfbf9 100%);
-        padding: 10px 14px !important;
-        border-radius: 12px;
+        padding: 8px 10px !important;
+        border-radius: 10px;
         box-shadow: 0 4px 15px rgba(45, 90, 39, 0.07);
         border-left: 4px solid #2d5a27;
         border-top: 1px solid #eae5df;
         border-right: 1px solid #eae5df;
         border-bottom: 1px solid #eae5df;
-        margin-bottom: 8px !important;
+        margin-bottom: 6px !important;
         transition: transform 0.2s ease;
+        overflow: hidden;
     }
     
     .stMetric:hover {
@@ -48,17 +49,21 @@ st.markdown("""
     }
     
     .stMetric label {
-        font-size: 0.72rem !important;
+        font-size: 0.68rem !important;
         color: #555555 !important;
         font-weight: 600 !important;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .stMetric [data-testid="stMetricValue"] {
-        font-size: 1.1rem !important;
+        font-size: 0.92rem !important;
         color: #1f2421 !important;
-        font-weight: 800 !important;
+        font-weight: 700 !important;
+        word-break: break-word;
     }
     
     h1, h2, h3, h4 {
