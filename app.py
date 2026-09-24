@@ -108,8 +108,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y PLANES DE SUSCRIPCIÓN COMERCIALES ---
-USERS_FILE = "usuarios_ganaderia_elite_planes_unified.json"
+# --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y PLANES DE SUSCRIPCIÓN PROPORCIONALES ---
+USERS_FILE = "usuarios_ganaderia_elite_planes_proportional.json"
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -126,14 +126,14 @@ def cargar_usuarios_persistentes():
             "password": hash_password("1234"),
             "email": "admin@ganaderiaelite.com",
             "subscription_active": True,
-            "plan": "Anual (12 Meses) - $7,560 MXN | $630.00/mes (⭐ Ahorro Total de $378.00/mes y 37.5% vs. Trimestral)",
+            "plan": "Anual (12 Meses) - $8,400 MXN | $700.00/mes",
             "fecha_registro": "2026-01-01"
         },
         "alejandro": {
             "password": hash_password("elite360"),
             "email": "alejandro.castaneda@ganaderiaelite.com",
             "subscription_active": True,
-            "plan": "Anual (12 Meses) - $7,560 MXN | $630.00/mes (⭐ Ahorro Total de $378.00/mes y 37.5% vs. Trimestral)",
+            "plan": "Anual (12 Meses) - $8,400 MXN | $700.00/mes",
             "fecha_registro": "2026-01-01"
         }
     }
@@ -199,18 +199,18 @@ if not st.session_state.authenticated:
                 else:
                     st.error("Tu suscripción se encuentra inactiva. Selecciona un plan y realiza el pago para renovar.")
             else:
-                st.error("Usuario o contraseña incorrectos. Verifica tus datos.")
+                st.error("Usuario or contraseña incorrectos. Verifica tus datos.")
 
     with tab_register:
-        st.markdown("### 🌟 Inversión Estratégica para tu Rancho")
-        st.markdown("Selecciona el periodo que mejor se alinee con tu ciclo biológico y comercial. **Asegura el máximo rendimiento con el Plan Anual:**")
+        st.markdown("### 🌟 Selección de Plan Proporcional")
+        st.markdown("Elige el periodo de suscripción que mejor se adapte a tus requerimientos operativos:")
         
         plan_elegido = st.radio(
             "Planes de Suscripción Elite Disponibles:",
             [
-                "Trimestral (3 Meses) - $3,024 MXN | $1,008.00/mes (Tarifa Estándar)",
-                "Semestral (6 Meses) - $4,200 MXN | $700.00/mes (Ahorro de $308.00/mes vs. Trimestral)",
-                "Anual (12 Meses) - $7,560 MXN | $630.00/mes (⭐ Ahorro Total de $378.00/mes y 37.5% vs. Trimestral)"
+                "Trimestral (3 Meses) - $2,700 MXN | $900.00/mes (Tarifa Estándar)",
+                "Semestral (6 Meses) - $4,800 MXN | $800.00/mes (Ahorro de $100.00/mes vs. Trimestral)",
+                "Anual (12 Meses) - $8,400 MXN | $700.00/mes (Ahorro de $200.00/mes vs. Trimestral)"
             ],
             index=2
         )
@@ -237,11 +237,11 @@ if not st.session_state.authenticated:
         
         st.markdown("")
         
-        # Extracción dinámica y exacta del costo seleccionado por el cliente
+        # Extracción dinámica exacta del costo seleccionado
         try:
             costo_str = plan_elegido.split("-")[1].split("|")[0].strip()
         except Exception:
-            costo_str = "$7,560 MXN"
+            costo_str = "$8,400 MXN"
         
         if st.button(f"💳 Pagar {costo_str} y Activar Licencia Elite", use_container_width=True):
             db_usuarios = cargar_usuarios_persistentes()
