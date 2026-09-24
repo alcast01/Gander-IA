@@ -7,9 +7,9 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from fpdf import FPDF
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL ULTRA-COMPACTO ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL COMPACTO ---
 st.set_page_config(
-    page_title="Ganader-IA Elite 360 | Nutrición y Economía",
+    page_title="Ganader-IA Elite 360 | Nutrición, Economía y Control Mensual",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -81,7 +81,7 @@ st.markdown("""
         </div>
         <div style="flex-grow: 1; min-width: 200px;">
             <h1 style="margin: 0; font-size: 1.5em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 6px; border-radius: 4px; font-size: 0.55em; vertical-align: middle;">ELITE 360</span></h1>
-            <p style="margin: 2px 0 0 0; font-size: 0.85em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización Compacta, Financiera y Sostenibilidad</p>
+            <p style="margin: 2px 0 0 0; font-size: 0.85em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización, Control Mensual (30 Días) y Sostenibilidad</p>
         </div>
     </div>
 """, unsafe_allow_html=True)
@@ -119,70 +119,59 @@ data_respaldo = {
 }
 df_base = pd.DataFrame(data_respaldo)
 
-# --- 4. CONTROLES GENERALES Y VARIABLES AVANZADAS EN LA BARRA LATERAL ---
-st.sidebar.header("⚙️ Parámetros del Lote y Población")
-cantidad_animales = st.sidebar.number_input("Número de Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
-peso_actual = st.sidebar.slider("Peso Vivo Actual / Compra (kg)", min_value=200.0, max_value=650.0, value=250.0, step=10.0)
-peso_objetivo = st.sidebar.slider("Peso de Venta / Meta (kg)", min_value=400.0, max_value=750.0, value=520.0, step=10.0)
-gde = st.sidebar.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=0.8, max_value=2.2, value=1.4, step=0.1)
+# --- 4. BARRA LATERAL ORGANIZADA EN MENÚS DESPLEGABLES (EXPANDERS) ---
+st.sidebar.markdown("### 🎛️ Panel de Control Elite")
 
-st.sidebar.markdown("---")
-st.sidebar.header("💰 Parámetros Económicos y de Mercado")
-precio_compra_kg = st.sidebar.number_input("Precio Compra Becerro (MXN/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
-precio_venta_kg = st.sidebar.number_input("Precio Venta Ganado Gordo (MXN/kg)", min_value=30.0, max_value=100.0, value=50.0, step=1.0)
-costo_sanidad_fijo = st.sidebar.number_input("Sanidad y Manejo (MXN/cab)", min_value=0.0, max_value=2000.0, value=350.0, step=50.0)
-costo_mano_obra_fijo = st.sidebar.number_input("Mano de Obra / Indirectos (MXN/cab)", min_value=0.0, max_value=3000.0, value=450.0, step=50.0)
+with st.sidebar.expander("📅 Etapas y Control Mensual (30 Días)", expanded=True):
+    mes_engorda = st.selectbox(
+        "Hito / Mes Actual de Engorda",
+        [
+            "Mes 0 - Recepción y Adaptación (200 - 280 kg)",
+            "Mes 1 - Crecimiento Inicial (280 - 334 kg)",
+            "Mes 2 - Crecimiento / Repasto (334 - 376 kg)",
+            "Mes 3 - Transición / Desarrollo (376 - 418 kg)",
+            "Mes 4 - Engorda Intermedia (418 - 460 kg)",
+            "Mes 5 - Finalización Avanzada (460 - 502 kg)",
+            "Mes 6+ - Cierre y Venta (502 - 520+ kg)"
+        ]
+    )
+    # Asignación automática de peso sugerido según el mes seleccionado
+    pesos_sugeridos = {
+        "Mes 0": 250.0, "Mes 1": 292.0, "Mes 2": 334.0, 
+        "Mes 3": 376.0, "Mes 4": 418.0, "Mes 5": 460.0, "Mes 6+": 502.0
+    }
+    sugerencia_peso = pesos_sugeridos.get(mes_engorda[:5], 250.0)
+    
+    cantidad_animales = st.number_input("Número de Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
+    peso_actual = st.slider("Peso Actual del Animal (kg)", min_value=200.0, max_value=650.0, value=sugerencia_peso, step=10.0)
+    peso_objetivo = st.slider("Peso de Venta / Meta (kg)", min_value=400.0, max_value=750.0, value=520.0, step=10.0)
+    gde = st.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=0.8, max_value=2.2, value=1.4, step=0.1)
 
-sistema_produccion = st.sidebar.selectbox("Sistema de Producción", ["Corral / Engorda Intensiva (Feedlot)", "Semi-estabulado (Mixto / Suplementación en Pastoreo)", "Pastoreo Extensivo (Praderas / Agostadero)"])
+with st.sidebar.expander("💰 Parámetros Económicos y de Mercado", expanded=False):
+    precio_compra_kg = st.number_input("Compra Becerro (MXN/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
+    precio_venta_kg = st.number_input("Venta Ganado Gordo (MXN/kg)", min_value=30.0, max_value=100.0, value=50.0, step=1.0)
+    costo_sanidad_fijo = st.number_input("Sanidad y Manejo (MXN/cab)", min_value=0.0, max_value=2000.0, value=350.0, step=50.0)
+    costo_mano_obra_fijo = st.number_input("Mano de Obra (MXN/cab)", min_value=0.0, max_value=3000.0, value=450.0, step=50.0)
 
-condiciones_pastoreo = st.sidebar.selectbox(
-    "Condiciones del Pastoreo",
-    [
-        "N/A (Corral Intensivo)",
-        "Pradera Cultivada / Riego (Alta Calidad)",
-        "Pradera Nativa / Agostadero en Temporal",
-        "Pradera Nativa / Agostadero Árido (Alta Caminata)",
-        "Sistema Silvopastoril / Arbustivo"
-    ]
-)
+with st.sidebar.expander("🌾 Sistema de Producción y Pastoreo", expanded=False):
+    sistema_produccion = st.selectbox("Sistema", ["Corral / Engorda Intensiva (Feedlot)", "Semi-estabulado (Mixto / Suplementación en Pastoreo)", "Pastoreo Extensivo (Praderas / Agostadero)"])
+    condiciones_pastoreo = st.selectbox("Condiciones Pastoreo", ["N/A (Corral Intensivo)", "Pradera Cultivada / Riego (Alta Calidad)", "Pradera Nativa / Agostadero en Temporal", "Pradera Nativa / Agostadero Árido (Alta Caminata)", "Sistema Silvopastoril / Arbustivo"])
+    estado_pasto = st.selectbox("Estado del Pasto", ["N/A (Corral / Sin Pastoreo)", "Vegetativo Temprano (Alta digestibilidad y PC)", "Vegetativo Tardío / Pre-floración (Calidad media)", "Floración / Madurez (Fibroso, baja PC)", "Lignificado / Seco (Muy baja digestibilidad)"])
+    estacion = st.selectbox("Temporada / Clima", ["Templado", "Invierno", "Verano"])
 
-estado_pasto = st.sidebar.selectbox(
-    "Estado Fisiológico del Pasto (Fenología)",
-    [
-        "N/A (Corral / Sin Pastoreo)",
-        "Vegetativo Temprano (Alta digestibilidad y PC)",
-        "Vegetativo Tardío / Pre-floración (Calidad media)",
-        "Floración / Madurez (Fibroso, baja PC)",
-        "Lignificado / Seco (Muy baja digestibilidad)"
-    ]
-)
+with st.sidebar.expander("🧬 Genética, Sexo y Marco", expanded=False):
+    raza_seleccionada = st.selectbox("Raza", ["Compuestas / Adaptadas (Beefmaster/Brangus)", "Británicas (Angus/Hereford)", "Continentales (Charolais/Simmental)", "Cebú / Tropicales (Bos indicus)", "Ganado Criollo / Local"])
+    sexo_lote = st.selectbox("Categoría Zootécnica", ["Novillos (Castrados)", "Toros Enteros", "Vaquillas de Repasto/Engorda", "Vacas de Desecho / Finalización"])
+    marco_lote = st.selectbox("Tamaño de Marco", ["Mediano (Standard)", "Precoz / Engrase rápido", "Grande (Continental / Retrasado)"])
 
-estacion = st.sidebar.selectbox("Temporada / Clima", ["Templado", "Invierno", "Verano"])
-
-st.sidebar.markdown("---")
-st.sidebar.header("🧬 Genética, Sexo y Manejo")
-raza_seleccionada = st.sidebar.selectbox(
-    "Predominancia Racial",
-    [
-        "Compuestas / Adaptadas (Beefmaster/Brangus)",
-        "Británicas (Angus/Hereford)",
-        "Continentales (Charolais/Simmental)",
-        "Cebú / Tropicales (Bos indicus)",
-        "Ganado Criollo / Local"
-    ]
-)
-sexo_lote = st.sidebar.selectbox("Tipo / Categoría Zootécnica", ["Novillos (Castrados)", "Toros Enteros", "Vaquillas de Repasto/Engorda", "Vacas de Desecho / Finalización"])
-marco_lote = st.sidebar.selectbox("Tamaño de Marco", ["Mediano (Standard)", "Precoz / Engrase rápido", "Grande (Continental / Retrasado)"])
-
-st.sidebar.markdown("---")
-st.sidebar.header("🌡️ Variables Avanzadas & Vanguardia JDS")
-condicion_corporal = st.sidebar.slider("Condición Corporal Inicial (CC 1.0 - 5.0)", min_value=1.0, max_value=5.0, value=2.5, step=0.5)
-nivel_thi = st.sidebar.selectbox("Estrés Térmico Ambiental (THI)", ["Confort Térmico (< 74)", "Estrés Moderado (74-78)", "Estrés Severo (> 78)"])
-perfil_aa = st.sidebar.selectbox("Modelo de Aminoácidos (JDS / NASEM)", ["Estándar (Proteína Cruda)", "Avanzado (Optimización Lisina:Metionina 3:1)"])
-aditivo_ruminal = st.sidebar.selectbox("Modificadores / Aditivos Zootécnicos", ["Ninguno", "Ionóforos (Monensina / Lasalocid)", "Buffer (Bicarbonato / Óxido Mg)", "Ambos (Ionóforo + Buffer)"])
-historial_nutricional = st.sidebar.selectbox("Historial Nutricional", ["Desarrollo Continuo (Normal)", "Crecimiento Compensatorio (Post-restricción)"])
-promotor_crecimiento = st.sidebar.selectbox("Promotores de Crecimiento", ["Ninguno", "Implante Hormonal", "Agonista β-adrenérgico (Finalización)"])
-condicion_lodo = st.sidebar.selectbox("Condición de Corral / Lodo", ["Seco y Confortable", "Lodo Moderado (10-15 cm)", "Lodo Severo (>20 cm)"])
+with st.sidebar.expander("🌡️ Variables Avanzadas y JDS", expanded=False):
+    condicion_corporal = st.slider("Condición Corporal (1.0 - 5.0)", min_value=1.0, max_value=5.0, value=2.5, step=0.5)
+    nivel_thi = st.selectbox("Estrés Térmico (THI)", ["Confort Térmico (< 74)", "Estrés Moderado (74-78)", "Estrés Severo (> 78)"])
+    perfil_aa = st.selectbox("Modelo Aminoácidos", ["Estándar (Proteína Cruda)", "Avanzado (Optimización Lisina:Metionina 3:1)"])
+    aditivo_ruminal = st.selectbox("Modificadores / Aditivos", ["Ninguno", "Ionóforos (Monensina / Lasalocid)", "Buffer (Bicarbonato / Óxido Mg)", "Ambos (Ionóforo + Buffer)"])
+    historial_nutricional = st.selectbox("Historial Nutricional", ["Desarrollo Continuo (Normal)", "Crecimiento Compensatorio (Post-restricción)"])
+    promotor_crecimiento = st.selectbox("Promotores Crecimiento", ["Ninguno", "Implante Hormonal", "Agonista β-adrenérgico (Finalización)"])
+    condicion_lodo = st.selectbox("Condición de Corral / Lodo", ["Seco y Confortable", "Lodo Moderado (10-15 cm)", "Lodo Severo (>20 cm)"])
 
 # --- MODELADO PREDICTIVO BIOLÓGICO AVANZADO ---
 factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
@@ -218,28 +207,38 @@ cms_estimado = peso_actual * 0.024 * factor_clima * factor_thi * factor_cc * fac
 kg_por_ganar = max(0.0, peso_objetivo - peso_actual)
 dias_a_meta = kg_por_ganar / gde if gde > 0 else 0
 
-if peso_actual < 300:
-    fase = "Crecimiento (Becerro / Repasto)"
-    meta_pc_base = (0.130 + (gde * 0.015)) * factor_fenologia_pc
-    meta_neg_base = (0.75 + (gde * 0.09)) * factor_sistema_energ * factor_pastoreo_energia * factor_fenologia_energ
-    meta_fnd_min = 0.30
-    meta_pendf_min = 0.22
-    meta_pdr_min = 0.080
-    meta_pnd_min = 0.045
+if peso_actual < 280:
+    fase = "Recepción y Adaptación (Mes 0)"
+    meta_pc_base = (0.135 + (gde * 0.015)) * factor_fenologia_pc
+    meta_neg_base = (0.70 + (gde * 0.09)) * factor_sistema_energ * factor_pastoreo_energia * factor_fenologia_energ
+    meta_fnd_min = 0.32
+    meta_pendf_min = 0.24
+    meta_pdr_min = 0.082
+    meta_pnd_min = 0.048
     meta_ca_min = 0.0055
     meta_p_min = 0.0035
-elif peso_actual < 400:
-    fase = "Desarrollo / Transición"
-    meta_pc_base = (0.120 + (gde * 0.015)) * factor_fenologia_pc
-    meta_neg_base = (0.85 + (gde * 0.09)) * factor_sistema_energ * factor_pastoreo_energia * factor_fenologia_energ
-    meta_fnd_min = 0.28
-    meta_pendf_min = 0.20
-    meta_pdr_min = 0.072
-    meta_pnd_min = 0.040
+elif peso_actual < 380:
+    fase = "Crecimiento / Repasto (Mes 1-2)"
+    meta_pc_base = (0.125 + (gde * 0.015)) * factor_fenologia_pc
+    meta_neg_base = (0.80 + (gde * 0.09)) * factor_sistema_energ * factor_pastoreo_energia * factor_fenologia_energ
+    meta_fnd_min = 0.29
+    meta_pendf_min = 0.21
+    meta_pdr_min = 0.075
+    meta_pnd_min = 0.042
     meta_ca_min = 0.0050
     meta_p_min = 0.0030
+elif peso_actual < 460:
+    fase = "Desarrollo / Transición (Mes 3-4)"
+    meta_pc_base = (0.115 + (gde * 0.015)) * factor_fenologia_pc
+    meta_neg_base = (0.90 + (gde * 0.09)) * factor_sistema_energ * factor_pastoreo_energia * factor_fenologia_energ
+    meta_fnd_min = 0.27
+    meta_pendf_min = 0.19
+    meta_pdr_min = 0.070
+    meta_pnd_min = 0.040
+    meta_ca_min = 0.0048
+    meta_p_min = 0.0029
 else:
-    fase = "Finalización (Engorda Pesada / Vacas)"
+    fase = "Finalización / Engorda Pesada (Mes 5-6+)"
     meta_pc_base = (0.105 + (gde * 0.015)) * factor_fenologia_pc
     meta_neg_base = (1.00 + (gde * 0.10)) * factor_sistema_energ * factor_pastoreo_energia * factor_fenologia_energ
     meta_fnd_min = 0.25
@@ -293,7 +292,7 @@ st.sidebar.markdown(
     "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px; font-family: Inter, sans-serif;'>"
     "<b>Ganader-IA Elite 360</b><br>"
     "Creado por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
-    "SaaS de Nutrición y Sostenibilidad."
+    "SaaS de Nutrición, Control Mensual y Sostenibilidad."
     "</div>",
     unsafe_allow_html=True
 )
@@ -307,8 +306,8 @@ tab1, tab2, tab3, tab4 = st.tabs([
 ])
 
 with tab1:
-    st.subheader("Predicciones de Parámetros Productivos y Análisis de Sensibilidad")
-    st.markdown(f"Proyecciones biológicas del lote bajo **{sistema_produccion}** | Perfil AA: *{perfil_aa}*:")
+    st.subheader("Predicciones de Parámetros Productivos y Control Mensual")
+    st.markdown(f"Evaluación del lote bajo **{mes_engorda}** | Sistema: *{sistema_produccion}* | Perfil AA: *{perfil_aa}*:")
     
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -356,7 +355,7 @@ with tab2:
     )
     
     st.markdown(
-        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V9)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
+        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V11)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
         unsafe_allow_html=True
     )
     st.markdown("<br>", unsafe_allow_html=True)
@@ -552,8 +551,8 @@ with tab3:
             st.metric("Fibra peNDF", f"{aporte_pendf:.1f}%", "Anti-acidosis")
             st.metric("Riesgo SARA", riesgo_sara, "Ruminal")
         with col_m3:
-            st.metric("Emisión $CH_4$", f"{ch4_g_dia:.1f} g/d", "IPCC Tier 2")
-            st.metric("Eq. $CO_2e$", f"{co2e_anual:,.0f} kg/año")
+            st.metric("Emisión CH4", f"{ch4_g_dia:.1f} g/d", "IPCC Tier 2")
+            st.metric("Eq. CO2e", f"{co2e_anual:,.0f} kg/año")
         with col_m4:
             st.metric("Bonos Carbono", f"${valor_bono_mxn:,.0f}", "Anual/Cab")
             st.metric("Lípidos", f"{aporte_lipidos:.1f}%", "Mitigador")
@@ -584,7 +583,7 @@ with tab4:
         st.markdown("---")
         st.markdown("#### 📋 Protocolo y Orden de Carga en Batea para Operarios:")
         st.info(
-            f"**Lote Activo:** {cantidad_animales} animales | **Sistema:** {sistema_produccion} | **Perfil AA:** {perfil_aa} | **Duración:** {dias_a_meta:.0f} días\n\n"
+            f"**Lote Activo:** {cantidad_animales} animales | **Hito:** {mes_engorda} | **Sistema:** {sistema_produccion} | **Perfil AA:** {perfil_aa}\n\n"
             "1. **Paso 1 (Forrajes Secos / Fibra Larga):** Cargar rastrojos o harinas fibrosas al inicio para asegurar el peNDF y evitar acidosis metabólica.\n"
             "2. **Paso 2 (Ingredientes Húmedos / Ensilados):** Agregar ensilados o subproductos húmedos calculando la corrección por materia seca.\n"
             "3. **Paso 3 (Granos Energéticos y Proteicos):** Incorporar maíz molido, pasta de soya y canola.\n"
@@ -595,12 +594,12 @@ with tab4:
         )
 
         # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ELITE ---
-        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, sistema_prod, cond_past, est_pasto, perf_aa, raza_L, sexo_L, marco_L, cc_val, thi_val, adit_val, p_act, p_obj, gain, dias, cabezas, util_neta, roi_c, c_kg_ganado, a_ca, a_p, r_cap, a_fnd, a_pendf, ch4_d, co2e, bonos, cost_lote, tons_lote):
+        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, sistema_prod, cond_past, est_pasto, perf_aa, raza_L, sexo_L, marco_L, cc_val, thi_val, adit_val, p_act, p_obj, gain, dias, cabezas, util_neta, roi_c, c_kg_ganado, a_ca, a_p, r_cap, a_fnd, a_pendf, ch4_d, co2e, bonos, cost_lote, tons_lote, mes_g):
             pdf = FPDF()
             pdf.add_page()
             
             pdf.set_font("Arial", "B", 14)
-            pdf.cell(0, 7, "Ganader-IA Elite 360 - Reporte Económico y Ejecutivo", 0, 1, "C")
+            pdf.cell(0, 7, "Ganader-IA Elite 360 - Reporte Económico y Control Mensual", 0, 1, "C")
             pdf.set_font("Arial", "I", 8)
             pdf.cell(0, 4, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
             pdf.ln(2)
@@ -613,9 +612,9 @@ with tab4:
             pdf.ln(2)
             
             pdf.set_font("Arial", "B", 9)
-            pdf.cell(0, 5, "2. Parametros Biologicos y Poblacionales del Lote", 0, 1)
+            pdf.cell(0, 5, "2. Hito Mensual y Parametros Biologicos del Lote", 0, 1)
             pdf.set_font("Arial", "", 8)
-            pdf.cell(0, 4, f"Fisiologia: {etapa} | Sistema: {sistema_prod} | Perfil AA: {perf_aa}", 0, 1)
+            pdf.cell(0, 4, f"Hito / Mes: {mes_g} | Fisiologia: {etapa} | Sistema: {sistema_prod}", 0, 1)
             pdf.cell(0, 4, f"Cabezas: {cabezas} | Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE: {gain} kg/d", 0, 1)
             pdf.ln(2)
             
@@ -659,17 +658,17 @@ with tab4:
         pdf_data = generar_pdf_ejecutivo(
             df_mezcla_pdf, resultado.fun, fase, sistema_produccion, condiciones_pastoreo, estado_pasto, perfil_aa, raza_seleccionada, sexo_lote, marco_lote, condicion_corporal, nivel_thi, aditivo_ruminal, peso_actual, peso_objetivo, gde, dias_a_meta,
             cantidad_animales, utilidad_neta_cab, roi_cab, costo_por_kg_ganado, aporte_ca, aporte_p, relacion_ca_p, aporte_fnd, aporte_pendf,
-            ch4_g_dia, co2e_anual, valor_bono_mxn, costo_total_lote, alimento_total_ciclo / 1000.0
+            ch4_g_dia, co2e_anual, valor_bono_mxn, costo_total_lote, alimento_total_ciclo / 1000.0, mes_engorda
         )
         
         st.markdown("---")
-        st.subheader("📥 Descarga de Reporte Ejecutivo y Económico PDF")
-        st.markdown("Haz clic en el botón para descargar el reporte oficial con la evaluación económica completa, rentabilidad y mezcla óptima:")
+        st.subheader("📥 Descarga de Reporte Ejecutivo, Económico y de Control Mensual PDF")
+        st.markdown("Haz clic en el botón para descargar el reporte oficial con el hito mensual, evaluación económica y mezcla óptima:")
         
         st.download_button(
-            label="📄 Descargar Reporte Económico y Ejecutivo PDF",
+            label="📄 Descargar Reporte Ejecutivo y Mensual PDF",
             data=pdf_data,
-            file_name=f"Reporte_Economico_GanaderIA_{fase.replace(' ', '_')}.pdf",
+            file_name=f"Reporte_Mensual_GanaderIA_{fase.replace(' ', '_')}.pdf",
             mime="application/pdf",
             use_container_width=True
         )
