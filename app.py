@@ -28,7 +28,6 @@ st.markdown("""
         background-color: #fcfbf9;
     }
     
-    /* Contenedores de tarjetas métricas con separación estricta para evitar empalmes */
     .stMetric {
         background-color: #ffffff;
         padding: 20px 16px;
@@ -56,7 +55,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. LOGOTIPO VECTORIAL CON DISEÑO ANTICAPAS (FLEXIBLE) ---
+# --- 2. LOGOTIPO VECTORIAL INSTITUCIONAL ---
 st.markdown("""
     <div style="display: flex; align-items: center; background: linear-gradient(135deg, #2d5a27 0%, #bc6c25 100%); padding: 25px; border-radius: 16px; box-shadow: 0 6px 20px rgba(45,90,39,0.15); margin-bottom: 25px; color: white; flex-wrap: wrap; gap: 15px;">
         <div style="flex-shrink: 0;">
@@ -67,44 +66,34 @@ st.markdown("""
         </div>
         <div style="flex-grow: 1; min-width: 250px;">
             <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">PRO</span></h1>
-            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Plataforma de Precisión Zootécnica y Optimización de Raciones</p>
+            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Plataforma de Precisión Zootécnica y Selección de Raciones a la Medida</p>
             <p style="margin: 6px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
-# --- 3. CARGA DE LA BASE DE DATOS DESDE GOOGLE SHEETS (V4) ---
-sheet_url = "https://docs.google.com/spreadsheets/d/1yCuTmDi1wEzdeMHoAbuxMewwo0Pe1neyjntMgAhMzhA/export?format=csv"
-
-@st.cache_data(ttl=10)
-def cargar_datos(url):
-    return pd.read_csv(url)
-
-try:
-    df_base = cargar_datos(sheet_url)
-    source_status = "☁️ Conectado a Google Sheets (Base V4 en Vivo)"
-except Exception:
-    source_status = "⚠️ Usando base de datos local de emergencia"
-    data_respaldo = {
-        "Nombre del Ingrediente": [
-            "Rastrojo de maiz molido", 
-            "Harina de soya", 
-            "Grano de maiz molido", 
-            "Urea", 
-            "Ensilado de maiz", 
-            "Canola (pasta)", 
-            "Melaza liquida",
-            "Sales Minerales (Cañón de Tlaltenango)", 
-            "Grasa de paso Lactomil"
-        ],
-        "Categoria": ["Forraje", "Suplemento Proteico", "Grano Energetico", "Suplemento NPN", "Forraje Humedo", "Suplemento Proteico", "Subproducto / Energetico", "Suplemento Mineral", "Suplemento Energetico"],
-        "Precio Estimado (MXN/ton)": [2500.0, 12500.0, 5800.0, 16000.0, 1200.0, 8500.0, 4800.0, 18000.0, 32000.0],
-        "Proteina Cruda (PC % MS)": [5.5, 48.0, 8.5, 281.0, 8.0, 38.0, 4.8, 0.0, 1.0],
-        "NEg (Mcal/kg)": [0.35, 1.48, 1.55, 0.0, 0.85, 1.15, 1.22, 0.0, 1.65]
-    }
-    df_base = pd.DataFrame(data_respaldo)
-
-st.caption(source_status)
+# --- 3. BASE DE DATOS INICIAL CON CONTROL DE DISPONIBILIDAD REGIONAL ---
+data_respaldo = {
+    "Nombre del Ingrediente": [
+        "Rastrojo de maiz molido", 
+        "Harina de soya", 
+        "Grano de maiz molido", 
+        "Urea", 
+        "Ensilado de maiz", 
+        "Canola (pasta)", 
+        "Melaza liquida",
+        "Sales Minerales (Cañón de Tlaltenango)", 
+        "Grasa de paso Lactomil"
+    ],
+    "Categoria": ["Forraje", "Suplemento Proteico", "Grano Energetico", "Suplemento NPN", "Forraje Humedo", "Suplemento Proteico", "Subproducto / Energetico", "Suplemento Mineral", "Suplemento Energetico"],
+    "Disponible": [True, True, True, True, False, True, True, True, True],  # Ensilado false por defecto para priorizar rastrojo y soya del cliente
+    "Precio Estimado (MXN/ton)": [2500.0, 12500.0, 5800.0, 16000.0, 1200.0, 8500.0, 4800.0, 18000.0, 32000.0],
+    "Proteina Cruda (PC % MS)": [5.5, 48.0, 8.5, 281.0, 8.0, 38.0, 4.8, 0.0, 1.0],
+    "NEg (Mcal/kg)": [0.35, 1.48, 1.55, 0.0, 0.85, 1.15, 1.22, 0.0, 1.65],
+    "Min Inclusión (%)": [20.0, 5.0, 10.0, 0.0, 0.0, 0.0, 2.0, 1.0, 0.0],
+    "Max Inclusión (%)": [60.0, 35.0, 50.0, 1.5, 0.0, 30.0, 6.0, 3.0, 3.0]
+}
+df_base = pd.DataFrame(data_respaldo)
 
 # --- 4. CONTROLES GENERALES Y PARÁMETROS PRODUCTIVOS EN LA BARRA LATERAL ---
 st.sidebar.header("⚙️ Parámetros del Lote")
@@ -126,7 +115,7 @@ raza_seleccionada = st.sidebar.selectbox(
     ]
 )
 
-# --- MODELADO PREDICTIVO BIOLÓGICO Y DINÁMICO DE ALTA FIDELIDAD ---
+# --- MODELADO PREDICTIVO BIOLÓGICO ---
 factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
 cms_estimado = peso_actual * 0.024 * factor_clima
 
@@ -162,7 +151,6 @@ else:
 meta_pc_min = meta_pc_base * factor_pc
 meta_neg_min = meta_neg_base * factor_neg
 
-# Créditos profesionales institucionales
 st.sidebar.markdown("---")
 st.sidebar.markdown(
     "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px; font-family: Inter, sans-serif;'>"
@@ -176,7 +164,7 @@ st.sidebar.markdown(
 # --- 5. INTERFAZ MODULAR POR PESTAÑAS (3 TABS) ---
 tab1, tab2, tab3 = st.tabs([
     "📋 1. Resumen y Predicciones", 
-    "🧪 2. Catálogo y Lab", 
+    "🧪 2. Selección de Ingredientes y Lab", 
     "📊 3. Resultados y Reporte PDF"
 ])
 
@@ -214,7 +202,6 @@ with tab1:
         lista_pesos.append(peso_proy)
         lista_cms.append(round(cms_proy, 2))
     
-    # Construcción de gráfica de doble eje con layout optimizado para evitar solapamientos
     fig_comportamiento = make_subplots(specs=[[{"secondary_y": True}]])
 
     fig_comportamiento.add_trace(
@@ -251,7 +238,6 @@ with tab1:
         plot_bgcolor="#ffffff",
         paper_bgcolor="#ffffff",
         font=dict(family="Inter", color="#2b2d42"),
-        # Leyenda reubicada en la parte inferior para total separación respecto al título
         legend=dict(
             orientation="h", 
             yanchor="top", 
@@ -268,38 +254,45 @@ with tab1:
     st.plotly_chart(fig_comportamiento, use_container_width=True)
 
 with tab2:
-    st.subheader("Gestión de Inventario y Análisis de Laboratorio")
-    st.markdown("Modifica precios o valores analíticos específicos de tus materias primas en tiempo real:")
+    st.subheader("🛠️ Control Regional de Inventario y Selección de Ingredientes")
+    st.markdown(
+        "**Elige los ingredientes disponibles en tu rancho y ajusta sus límites.** "
+        "Marca con un visto bueno (`✓`) los insumos con los que realmente cuentas (por ejemplo, *Rastrojo de maíz molido* y *Harina de soya*), "
+        "desactiva los que no tengas (como el *Ensilado de maíz*) y define sus rangos mínimos y máximos de inclusión en la dieta:"
+    )
+    
     df_ingredientes = st.data_editor(
         df_base, 
         num_rows="dynamic", 
         use_container_width=True,
+        column_config={
+            "Disponible": st.column_config.CheckboxColumn("¿Disponible en tu Rancho?", default=True),
+            "Min Inclusión (%)": st.column_config.NumberColumn("Min (%)", min_value=0.0, max_value=100.0, step=0.5),
+            "Max Inclusión (%)": st.column_config.NumberColumn("Max (%)", min_value=0.0, max_value=100.0, step=0.5),
+        },
         key="editor_ingredientes"
     )
 
-# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL ---
+# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL PERSONALIZADO ---
 try:
     nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
     c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
     pc = df_ingredientes["Proteina Cruda (PC % MS)"].astype(float).values / 100.0  
     neg = df_ingredientes["NEg (Mcal/kg)"].astype(float).values
+    disponibles = df_ingredientes["Disponible"].astype(bool).values
 except KeyError as err:
     st.error(f"Falta una columna clave en la tabla: {err}.")
     st.stop()
 
 bounds = []
 for idx, row in df_ingredientes.iterrows():
-    nombre = str(row["Nombre del Ingrediente"]).lower()
-    if "urea" in nombre:
-        bounds.append((0.0, 0.015))    # Urea: Máximo 1.5%
-    elif "mineral" in nombre or "sal" in nombre:
-        bounds.append((0.01, 0.03))   # Minerales: 1% a 3%
-    elif "grasa" in nombre or "lactomil" in nombre:
-        bounds.append((0.01, 0.03))   # Grasa de sobrepaso: 1% a 3%
-    elif "melaza" in nombre:
-        bounds.append((0.02, 0.06))   # Melaza: 2% a 6%
+    if not row["Disponible"]:
+        # Si el cliente no lo tiene en su rancho, la inclusión forzosa es 0.0
+        bounds.append((0.0, 0.0))
     else:
-        bounds.append((0.0, 1.0))      # Forrajes y concentrados
+        min_lim = max(0.0, float(row["Min Inclusión (%)"]) / 100.0)
+        max_lim = min(1.0, float(row["Max Inclusión (%)"]) / 100.0)
+        bounds.append((min_lim, max_lim))
 
 A_eq = np.ones((1, len(c)))
 b_eq = np.array([1.0])
@@ -316,7 +309,7 @@ with tab3:
         with col_res1:
             st.metric(label="Costo Óptimo por Tonelada", value=f"${resultado.fun:,.2f} MXN")
         with col_res2:
-            st.metric(label="Estado del Proceso", value="Factible (Máxima Eficiencia) 🟢")
+            st.metric(label="Estado del Proceso", value="Factible con tus Insumos Seleccionados 🟢")
         
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("#### 📋 Tabla de Ingredientes y Mezcla Exacta por Tonelada:")
@@ -372,9 +365,9 @@ with tab3:
             pdf.cell(0, 6, f"Costo Optimo por Tonelada de Alimento: ${costo_ton:,.2f} MXN", 0, 1)
             pdf.ln(4)
             
-            # Tabla de ingredientes
+            # Tabla de ingredientes seleccionados
             pdf.set_font("Arial", "B", 11)
-            pdf.cell(0, 7, "3. Orden Exacta de Ingredientes por Tonelada (1,000 kg)", 0, 1)
+            pdf.cell(0, 7, "3. Orden Exacta de Ingredientes Seleccionados por Tonelada (1,000 kg)", 0, 1)
             pdf.set_font("Arial", "B", 9)
             pdf.cell(80, 7, "Ingrediente", 1)
             pdf.cell(30, 7, "Inclusion (%)", 1)
@@ -395,8 +388,8 @@ with tab3:
             pdf.cell(0, 7, "4. Instrucciones de Mezclado para los Operarios del Corral", 0, 1)
             pdf.set_font("Arial", "", 9)
             pdf.multi_cell(0, 5, 
-                "1. Orden de carga en la batea: Agregar primero los forrajes secos y ensilados.\n"
-                "2. Incorporar los granos energeticos, concentrados proteicos y subproductos.\n"
+                "1. Orden de carga en la batea: Agregar primero los forrajes secos disponibles (ej. rastrojo).\n"
+                "2. Incorporar los granos energeticos, concentrados proteicos (ej. harina de soya) y subproductos.\n"
                 "3. Agregar con precision los aditivos especiales (Sales Minerales, Grasa de paso Lactomil y Urea).\n"
                 "4. Verter la melaza liquida al final junto con el agua de batea para asegurar palatabilidad y evitar polvos.\n"
                 "5. Tiempo de mezcla recomendado: 8 a 10 minutos posteriores a la adicion del ultimo ingrediente."
@@ -407,7 +400,7 @@ with tab3:
         
         st.markdown("---")
         st.subheader("📥 Descarga de Reporte Ejecutivo PDF")
-        st.markdown("Haz clic en el siguiente botón para generar y descargar el reporte oficial con la receta de batea y corrida financiera:")
+        st.markdown("Haz clic en el siguiente botón para generar y descargar el reporte oficial con tu receta personalizada y corrida financiera:")
         
         st.download_button(
             label="📄 Descargar Reporte Ejecutivo PDF (Operarios y Corrida Financiera)",
@@ -427,7 +420,7 @@ with tab3:
             names="Categoría", 
             values="Porcentaje", 
             hole=0.4, 
-            title="Distribución de Insumos en la Mezcla",
+            title="Distribución de Insumos Seleccionados en la Mezcla",
             color_discrete_sequence=colores_campo
         )
         fig_pie.update_layout(font=dict(family="Inter", color="#2b2d42"))
@@ -449,7 +442,6 @@ with tab3:
         
     else:
         st.error(
-            "⚠️ **Aviso del Optimizador:** Con los precios actuales o metas extremas introducidas, no se encontró una solución matemática 100% factible. "
-            "Sin embargo, **las predicciones de parámetros productivos y consumo en la Pestaña 1 siguen vigentes y operativas**. "
-            "Revisa los precios o valores analíticos en la pestaña **Catálogo y Lab**."
+            "⚠️ **Aviso del Optimizador:** Con los ingredientes que seleccionaste o los límites mínimos/máximos impuestos, no se encontró una solución matemática 100% factible para cumplir con los requerimientos nutricionales de esta etapa. "
+            "Por favor, revisa en la pestaña **Selección de Ingredientes y Lab** que tengas suficientes fuentes de proteína (como soya) y energía activadas, o ajusta los rangos permitidos."
         )
