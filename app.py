@@ -360,7 +360,7 @@ with tab3:
         with col_res1:
             st.metric(label="Costo Óptimo por Tonelada", value=f"${resultado.fun:,.2f} MXN")
         with col_res2:
-            st.metric(label="Estado del Proceso", value="Factible (NASEM & IPCC) 🟢")
+            st.metric(label="Estado del Processo", value="Factible (NASEM & IPCC) 🟢")
         
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("#### 📋 Tabla de Ingredientes y Mezcla Exacta por Tonelada:")
@@ -429,7 +429,7 @@ with tab3:
             st.metric("Factor $Y_m$ Estimado", f"{ym_ajustado*100:.2f}% GE")
 
         # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO CON SOSTENIBILIDAD ---
-        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, p_act, p_obj, gain, dias, a_pc, a_neg, a_fnd, a_pendf, a_pdr, a_pnd, a_ca, a_p, a_lip, ch4_d, ch4_kg, co2e, ym):
+        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, p_act, p_obj, gain, dias, a_pc, a_neg, a_fnd, a_pendf, a_pdr, a_pnd, a_ca, a_p, a_lipidos, ch4_d, ch4_kg, co2e, ym):
             pdf = FPDF()
             pdf.add_page()
             
@@ -461,7 +461,7 @@ with tab3:
             pdf.set_font("Arial", "", 9)
             pdf.cell(0, 5, f"Emision Diaria de Metano (CH4): {ch4_d:.1f} g/dia | Intensidad: {ch4_kg:.1f} g/kg ganancia", 0, 1)
             pdf.cell(0, 5, f"Factor Conversion (Ym): {ym*100:.2f}% GE | Equivalente CO2e Anual: {co2e:,.1f} kg/ano/animal", 0, 1)
-            pdf.cell(0, 5, f"Fibra FND: {a_fnd:.1f}% | peNDF (Salud Ruminal): {a_pendf:.1f}% | Lipidos: {a_lip:.1f}%", 0, 1)
+            pdf.cell(0, 5, f"Fibra FND: {a_fnd:.1f}% | peNDF (Salud Ruminal): {a_pendf:.1f}% | Lipidos: {a_lipidos:.1f}%", 0, 1)
             pdf.ln(3)
             
             # Tabla de ingredientes
@@ -497,7 +497,7 @@ with tab3:
 
         pdf_data = generar_pdf_ejecutivo(
             df_mezcla_final, resultado.fun, fase, raza_seleccionada, peso_actual, peso_objetivo, gde, dias_a_meta,
-            aporte_pc, aporte_neg, aporte_fnd, aporte_pendf, aporte_pdr, aporte_pnd, aporte_ca, aporte_p, aporte_lip,
+            aporte_pc, aporte_neg, aporte_fnd, aporte_pendf, aporte_pdr, aporte_pnd, aporte_ca, aporte_p, aporte_lipidos,
             ch4_g_dia, ch4_g_kg_ganancia, co2e_anual, ym_ajustado
         )
         
