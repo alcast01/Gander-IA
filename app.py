@@ -15,7 +15,6 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-    /* Importación de tipografía moderna y uniforme (Inter) */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
     html, body, [class*="css"] {
@@ -24,16 +23,15 @@ st.markdown("""
     }
     
     .main {
-        background-color: #fcfbf9; /* Fondo arena cálida / campo */
+        background-color: #fcfbf9;
     }
     
-    /* Contenedores de tarjetas métricas ejecutivas */
     .stMetric {
         background-color: #ffffff;
         padding: 18px;
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(45, 90, 39, 0.08);
-        border-left: 5px solid #2d5a27; /* Verde pastura */
+        border-left: 5px solid #2d5a27;
         border-top: 1px solid #e6e2dd;
         border-right: 1px solid #e6e2dd;
         border-bottom: 1px solid #e6e2dd;
@@ -43,7 +41,6 @@ st.markdown("""
         transform: translateY(-2px);
     }
     
-    /* Encabezados y títulos uniformes */
     h1, h2, h3, h4 {
         color: #1f2421;
         font-family: 'Inter', sans-serif !important;
@@ -153,25 +150,26 @@ raza_seleccionada = st.sidebar.selectbox(
     ]
 )
 
-# --- MODELADO PREDICTIVO BIOLÓGICO ---
+# --- MODELADO PREDICTIVO BIOLÓGICO Y DINÁMICO (SENSIBLE A GDE Y PESO) ---
 factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
 cms_estimado = peso_actual * 0.024 * factor_clima
 
 kg_por_ganar = max(0.0, peso_objetivo - peso_actual)
 dias_a_meta = kg_por_ganar / gde if gde > 0 else 0
 
+# Requerimientos base ajustados dinámicamente por la GDE seleccionada (a mayor GDE, mayores requerimientos nutricionales)
 if peso_actual < 300:
     fase = "Crecimiento (Becerro Ligero)"
-    meta_pc_base = 0.150  
-    meta_neg_base = 0.88  
+    meta_pc_base = 0.130 + (gde * 0.015)
+    meta_neg_base = 0.75 + (gde * 0.09)
 elif peso_actual < 380:
     fase = "Desarrollo / Transición"
-    meta_pc_base = 0.135  
-    meta_neg_base = 0.95  
+    meta_pc_base = 0.120 + (gde * 0.015)
+    meta_neg_base = 0.85 + (gde * 0.09)
 else:
     fase = "Finalización (Engorda Pesada)"
-    meta_pc_base = 0.115  
-    meta_neg_base = 1.15  
+    meta_pc_base = 0.105 + (gde * 0.015)
+    meta_neg_base = 1.00 + (gde * 0.10)
 
 if "Británicas" in raza_seleccionada:
     factor_pc = 1.02
