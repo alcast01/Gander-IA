@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from fpdf import FPDF
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL SIN EMPALMES ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL LIMPIO ---
 st.set_page_config(
     page_title="Ganader-IA Elite 360 | Nutrición y Economía",
     page_icon="🐄",
@@ -28,17 +28,18 @@ st.markdown("""
         background-color: #fcfbf9;
     }
     
-    /* Espaciado optimizado para los expanders y controles de la barra lateral */
+    /* Estilo limpio para los títulos de los expanders de la barra lateral */
     [data-testid="stSidebar"] .streamlit-expanderHeader {
-        font-size: 0.85rem !important;
+        font-size: 0.82rem !important;
         font-weight: 600 !important;
         color: #2d5a27 !important;
         background-color: #f4f1de !important;
         border-radius: 6px !important;
-        margin-bottom: 6px !important;
+        padding: 6px 10px !important;
+        margin-bottom: 8px !important;
     }
     
-    /* Métricas ultra compactas y protegidas contra recortes */
+    /* Métricas compactas protegidas contra recortes */
     .stMetric {
         background-color: #ffffff;
         padding: 6px 8px !important;
@@ -128,33 +129,33 @@ data_respaldo = {
 }
 df_base = pd.DataFrame(data_respaldo)
 
-# --- 4. PANEL DE CONTROL LATERAL ORGANIZADO Y SIN EMPALMES ---
-st.sidebar.markdown("### ⚙️ Parámetros de Configuración")
+# --- 4. PANEL DE CONTROL LATERAL ORGANIZADO Y LIMPIO ---
+st.sidebar.markdown("### Parámetros de Configuración")
 
-with st.sidebar.expander("📦 1. Población y Lote", expanded=True):
+with st.sidebar.expander("Población y Lote", expanded=True):
     cantidad_animales = st.number_input("Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
     peso_actual = st.slider("Peso Actual / Compra (kg)", min_value=200.0, max_value=650.0, value=250.0, step=10.0)
     peso_objetivo = st.slider("Peso Venta / Meta (kg)", min_value=400.0, max_value=750.0, value=520.0, step=10.0)
     gde = st.slider("Ganancia Diaria (GDE kg/d)", min_value=0.8, max_value=2.2, value=1.4, step=0.1)
 
-with st.sidebar.expander("💰 2. Economía y Mercado"):
+with st.sidebar.expander("Economía y Mercado"):
     precio_compra_kg = st.number_input("Precio Compra ($/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
     precio_venta_kg = st.number_input("Precio Venta ($/kg)", min_value=30.0, max_value=100.0, value=50.0, step=1.0)
     costo_sanidad_fijo = st.number_input("Sanidad/Manejo ($/cab)", min_value=0.0, max_value=2000.0, value=350.0, step=50.0)
     costo_mano_obra_fijo = st.number_input("Mano de Obra ($/cab)", min_value=0.0, max_value=3000.0, value=450.0, step=50.0)
 
-with st.sidebar.expander("🌾 3. Sistema y Pastoreo"):
+with st.sidebar.expander("Sistema y Pastoreo"):
     sistema_produccion = st.selectbox("Sistema Productivo", ["Corral / Feedlot", "Semi-estabulado", "Pastoreo"])
     condiciones_pastoreo = st.selectbox("Condición Pradera", ["N/A (Feedlot)", "Riego (Alta)", "Temporal", "Árido (Caminata)", "Silvopastoril"])
     estado_pasto = st.selectbox("Fenología Pasto", ["N/A (Feedlot)", "Vegetativo Temprano", "Vegetativo Tardío", "Floración / Madurez", "Lignificado / Seco"])
     estacion = st.selectbox("Temporada Clima", ["Templado", "Invierno", "Verano"])
 
-with st.sidebar.expander("🧬 4. Genética y Sexo"):
+with st.sidebar.expander("Genética y Sexo"):
     raza_seleccionada = st.selectbox("Predominancia Racial", ["Compuestas / Adaptadas", "Británicas", "Continentales", "Cebú / Tropicales", "Criollo / Local"])
     sexo_lote = st.selectbox("Categoría Zootécnica", ["Novillos", "Toros Enteros", "Vaquillas", "Vacas de Desecho"])
     marco_lote = st.selectbox("Tamaño de Marco", ["Mediano (Standard)", "Precoz", "Grande (Continental)"])
 
-with st.sidebar.expander("🌡️ 5. Avanzadas y Vanguardia JDS"):
+with st.sidebar.expander("Avanzadas y Vanguardia JDS"):
     condicion_corporal = st.slider("Condición Corporal (1-5)", min_value=1.0, max_value=5.0, value=2.5, step=0.5)
     nivel_thi = st.selectbox("Estrés Térmico (THI)", ["Confort (<74)", "Moderado (74-78)", "Severo (>78)"])
     perfil_aa = st.selectbox("Modelo Aminoácidos", ["Estándar", "Avanzado (Lis:Met)"])
@@ -334,7 +335,7 @@ with tab2:
     )
     
     st.markdown(
-        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V11)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
+        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V12)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
         unsafe_allow_html=True
     )
     st.markdown("<br>", unsafe_allow_html=True)
