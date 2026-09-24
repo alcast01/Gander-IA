@@ -119,79 +119,70 @@ data_respaldo = {
 }
 df_base = pd.DataFrame(data_respaldo)
 
-# --- 4. CONTROLES GENERALES Y VARIABLES AGRUPADAS EN LA BARRA LATERAL ---
-st.sidebar.header("⚙️ Configuración del Sistema")
-
-with st.sidebar.expander("👥 1. Población e Inventario", expanded=True):
-    cantidad_animales = st.number_input("Número de Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
-
-with st.sidebar.expander("⚖️ 2. Pesos y Metas de Crecimiento", expanded=True):
-    peso_actual = st.slider("Peso Vivo Actual / Compra (kg)", min_value=200.0, max_value=650.0, value=250.0, step=10.0)
-    peso_objetivo = st.slider("Peso de Venta / Meta (kg)", min_value=400.0, max_value=750.0, value=520.0, step=10.0)
-    gde = st.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=0.8, max_value=2.2, value=1.4, step=0.1)
-
-with st.sidebar.expander("🧬 3. Genética, Sexo y Marco", expanded=False):
-    raza_seleccionada = st.selectbox(
-        "Predominancia Racial",
-        [
-            "Compuestas / Adaptadas (Beefmaster/Brangus)",
-            "Británicas (Angus/Hereford)",
-            "Continentales (Charolais/Simmental)",
-            "Cebú / Tropicales (Bos indicus)",
-            "Ganado Criollo / Local"
-        ]
-    )
-    sexo_lote = st.selectbox("Tipo / Categoría Zootécnica", ["Novillos (Castrados)", "Toros Enteros", "Vaquillas de Repasto/Engorda", "Vacas de Desecho / Finalización"])
-    marco_lote = st.selectbox("Tamaño de Marco", ["Mediano (Standard)", "Precoz / Engrase rápido", "Grande (Continental / Retrasado)"])
-    condicion_corporal = st.slider("Condición Corporal Inicial (CC 1.0 - 5.0)", min_value=1.0, max_value=5.0, value=2.5, step=0.5)
-
-with st.sidebar.expander("🌍 4. Sistema, Clima y Entorno", expanded=False):
-    sistema_produccion = st.selectbox("Sistema de Producción", ["Corral / Engorda Intensiva (Feedlot)", "Semi-estabulado (Mixto / Suplementación en Pastoreo)", "Pastoreo Extensivo (Praderas / Agostadero)"])
-    condiciones_pastoreo = st.selectbox(
-        "Condiciones del Pastoreo",
-        [
-            "N/A (Corral Intensivo)",
-            "Pradera Cultivada / Riego (Alta Calidad)",
-            "Pradera Nativa / Agostadero en Temporal",
-            "Pradera Nativa / Agostadero Árido (Alta Caminata)",
-            "Sistema Silvopastoril / Arbustivo"
-        ]
-    )
-    estado_pasto = st.selectbox(
-        "Estado Fisiológico del Pasto (Fenología)",
-        [
-            "N/A (Corral / Sin Pastoreo)",
-            "Vegetativo Temprano (Alta digestibilidad y PC)",
-            "Vegetativo Tardío / Pre-floración (Calidad media)",
-            "Floración / Madurez (Fibroso, baja PC)",
-            "Lignificado / Seco (Muy baja digestibilidad)"
-        ]
-    )
-    estacion = st.selectbox("Temporada / Clima", ["Templado", "Invierno", "Verano"])
-    nivel_thi = st.selectbox("Estrés Térmico Ambiental (THI)", ["Confort Térmico (< 74)", "Estrés Moderado (74-78)", "Estrés Severo (> 78)"])
-    condicion_lodo = st.selectbox("Condición de Corral / Lodo", ["Seco y Confortable", "Lodo Moderado (10-15 cm)", "Lodo Severo (>20 cm)"])
-
-with st.sidebar.expander("🧪 5. Nutrición, Aditivos y Manejo", expanded=False):
-    perfil_aa = st.selectbox("Modelo de Aminoácidos (JDS / NASEM)", ["Estándar (Proteína Cruda)", "Avanzado (Optimización Lisina:Metionina 3:1)"])
-    aditivo_ruminal = st.selectbox("Modificadores / Aditivos Zootécnicos", ["Ninguno", "Ionóforos (Monensina / Lasalocid)", "Buffer (Bicarbonato / Óxido Mg)", "Ambos (Ionóforo + Buffer)"])
-    historial_nutricional = st.selectbox("Historial Nutricional", ["Desarrollo Continuo (Normal)", "Crecimiento Compensatorio (Post-restricción)"])
-    promotor_crecimiento = st.selectbox("Promotores de Crecimiento", ["Ninguno", "Implante Hormonal", "Agonista β-adrenérgico (Finalización)"])
-
-with st.sidebar.expander("💰 6. Parámetros Económicos y de Mercado", expanded=True):
-    precio_compra_kg = st.number_input("Precio Compra Becerro (MXN/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
-    precio_venta_kg = st.number_input("Precio Venta Ganado Gordo (MXN/kg)", min_value=30.0, max_value=100.0, value=50.0, step=1.0)
-    costo_sanidad_fijo = st.number_input("Sanidad y Manejo (MXN/cab)", min_value=0.0, max_value=2000.0, value=350.0, step=50.0)
-    costo_mano_obra_fijo = st.number_input("Mano de Obra / Indirectos (MXN/cab)", min_value=0.0, max_value=3000.0, value=450.0, step=50.0)
+# --- 4. CONTROLES GENERALES Y VARIABLES AVANZADAS EN LA BARRA LATERAL ---
+st.sidebar.header("⚙️ Parámetros del Lote y Población")
+cantidad_animales = st.sidebar.number_input("Número de Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
+peso_actual = st.sidebar.slider("Peso Vivo Actual / Compra (kg)", min_value=200.0, max_value=650.0, value=250.0, step=10.0)
+peso_objetivo = st.sidebar.slider("Peso de Venta / Meta (kg)", min_value=400.0, max_value=750.0, value=520.0, step=10.0)
+gde = st.sidebar.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=0.8, max_value=2.2, value=1.4, step=0.1)
 
 st.sidebar.markdown("---")
-st.sidebar.markdown(
-    "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px; font-family: Inter, sans-serif;'>"
-    "<b>Ganader-IA Elite 360</b><br>"
-    "Creado por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
-    "SaaS de Nutrición y Sostenibilidad."
-    "</div>",
-    unsafe_allow_html=True
+st.sidebar.header("💰 Parámetros Económicos y de Mercado")
+precio_compra_kg = st.sidebar.number_input("Precio Compra Becerro (MXN/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
+precio_venta_kg = st.sidebar.number_input("Precio Venta Ganado Gordo (MXN/kg)", min_value=30.0, max_value=100.0, value=50.0, step=1.0)
+costo_sanidad_fijo = st.sidebar.number_input("Sanidad y Manejo (MXN/cab)", min_value=0.0, max_value=2000.0, value=350.0, step=50.0)
+costo_mano_obra_fijo = st.sidebar.number_input("Mano de Obra / Indirectos (MXN/cab)", min_value=0.0, max_value=3000.0, value=450.0, step=50.0)
+
+sistema_produccion = st.sidebar.selectbox("Sistema de Producción", ["Corral / Engorda Intensiva (Feedlot)", "Semi-estabulado (Mixto / Suplementación en Pastoreo)", "Pastoreo Extensivo (Praderas / Agostadero)"])
+
+condiciones_pastoreo = st.sidebar.selectbox(
+    "Condiciones del Pastoreo",
+    [
+        "N/A (Corral Intensivo)",
+        "Pradera Cultivada / Riego (Alta Calidad)",
+        "Pradera Nativa / Agostadero en Temporal",
+        "Pradera Nativa / Agostadero Árido (Alta Caminata)",
+        "Sistema Silvopastoril / Arbustivo"
+    ]
 )
+
+estado_pasto = st.sidebar.selectbox(
+    "Estado Fisiológico del Pasto (Fenología)",
+    [
+        "N/A (Corral / Sin Pastoreo)",
+        "Vegetativo Temprano (Alta digestibilidad y PC)",
+        "Vegetativo Tardío / Pre-floración (Calidad media)",
+        "Floración / Madurez (Fibroso, baja PC)",
+        "Lignificado / Seco (Muy baja digestibilidad)"
+    ]
+)
+
+estacion = st.sidebar.selectbox("Temporada / Clima", ["Templado", "Invierno", "Verano"])
+
+st.sidebar.markdown("---")
+st.sidebar.header("🧬 Genética, Sexo y Manejo")
+raza_seleccionada = st.sidebar.selectbox(
+    "Predominancia Racial",
+    [
+        "Compuestas / Adaptadas (Beefmaster/Brangus)",
+        "Británicas (Angus/Hereford)",
+        "Continentales (Charolais/Simmental)",
+        "Cebú / Tropicales (Bos indicus)",
+        "Ganado Criollo / Local"
+    ]
+)
+sexo_lote = st.sidebar.selectbox("Tipo / Categoría Zootécnica", ["Novillos (Castrados)", "Toros Enteros", "Vaquillas de Repasto/Engorda", "Vacas de Desecho / Finalización"])
+marco_lote = st.sidebar.selectbox("Tamaño de Marco", ["Mediano (Standard)", "Precoz / Engrase rápido", "Grande (Continental / Retrasado)"])
+
+st.sidebar.markdown("---")
+st.sidebar.header("🌡️ Variables Avanzadas & Vanguardia JDS")
+condicion_corporal = st.sidebar.slider("Condición Corporal Inicial (CC 1.0 - 5.0)", min_value=1.0, max_value=5.0, value=2.5, step=0.5)
+nivel_thi = st.sidebar.selectbox("Estrés Térmico Ambiental (THI)", ["Confort Térmico (< 74)", "Estrés Moderado (74-78)", "Estrés Severo (> 78)"])
+perfil_aa = st.sidebar.selectbox("Modelo de Aminoácidos (JDS / NASEM)", ["Estándar (Proteína Cruda)", "Avanzado (Optimización Lisina:Metionina 3:1)"])
+aditivo_ruminal = st.sidebar.selectbox("Modificadores / Aditivos Zootécnicos", ["Ninguno", "Ionóforos (Monensina / Lasalocid)", "Buffer (Bicarbonato / Óxido Mg)", "Ambos (Ionóforo + Buffer)"])
+historial_nutricional = st.sidebar.selectbox("Historial Nutricional", ["Desarrollo Continuo (Normal)", "Crecimiento Compensatorio (Post-restricción)"])
+promotor_crecimiento = st.sidebar.selectbox("Promotores de Crecimiento", ["Ninguno", "Implante Hormonal", "Agonista β-adrenérgico (Finalización)"])
+condicion_lodo = st.sidebar.selectbox("Condición de Corral / Lodo", ["Seco y Confortable", "Lodo Moderado (10-15 cm)", "Lodo Severo (>20 cm)"])
 
 # --- MODELADO PREDICTIVO BIOLÓGICO AVANZADO ---
 factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
@@ -297,6 +288,16 @@ factor_compensatorio = 0.93 if "Compensatorio" in historial_nutricional else 1.0
 meta_pc_min = meta_pc_base * factor_pc * factor_sexo_pc * factor_promotor
 meta_neg_min = meta_neg_base * factor_neg * factor_sexo_neg * factor_marco * factor_lodo * factor_compensatorio
 
+st.sidebar.markdown("---")
+st.sidebar.markdown(
+    "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px; font-family: Inter, sans-serif;'>"
+    "<b>Ganader-IA Elite 360</b><br>"
+    "Creado por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
+    "SaaS de Nutrición y Sostenibilidad."
+    "</div>",
+    unsafe_allow_html=True
+)
+
 # --- 5. INTERFAZ MODULAR POR PESTAÑAS (4 TABS ELITE) ---
 tab1, tab2, tab3, tab4 = st.tabs([
     "📋 1. Resumen y Sensibilidad", 
@@ -355,7 +356,7 @@ with tab2:
     )
     
     st.markdown(
-        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V10)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
+        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V9)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
         unsafe_allow_html=True
     )
     st.markdown("<br>", unsafe_allow_html=True)
