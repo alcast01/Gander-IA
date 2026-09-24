@@ -103,8 +103,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y SUSCRIPCIÓN ---
-USERS_FILE = "usuarios_ganaderia_elite_suscripcion.json"
+# --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y PLANES DE SUSCRIPCIÓN ---
+USERS_FILE = "usuarios_ganaderia_elite_planes.json"
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -122,12 +122,14 @@ def cargar_usuarios_persistentes():
             "password": hash_password("1234"),
             "email": "admin@ganaderiaelite.com",
             "subscription_active": True,
+            "plan": "Anual (12 Meses) - $4,500 MXN",
             "fecha_registro": "2026-01-01"
         },
         "alejandro": {
             "password": hash_password("elite360"),
             "email": "alejandro.castaneda@ganaderiaelite.com",
             "subscription_active": True,
+            "plan": "Anual (12 Meses) - $4,500 MXN",
             "fecha_registro": "2026-01-01"
         }
     }
@@ -173,7 +175,7 @@ if not st.session_state.authenticated:
         </p>
     """, unsafe_allow_html=True)
 
-    tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "💳 Suscripción y Registro Nuevo"])
+    tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "💳 Elegir Plan y Registrarse"])
 
     with tab_login:
         st.markdown("### Acceso a Usuarios Registrados")
@@ -191,13 +193,26 @@ if not st.session_state.authenticated:
                     st.success(f"¡Bienvenido de nuevo, {user_input}!")
                     st.rerun()
                 else:
-                    st.error("Tu suscripción se encuentra inactiva. Realiza el pago para renovar acceso.")
+                    st.error("Tu suscripción se encuentra inactiva. Elige un plan y realiza el pago para renovar acceso.")
             else:
                 st.error("Usuario o contraseña incorrectos. Verifica tus datos.")
 
     with tab_register:
-        st.markdown("### Registro de Nueva Cuenta y Pasarela de Pago")
-        st.info("💡 **Paso 1:** Introduce tus datos de usuario. **Paso 2:** Ingresa los datos de tu tarjeta para realizar el pago único de la **Membresía Anual Elite ($1,500 MXN)**. Una vez aprobado, tu cuenta quedará activa inmediatamente y recibirás un correo de confirmación.")
+        st.markdown("### 🌟 Selección de Plan y Registro de Cuenta")
+        st.markdown("Elige libremente el plan de suscripción que mejor se adapte a tus requerimientos operativos:")
+        
+        plan_elegido = st.radio(
+            "Planes de Suscripción Elite Disponibles:",
+            [
+                "Trimestral (3 Meses) - $1,800 MXN",
+                "Semestral (6 Meses) - $2,500 MXN",
+                "Anual (12 Meses) - $4,500 MXN"
+            ],
+            index=2
+        )
+        
+        st.markdown("---")
+        st.markdown("##### 📝 Datos de Cuenta y Pago Seguro")
         
         col_r1, col_r2 = st.columns(2)
         with col_r1:
@@ -207,8 +222,7 @@ if not st.session_state.authenticated:
             new_pass = st.text_input("Contraseña", type="password", key="reg_pass")
             confirm_pass = st.text_input("Confirma Contraseña", type="password", key="reg_conf")
         
-        st.markdown("---")
-        st.markdown("##### 💳 Datos de Pago Seguro (Stripe / Pasarela Simulada)")
+        st.markdown("")
         col_p1, col_p2, col_p3 = st.columns([2, 1, 1])
         with col_p1:
             num_tarjeta = st.text_input("Número de Tarjeta de Crédito / Débito", placeholder="4000 1234 5678 9010", key="reg_card")
@@ -218,7 +232,11 @@ if not st.session_state.authenticated:
             cvv_tarjeta = st.text_input("CVV", type="password", placeholder="123", key="reg_cvv")
         
         st.markdown("")
-        if st.button("💳 Pagar $1,500 MXN y Activar Cuenta Elite", use_container_width=True):
+        
+        # Extraer costo según plan
+        costo_str = plan_elegido.split("-")[1].strip()
+        
+        if st.button(f"💳 Pagar {costo_str} y Activar Suscripción", use_container_width=True):
             db_usuarios = cargar_usuarios_persistentes()
             
             if not new_user or not new_email or not new_pass or not num_tarjeta:
@@ -230,18 +248,19 @@ if not st.session_state.authenticated:
             elif len(num_tarjeta.replace(" ", "")) < 15:
                 st.error("⚠️ Número de tarjeta inválido. Verifica los dígitos.")
             else:
-                # Guardar nuevo usuario con suscripción activa
+                # Guardar nuevo usuario con plan seleccionado y suscripción activa
                 db_usuarios[new_user] = {
                     "password": hash_password(new_pass),
                     "email": new_email,
                     "subscription_active": True,
+                    "plan": plan_elegido,
                     "fecha_registro": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 }
                 guardar_usuarios_persistentes(db_usuarios)
                 
-                # Simulación de Envío de Notificación por Correo
-                st.success(f"🎉 **¡Pago Exitoso por $1,500 MXN!** Transacción aprobada.")
-                st.success(f"📧 **Notificación Enviada:** Se ha enviado un correo electrónico de confirmación y bienvenida a **{new_email}** con tu comprobante de pago y los accesos de tu cuenta.")
+                # Simulación de notificación por correo y cobro exitoso
+                st.success(f"🎉 **¡Pago Exitoso de {costo_str} ({plan_elegido})!** Transacción aprobada.")
+                st.success(f"📧 **Notificación Enviada:** Se ha enviado un correo electrónico de confirmación y factura a **{new_email}**, junto con los detalles de activación de tu cuenta.")
                 
                 st.session_state.authenticated = True
                 st.session_state.current_user = new_user
@@ -251,6 +270,10 @@ if not st.session_state.authenticated:
     st.stop() # Detiene la ejecución hasta autenticarse
 
 # --- 3. LOGOTIPO VETERINARIO Y DE CAMPO (USUARIO AUTENTICADO) ---
+db_usuarios_activos = cargar_usuarios_persistentes()
+user_info = db_usuarios_activos.get(st.session_state.current_user, {})
+plan_activo_usuario = user_info.get("plan", "Plan Elite")
+
 st.markdown(f"""
     <div style="display: flex; align-items: center; background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 50%, #fef3c7 100%); padding: 22px 26px; border-radius: 20px; box-shadow: 0 15px 35px -10px rgba(5, 150, 105, 0.15); margin-bottom: 24px; border: 2px solid #34d399; flex-wrap: wrap; gap: 20px;">
         <div style="flex-shrink: 0; background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 12px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);">
@@ -277,7 +300,7 @@ st.markdown(f"""
                 Ganader-IA <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">ELITE 360</span>
             </h1>
             <p style="margin: 3px 0 2px 0; font-size: 0.9em; color: #1e293b; font-weight: 600; font-family: 'Calibri', sans-serif;">
-                Usuario: <span style="color: #059669; font-weight: 700;">{st.session_state.current_user.capitalize()}</span> (Suscripción Activa 🟢) | Creado por: Dr. Alejandro Castañeda Correa
+                Usuario: <span style="color: #059669; font-weight: 700;">{st.session_state.current_user.capitalize()}</span> | Plan: <span style="color: #d97706; font-weight: 700;">{plan_activo_usuario}</span> | Creado por: Dr. Alejandro Castañeda Correa
             </p>
         </div>
     </div>
@@ -312,7 +335,7 @@ if "df_ingredientes_state" not in st.session_state:
 # --- 5. BARRA LATERAL ---
 st.sidebar.markdown(f"### 🎛️ Panel de Control Elite")
 st.sidebar.markdown(f"👤 **Usuario:** {st.session_state.current_user.capitalize()}")
-st.sidebar.markdown(f"🛡️ **Plan:** Membresía Elite Anual")
+st.sidebar.markdown(f"🛡️ **Plan:** {plan_activo_usuario}")
 if st.sidebar.button("🚪 Cerrar Sesión", use_container_width=True):
     st.session_state.authenticated = False
     st.session_state.current_user = ""
