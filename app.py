@@ -7,9 +7,9 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from fpdf import FPDF
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (CAMPO Y GANADERÍA) ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL COMPACTO ---
 st.set_page_config(
-    page_title="Ganader-IA Elite 360 | Nutrición, Economía y Sostenibilidad",
+    page_title="Ganader-IA Elite 360 | Nutrición y Economía",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -28,46 +28,57 @@ st.markdown("""
         background-color: #fcfbf9;
     }
     
+    /* Cuadros de métricas compactos y legibles */
     .stMetric {
         background-color: #ffffff;
-        padding: 20px 16px;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(45, 90, 39, 0.08);
-        border-left: 5px solid #2d5a27;
+        padding: 10px 12px !important;
+        border-radius: 10px;
+        box-shadow: 0 3px 8px rgba(45, 90, 39, 0.06);
+        border-left: 4px solid #2d5a27;
         border-top: 1px solid #e6e2dd;
         border-right: 1px solid #e6e2dd;
         border-bottom: 1px solid #e6e2dd;
-        margin-bottom: 12px;
+        margin-bottom: 8px !important;
+    }
+    
+    .stMetric label {
+        font-size: 0.75rem !important;
+        color: #555555 !important;
+    }
+    
+    .stMetric [data-testid="stMetricValue"] {
+        font-size: 1.15rem !important;
+        color: #1f2421 !important;
+        font-weight: 700 !important;
     }
     
     h1, h2, h3, h4 {
         color: #1f2421;
         font-family: 'Inter', sans-serif !important;
         font-weight: 700;
-        line-height: 1.3;
+        line-height: 1.2;
     }
 
     p, span, label {
         font-family: 'Inter', sans-serif !important;
         color: #333333;
-        line-height: 1.5;
+        line-height: 1.4;
     }
     </style>
 """, unsafe_allow_html=True)
 
 # --- 2. LOGOTIPO VECTORIAL INSTITUCIONAL ---
 st.markdown("""
-    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #2d5a27 0%, #bc6c25 100%); padding: 25px; border-radius: 16px; box-shadow: 0 6px 20px rgba(45,90,39,0.15); margin-bottom: 25px; color: white; flex-wrap: wrap; gap: 15px;">
+    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #2d5a27 0%, #bc6c25 100%); padding: 18px; border-radius: 14px; box-shadow: 0 4px 15px rgba(45,90,39,0.15); margin-bottom: 20px; color: white; flex-wrap: wrap; gap: 12px;">
         <div style="flex-shrink: 0;">
-            <svg width="70" height="70" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="55" height="55" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="#ffffff"/>
                 <circle cx="12" cy="12" r="3" fill="#dda15e"/>
             </svg>
         </div>
-        <div style="flex-grow: 1; min-width: 250px;">
-            <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">ELITE 360</span></h1>
-            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización, Evaluación Económica Financiera y Sostenibilidad</p>
-            <p style="margin: 6px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
+        <div style="flex-grow: 1; min-width: 220px;">
+            <h1 style="margin: 0; font-size: 1.8em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 6px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">ELITE 360</span></h1>
+            <p style="margin: 4px 0 0 0; font-size: 0.95em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización Compacta, Evaluación Financiera y Sostenibilidad</p>
         </div>
     </div>
 """, unsafe_allow_html=True)
@@ -114,9 +125,9 @@ gde = st.sidebar.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=0.8,
 
 st.sidebar.markdown("---")
 st.sidebar.header("💰 Parámetros Económicos y de Mercado")
-precio_compra_kg = st.sidebar.number_input("Precio de Compra Becerro (MXN/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
-precio_venta_kg = st.sidebar.number_input("Precio de Venta Ganado Gordo (MXN/kg)", min_value=30.0, max_value=100.0, value=50.0, step=1.0)
-costo_sanidad_fijo = st.sidebar.number_input("Gastos Fijos Sanidad/Manejo (MXN/cab)", min_value=0.0, max_value=2000.0, value=350.0, step=50.0)
+precio_compra_kg = st.sidebar.number_input("Precio Compra Becerro (MXN/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
+precio_venta_kg = st.sidebar.number_input("Precio Venta Ganado Gordo (MXN/kg)", min_value=30.0, max_value=100.0, value=50.0, step=1.0)
+costo_sanidad_fijo = st.sidebar.number_input("Sanidad y Manejo (MXN/cab)", min_value=0.0, max_value=2000.0, value=350.0, step=50.0)
 costo_mano_obra_fijo = st.sidebar.number_input("Mano de Obra / Indirectos (MXN/cab)", min_value=0.0, max_value=3000.0, value=450.0, step=50.0)
 
 sistema_produccion = st.sidebar.selectbox("Sistema de Producción", ["Corral / Engorda Intensiva (Feedlot)", "Semi-estabulado (Mixto / Suplementación en Pastoreo)", "Pastoreo Extensivo (Praderas / Agostadero)"])
@@ -342,7 +353,7 @@ with tab2:
     )
     
     st.markdown(
-        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V7)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
+        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V8)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
         unsafe_allow_html=True
     )
     st.markdown("<br>", unsafe_allow_html=True)
@@ -443,21 +454,21 @@ with tab3:
         
         costo_por_kg_ganado = costo_alimentacion_cab / kg_por_ganar if kg_por_ganar > 0 else 0
         
-        status_rentabilidad = "🟢 Negocio Rentable" if utilidad_neta_cab > 0 else "🔴 Margen Negativo (Revisar Costos/Precios)"
+        status_rentabilidad = "🟢 Negocio Rentable" if utilidad_neta_cab > 0 else "🔴 Margen Negativo"
         
         col_ec1, col_ec2, col_ec3, col_ec4 = st.columns(4)
         with col_ec1:
-            st.metric("Costo Compra Becerro", f"${costo_compra_cab:,.2f} MXN")
-            st.metric("Costo de Alimento/Cab", f"${costo_alimentacion_cab:,.2f} MXN")
+            st.metric("Costo Compra Becerro", f"${costo_compra_cab:,.0f} MXN")
+            st.metric("Costo Alimento/Cab", f"${costo_alimentacion_cab:,.0f} MXN")
         with col_ec2:
-            st.metric("Costo Total por Animal", f"${costo_total_cab:,.2f} MXN")
-            st.metric("Costo por kg Ganado", f"${costo_por_kg_ganado:,.2f} MXN/kg")
+            st.metric("Costo Total Animal", f"${costo_total_cab:,.0f} MXN")
+            st.metric("Costo x kg Ganado", f"${costo_por_kg_ganado:,.1f} MXN")
         with col_ec3:
-            st.metric("Ingreso por Venta/Cab", f"${ingreso_venta_cab:,.2f} MXN")
-            st.metric("Utilidad Neta / Animal", f"${utilidad_neta_cab:,.2f} MXN")
+            st.metric("Ingreso Venta/Cab", f"${ingreso_venta_cab:,.0f} MXN")
+            st.metric("Utilidad Neta / Cab", f"${utilidad_neta_cab:,.0f} MXN")
         with col_ec4:
-            st.metric("ROI del Ciclo", f"{roi_cab:.2f}%", "Retorno Inversión")
-            st.metric("Estatus Comercial", status_rentabilidad)
+            st.metric("ROI del Ciclo", f"{roi_cab:.1f}%")
+            st.metric("Estatus", status_rentabilidad)
             
         st.markdown("---")
         st.markdown("#### 📋 Desglose Analítico de Costos de Producción por Tonelada de Alimento:")
@@ -511,8 +522,8 @@ with tab3:
         aporte_lipidos = np.sum(resultado.x * lipidos) * 100
         
         relacion_ca_p = (aporte_ca / aporte_p) if aporte_p > 0 else 0
-        status_ca_p = "🟢 Óptimo Automático"
-        riesgo_sara = "🟢 Bajo (Seguro)" if aporte_pendf >= 18.0 else ("🟡 Moderado (Monitorear Buffer)" if aporte_pendf >= 14.0 else "🔴 Alto Riesgo SARA (Aumentar Fibra E.F.)")
+        status_ca_p = "🟢 Óptimo"
+        riesgo_sara = "🟢 Seguro" if aporte_pendf >= 18.0 else ("🟡 Monitorear" if aporte_pendf >= 14.0 else "🔴 Alto Riesgo")
         
         ge_diaria = cms_estimado * 18.4 
         reduccion_lipidica = max(0.0, (aporte_lipidos - 3.0) * 0.003)
@@ -532,17 +543,17 @@ with tab3:
         
         col_m1, col_m2, col_m3, col_m4 = st.columns(4)
         with col_m1:
-            st.metric("Calcio (Ca)", f"{aporte_ca:.2f}%", "Mineral Mayor")
-            st.metric("Relación Ca:P", f"{relacion_ca_p:.2f}:1", status_ca_p)
+            st.metric("Calcio (Ca)", f"{aporte_ca:.2f}%", "Mineral")
+            st.metric("Relación Ca:P", f"{relacion_ca_p:.1f}:1", status_ca_p)
         with col_m2:
             st.metric("Fibra peNDF", f"{aporte_pendf:.1f}%", "Anti-acidosis")
-            st.metric("Riesgo SARA", riesgo_sara, "Salud Ruminal")
+            st.metric("Riesgo SARA", riesgo_sara, "Ruminal")
         with col_m3:
-            st.metric("Emisión $CH_4$", f"{ch4_g_dia:.1f} g/día", f"IPCC Tier 2 ({aditivo_ruminal[:10]})")
-            st.metric("Equivalente $CO_2e$", f"{co2e_anual:,.1f} kg/año")
+            st.metric("Emisión $CH_4$", f"{ch4_g_dia:.1f} g/d", f"IPCC Tier 2")
+            st.metric("Eq. $CO_2e$", f"{co2e_anual:,.0f} kg/año")
         with col_m4:
-            st.metric("Valor Bonos Carbono", f"${valor_bono_mxn:,.2f} MXN", "Potencial Anual/Cab")
-            st.metric("Lípidos Totales", f"{aporte_lipidos:.1f}%", "Mitigador")
+            st.metric("Bonos Carbono", f"${valor_bono_mxn:,.0f} MXN", "Anual/Cab")
+            st.metric("Lípidos", f"{aporte_lipidos:.1f}%", "Mitigador")
 
     else:
         st.error(
@@ -561,11 +572,11 @@ with tab4:
         
         col_l1, col_l2, col_l3 = st.columns(3)
         with col_l1:
-            st.metric("Consumo Diario del Lote", f"{cms_total_lote:,.1f} kg MS/día")
+            st.metric("Consumo Diario Lote", f"{cms_total_lote:,.1f} kg/día")
         with col_l2:
-            st.metric("Alimento Total Requerido", f"{alimento_total_ciclo:,.1f} kg ({alimento_total_ciclo/1000.0:,.1f} tons)")
+            st.metric("Alimento Total Lote", f"{alimento_total_ciclo/1000.0:,.1f} tons")
         with col_l3:
-            st.metric("Costo Total de Alimentación", f"${costo_total_lote:,.2f} MXN")
+            st.metric("Costo Total Ciclo", f"${costo_total_lote:,.0f} MXN")
             
         st.markdown("---")
         st.markdown("#### 📋 Protocolo y Orden de Carga en Batea para Operarios:")
@@ -585,59 +596,59 @@ with tab4:
             pdf = FPDF()
             pdf.add_page()
             
-            pdf.set_font("Arial", "B", 15)
-            pdf.cell(0, 8, "Ganader-IA Elite 360 - Reporte Económico y Ejecutivo", 0, 1, "C")
-            pdf.set_font("Arial", "I", 9)
-            pdf.cell(0, 5, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
-            pdf.ln(3)
+            pdf.set_font("Arial", "B", 14)
+            pdf.cell(0, 7, "Ganader-IA Elite 360 - Reporte Económico y Ejecutivo", 0, 1, "C")
+            pdf.set_font("Arial", "I", 8)
+            pdf.cell(0, 4, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
+            pdf.ln(2)
             
-            pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "1. Evaluacion Economica y Rentabilidad del Negocio", 0, 1)
-            pdf.set_font("Arial", "", 9)
-            pdf.cell(0, 5, f"Utilidad Neta por Animal: ${util_neta:,.2f} MXN | ROI del Ciclo: {roi_c:.2f}%", 0, 1)
-            pdf.cell(0, 5, f"Costo por kg Ganado: ${c_kg_ganado:,.2f} MXN/kg | Costo Alimento Ton: ${costo_ton:,.2f} MXN", 0, 1)
-            pdf.ln(3)
+            pdf.set_font("Arial", "B", 9)
+            pdf.cell(0, 5, "1. Evaluacion Economica y Rentabilidad del Negocio", 0, 1)
+            pdf.set_font("Arial", "", 8)
+            pdf.cell(0, 4, f"Utilidad Neta por Animal: ${util_neta:,.2f} MXN | ROI del Ciclo: {roi_c:.2f}%", 0, 1)
+            pdf.cell(0, 4, f"Costo por kg Ganado: ${c_kg_ganado:,.2f} MXN/kg | Costo Alimento Ton: ${costo_ton:,.2f} MXN", 0, 1)
+            pdf.ln(2)
             
-            pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "2. Parametros Biologicos y Poblacionales del Lote", 0, 1)
-            pdf.set_font("Arial", "", 9)
-            pdf.cell(0, 5, f"Fisiologia: {etapa} | Sistema: {sistema_prod} | Perfil AA: {perf_aa}", 0, 1)
-            pdf.cell(0, 5, f"Cabezas: {cabezas} | Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE: {gain} kg/d", 0, 1)
-            pdf.ln(3)
+            pdf.set_font("Arial", "B", 9)
+            pdf.cell(0, 5, "2. Parametros Biologicos y Poblacionales del Lote", 0, 1)
+            pdf.set_font("Arial", "", 8)
+            pdf.cell(0, 4, f"Fisiologia: {etapa} | Sistema: {sistema_prod} | Perfil AA: {perf_aa}", 0, 1)
+            pdf.cell(0, 4, f"Cabezas: {cabezas} | Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE: {gain} kg/d", 0, 1)
+            pdf.ln(2)
             
-            pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "3. Balance Mineral, Salud Ruminal y Sostenibilidad (IPCC)", 0, 1)
-            pdf.set_font("Arial", "", 9)
-            pdf.cell(0, 5, f"Calcio (Ca): {a_ca:.2f}% | Fosforo (P): {a_p:.2f}% | Relacion Ca:P: {r_cap:.2f}:1", 0, 1)
-            pdf.cell(0, 5, f"Fibra peNDF: {a_pendf:.1f}% | Emision CH4: {ch4_d:.1f} g/dia", 0, 1)
-            pdf.cell(0, 5, f"Valor Potencial Bonos de Carbono: ${bonos:,.2f} MXN por animal/ano", 0, 1)
-            pdf.ln(3)
+            pdf.set_font("Arial", "B", 9)
+            pdf.cell(0, 5, "3. Balance Mineral, Salud Ruminal y Sostenibilidad (IPCC)", 0, 1)
+            pdf.set_font("Arial", "", 8)
+            pdf.cell(0, 4, f"Calcio (Ca): {a_ca:.2f}% | Fosforo (P): {a_p:.2f}% | Relacion Ca:P: {r_cap:.2f}:1", 0, 1)
+            pdf.cell(0, 4, f"Fibra peNDF: {a_pendf:.1f}% | Emision CH4: {ch4_d:.1f} g/dia", 0, 1)
+            pdf.cell(0, 4, f"Valor Potencial Bonos de Carbono: ${bonos:,.2f} MXN por animal/ano", 0, 1)
+            pdf.ln(2)
             
-            pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "4. Mezcla Exacta por Tonelada (1,000 kg)", 0, 1)
-            pdf.set_font("Arial", "B", 8)
-            pdf.cell(80, 6, "Ingrediente", 1)
-            pdf.cell(30, 6, "Inclusion (%)", 1)
-            pdf.cell(35, 6, "Kg / Tonelada", 1)
-            pdf.cell(45, 6, "Costo Parcial ($)", 1)
+            pdf.set_font("Arial", "B", 9)
+            pdf.cell(0, 5, "4. Mezcla Exacta por Tonelada (1,000 kg)", 0, 1)
+            pdf.set_font("Arial", "B", 7)
+            pdf.cell(80, 5, "Ingrediente", 1)
+            pdf.cell(30, 5, "Inclusion (%)", 1)
+            pdf.cell(35, 5, "Kg / Tonelada", 1)
+            pdf.cell(45, 5, "Costo Parcial ($)", 1)
             pdf.ln()
             
-            pdf.set_font("Arial", "", 8)
+            pdf.set_font("Arial", "", 7)
             for _, row in df_resumen.iterrows():
                 if row["Ingrediente"] != "TOTALES / MEZCLA FINAL":
-                    pdf.cell(80, 5, str(row["Ingrediente"]), 1)
-                    pdf.cell(30, 5, f"{row['Inclusion (%)']}%", 1)
-                    pdf.cell(35, 5, f"{row['Kg por Tonelada (1,000 kg)']}", 1)
-                    pdf.cell(45, 5, str(row['Aporte al Costo Total ($)']), 1)
+                    pdf.cell(80, 4, str(row["Ingrediente"]), 1)
+                    pdf.cell(30, 4, f"{row['Inclusion (%)']}%", 1)
+                    pdf.cell(35, 4, f"{row['Kg por Tonelada (1,000 kg)']}", 1)
+                    pdf.cell(45, 4, str(row['Aporte al Costo Total ($)']), 1)
                     pdf.ln()
             
             tot_inc = df_resumen[df_resumen["Ingrediente"] != "TOTALES / MEZCLA FINAL"]['Inclusion (%)'].sum()
             tot_kg = df_resumen[df_resumen["Ingrediente"] != "TOTALES / MEZCLA FINAL"]['Kg por Tonelada (1,000 kg)'].sum()
-            pdf.set_font("Arial", "B", 8)
-            pdf.cell(80, 5, "TOTALES / MEZCLA FINAL", 1)
-            pdf.cell(30, 5, f"{tot_inc:.1f}%", 1)
-            pdf.cell(35, 5, f"{tot_kg:.1f} kg", 1)
-            pdf.cell(45, 5, f"${costo_ton:,.2f}", 1)
+            pdf.set_font("Arial", "B", 7)
+            pdf.cell(80, 4, "TOTALES / MEZCLA FINAL", 1)
+            pdf.cell(30, 4, f"{tot_inc:.1f}%", 1)
+            pdf.cell(35, 4, f"{tot_kg:.1f} kg", 1)
+            pdf.cell(45, 4, f"${costo_ton:,.2f}", 1)
             pdf.ln()
             return bytes(pdf.output())
 
