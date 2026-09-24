@@ -9,7 +9,7 @@ from fpdf import FPDF
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (CAMPO Y GANADERÍA) ---
 st.set_page_config(
-    page_title="Ganader-IA Pro | Nutrición Bovina Inteligente",
+    page_title="Ganader-IA Pro | Nutrición Bovina Inteligente NASEM/NRC",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -65,14 +65,14 @@ st.markdown("""
             </svg>
         </div>
         <div style="flex-grow: 1; min-width: 250px;">
-            <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">PRO</span></h1>
-            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Plataforma de Precisión Zootécnica y Selección de Raciones a la Medida</p>
-            <p style="margin: 6px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
+            <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">PRO NASEM</span></h1>
+            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Plataforma de Precisión Zootécnica y Salud Ruminal Avanzada</p>
+            <p style="margin: 6px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Modelos NASEM/NRC 2016-2026 en tus manos</p>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
-# --- 3. BASE DE DATOS INICIAL CON CONTROL DE DISPONIBILIDAD REGIONAL ---
+# --- 3. BASE DE DATOS INICIAL CON ESTÁNDARES NASEM/NRC (FND, peNDF, PDR, PND Y MINERALES) ---
 data_respaldo = {
     "Nombre del Ingrediente": [
         "Rastrojo de maiz molido", 
@@ -82,14 +82,22 @@ data_respaldo = {
         "Ensilado de maiz", 
         "Canola (pasta)", 
         "Melaza liquida",
-        "Sales Minerales (Cañón de Tlaltenango)", 
+        "Sales Minerales (Especializadas)", 
         "Grasa de paso Lactomil"
     ],
     "Categoria": ["Forraje", "Suplemento Proteico", "Grano Energetico", "Suplemento NPN", "Forraje Humedo", "Suplemento Proteico", "Subproducto / Energetico", "Suplemento Mineral", "Suplemento Energetico"],
-    "Disponible": [True, True, True, True, False, True, True, True, True],  # Ensilado false por defecto para priorizar rastrojo y soya del cliente
+    "Disponible": [True, True, True, True, False, True, True, True, True],
     "Precio Estimado (MXN/ton)": [2500.0, 12500.0, 5800.0, 16000.0, 1200.0, 8500.0, 4800.0, 18000.0, 32000.0],
     "Proteina Cruda (PC % MS)": [5.5, 48.0, 8.5, 281.0, 8.0, 38.0, 4.8, 0.0, 1.0],
     "NEg (Mcal/kg)": [0.35, 1.48, 1.55, 0.0, 0.85, 1.15, 1.22, 0.0, 1.65],
+    "FND (% MS)": [75.0, 12.0, 9.0, 0.0, 45.0, 28.0, 0.0, 0.0, 0.0],
+    "peNDF (% MS)": [65.0, 2.0, 3.0, 0.0, 30.0, 10.0, 0.0, 0.0, 0.0],
+    "PDR (% MS)": [3.5, 33.6, 5.5, 281.0, 5.0, 24.0, 4.5, 0.0, 0.0],
+    "PND (% MS)": [2.0, 14.4, 3.0, 0.0, 3.0, 14.0, 0.3, 0.0, 1.0],
+    "Calcio (Ca %)": [0.35, 0.30, 0.02, 0.0, 0.25, 0.70, 0.80, 18.0, 1.0],
+    "Fosforo (P %)": [0.10, 0.65, 0.30, 0.0, 0.22, 1.10, 0.08, 10.0, 0.1],
+    "Sodio (Na %)": [0.02, 0.03, 0.02, 0.0, 0.02, 0.05, 0.10, 10.0, 0.0],
+    "Magnesio (Mg %)": [0.15, 0.28, 0.12, 0.0, 0.18, 0.50, 0.40, 2.0, 0.0],
     "Min Inclusión (%)": [20.0, 5.0, 10.0, 0.0, 0.0, 0.0, 2.0, 1.0, 0.0],
     "Max Inclusión (%)": [60.0, 35.0, 50.0, 1.5, 0.0, 30.0, 6.0, 3.0, 3.0]
 }
@@ -115,7 +123,7 @@ raza_seleccionada = st.sidebar.selectbox(
     ]
 )
 
-# --- MODELADO PREDICTIVO BIOLÓGICO ---
+# --- MODELADO PREDICTIVO BIOLÓGICO NASEM/NRC ---
 factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
 cms_estimado = peso_actual * 0.024 * factor_clima
 
@@ -126,14 +134,32 @@ if peso_actual < 300:
     fase = "Crecimiento (Becerro Ligero)"
     meta_pc_base = 0.130 + (gde * 0.015)
     meta_neg_base = 0.75 + (gde * 0.09)
+    meta_fnd_min = 0.30
+    meta_pendf_min = 0.22
+    meta_pdr_min = 0.080
+    meta_pnd_min = 0.045
+    meta_ca_min = 0.0055
+    meta_p_min = 0.0035
 elif peso_actual < 380:
     fase = "Desarrollo / Transición"
     meta_pc_base = 0.120 + (gde * 0.015)
     meta_neg_base = 0.85 + (gde * 0.09)
+    meta_fnd_min = 0.28
+    meta_pendf_min = 0.20
+    meta_pdr_min = 0.072
+    meta_pnd_min = 0.040
+    meta_ca_min = 0.0050
+    meta_p_min = 0.0030
 else:
     fase = "Finalización (Engorda Pesada)"
     meta_pc_base = 0.105 + (gde * 0.015)
     meta_neg_base = 1.00 + (gde * 0.10)
+    meta_fnd_min = 0.25  # Previene acidosis en dietas altas en grano
+    meta_pendf_min = 0.18
+    meta_pdr_min = 0.065
+    meta_pnd_min = 0.038
+    meta_ca_min = 0.0045
+    meta_p_min = 0.0028
 
 if "Británicas" in raza_seleccionada:
     factor_pc = 1.02
@@ -154,9 +180,9 @@ meta_neg_min = meta_neg_base * factor_neg
 st.sidebar.markdown("---")
 st.sidebar.markdown(
     "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px; font-family: Inter, sans-serif;'>"
-    "<b>Ganader-IA Pro</b><br>"
+    "<b>Ganader-IA Pro NASEM</b><br>"
     "Creado por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
-    "Diseñado para Nutriólogos, Técnicos, Estudiantes Universitarios y Ganaderos."
+    "Nutrición de Precisión y Salud Ruminal."
     "</div>",
     unsafe_allow_html=True
 )
@@ -164,8 +190,8 @@ st.sidebar.markdown(
 # --- 5. INTERFAZ MODULAR POR PESTAÑAS (3 TABS) ---
 tab1, tab2, tab3 = st.tabs([
     "📋 1. Resumen y Predicciones", 
-    "🧪 2. Selección de Ingredientes y Lab", 
-    "📊 3. Resultados y Reporte PDF"
+    "🧪 2. Inventario, Ingredientes y Lab NASEM", 
+    "📊 3. Resultados, Salud Ruminal y Reporte PDF"
 ])
 
 with tab1:
@@ -254,11 +280,11 @@ with tab1:
     st.plotly_chart(fig_comportamiento, use_container_width=True)
 
 with tab2:
-    st.subheader("🛠️ Control Regional de Inventario y Selección de Ingredientes")
+    st.subheader("🧪 Laboratorio de Ingredientes y Control Regional NASEM/NRC")
     st.markdown(
-        "**Elige los ingredientes disponibles en tu rancho y ajusta sus límites.** "
-        "Marca con un visto bueno (`✓`) los insumos con los que realmente cuentas (por ejemplo, *Rastrojo de maíz molido* y *Harina de soya*), "
-        "desactiva los que no tengas (como el *Ensilado de maíz*) y define sus rangos mínimos y máximos de inclusión en la dieta:"
+        "**Personaliza tu inventario y los perfiles nutricionales de tus insumos.** "
+        "Selecciona cuáles ingredientes están disponibles en tu rancho (`✓`), ajusta sus límites mínimos y máximos de inclusión, "
+        "y modifica los valores de **FND, peNDF, PDR, PND y Minerales** según tus propios análisis de laboratorio:"
     )
     
     df_ingredientes = st.data_editor(
@@ -273,12 +299,19 @@ with tab2:
         key="editor_ingredientes"
     )
 
-# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL PERSONALIZADO ---
+# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL NASEM/NRC ---
 try:
     nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
     c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
     pc = df_ingredientes["Proteina Cruda (PC % MS)"].astype(float).values / 100.0  
     neg = df_ingredientes["NEg (Mcal/kg)"].astype(float).values
+    fnd = df_ingredientes["FND (% MS)"].astype(float).values / 100.0
+    pendf = df_ingredientes["peNDF (% MS)"].astype(float).values / 100.0
+    pdr = df_ingredientes["PDR (% MS)"].astype(float).values / 100.0
+    pnd = df_ingredientes["PND (% MS)"].astype(float).values / 100.0
+    ca = df_ingredientes["Calcio (Ca %)"].astype(float).values / 100.0
+    p_min_ing = df_ingredientes["Fosforo (P %)"].astype(float).values / 100.0
+    
     disponibles = df_ingredientes["Disponible"].astype(bool).values
 except KeyError as err:
     st.error(f"Falta una columna clave en la tabla: {err}.")
@@ -287,7 +320,6 @@ except KeyError as err:
 bounds = []
 for idx, row in df_ingredientes.iterrows():
     if not row["Disponible"]:
-        # Si el cliente no lo tiene en su rancho, la inclusión forzosa es 0.0
         bounds.append((0.0, 0.0))
     else:
         min_lim = max(0.0, float(row["Min Inclusión (%)"]) / 100.0)
@@ -296,20 +328,40 @@ for idx, row in df_ingredientes.iterrows():
 
 A_eq = np.ones((1, len(c)))
 b_eq = np.array([1.0])
-A_ub = np.array([-pc, -neg])
-b_ub = np.array([-meta_pc_min, -meta_neg_min])
+
+# Restricciones de desigualdad (A_ub * x <= b_ub equivale a requisito >= min)
+A_ub = np.array([
+    -pc,
+    -neg,
+    -fnd,
+    -pendf,
+    -pdr,
+    -pnd,
+    -ca,
+    -p_min_ing
+])
+b_ub = np.array([
+    -meta_pc_min,
+    -meta_neg_min,
+    -meta_fnd_min,
+    -meta_pendf_min,
+    -meta_pdr_min,
+    -meta_pnd_min,
+    -meta_ca_min,
+    -meta_p_min
+])
 
 resultado = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
 
 with tab3:
-    st.subheader("Reporte Financiero, Mezcla y Descarga de PDF")
+    st.subheader("Reporte Financiero, Salud Ruminal NASEM y Descarga de PDF")
     
     if resultado.success:
         col_res1, col_res2 = st.columns(2)
         with col_res1:
             st.metric(label="Costo Óptimo por Tonelada", value=f"${resultado.fun:,.2f} MXN")
         with col_res2:
-            st.metric(label="Estado del Proceso", value="Factible con tus Insumos Seleccionados 🟢")
+            st.metric(label="Estado del Proceso", value="Factible (NASEM/NRC) 🟢")
         
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("#### 📋 Tabla de Ingredientes y Mezcla Exacta por Tonelada:")
@@ -337,75 +389,119 @@ with tab3:
         df_mezcla_final = pd.DataFrame(tabla_mezcla)
         st.dataframe(df_mezcla_final, use_container_width=True, hide_index=True)
         
-        # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ---
-        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, p_act, p_obj, gain, dias):
+        # --- CÁLCULOS AVANZADOS DE APORTES NASEM/NRC ---
+        aporte_pc = np.sum(resultado.x * pc) * 100
+        aporte_neg = np.sum(resultado.x * neg)
+        aporte_fnd = np.sum(resultado.x * fnd) * 100
+        aporte_pendf = np.sum(resultado.x * pendf) * 100
+        aporte_pdr = np.sum(resultado.x * pdr) * 100
+        aporte_pnd = np.sum(resultado.x * pnd) * 100
+        aporte_ca = np.sum(resultado.x * ca) * 100
+        aporte_p = np.sum(resultado.x * p_min_ing) * 100
+        aporte_na = np.sum(resultado.x * df_ingredientes["Sodio (Na %)"].astype(float).values) * 100
+        aporte_mg = np.sum(resultado.x * df_ingredientes["Magnesio (Mg %)"].astype(float).values) * 100
+        
+        relacion_ca_p = (aporte_ca / aporte_p) if aporte_p > 0 else 0
+        
+        st.markdown("---")
+        st.subheader("🛡️ Validación de Salud Ruminal y Nutrición Avanzada (NASEM/NRC)")
+        
+        col_m1, col_m2, col_m3, col_m4 = st.columns(4)
+        with col_m1:
+            st.metric("Fibra FND Total", f"{aporte_fnd:.1f}%", f"Mín: {meta_fnd_min*100:.0f}%")
+            st.metric("Proteína PDR", f"{aporte_pdr:.1f}%", f"Mín: {meta_pdr_min*100:.1f}%")
+        with col_m2:
+            st.metric("Fibra peNDF (Efectiva)", f"{aporte_pendf:.1f}%", f"Mín: {meta_pendf_min*100:.0f}% (Anti-acidosis)")
+            st.metric("Proteína PND (Bypass)", f"{aporte_pnd:.1f}%", f"Mín: {meta_pnd_min*100:.1f}%")
+        with col_m3:
+            st.metric("Calcio (Ca)", f"{aporte_ca:.2f}%")
+            st.metric("Sodio (Na)", f"{aporte_na:.2f}%")
+        with col_m4:
+            st.metric("Fósforo (P)", f"{aporte_p:.2f}%")
+            st.metric("Relación Ca:P", f"{relacion_ca_p:.2f}:1", "Ideal: 1.5 - 2.0")
+
+        # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO NASEM ---
+        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, p_act, p_obj, gain, dias, a_pc, a_neg, a_fnd, a_pendf, a_pdr, a_pnd, a_ca, a_p, a_na, a_mg, r_cap):
             pdf = FPDF()
             pdf.add_page()
             
             # Encabezado
-            pdf.set_font("Arial", "B", 16)
-            pdf.cell(0, 10, "Ganader-IA Pro - Reporte Ejecutivo de Nutricion", 0, 1, "C")
-            pdf.set_font("Arial", "I", 10)
-            pdf.cell(0, 6, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
-            pdf.ln(5)
+            pdf.set_font("Arial", "B", 15)
+            pdf.cell(0, 8, "Ganader-IA Pro NASEM - Reporte Ejecutivo de Nutricion", 0, 1, "C")
+            pdf.set_font("Arial", "I", 9)
+            pdf.cell(0, 5, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
+            pdf.ln(3)
             
             # Datos del Lote
-            pdf.set_font("Arial", "B", 11)
-            pdf.cell(0, 7, "1. Parametros y Predicciones del Lote", 0, 1)
-            pdf.set_font("Arial", "", 10)
-            pdf.cell(0, 6, f"Fisiologia: {etapa} | Genetica: {raza_L}", 0, 1)
-            pdf.cell(0, 6, f"Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE Esperada: {gain} kg/dia", 0, 1)
-            pdf.cell(0, 6, f"Dias Proyectados a Venta: {dias:.0f} dias", 0, 1)
-            pdf.ln(4)
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(0, 6, "1. Parametros Biologicos y Predicciones del Lote", 0, 1)
+            pdf.set_font("Arial", "", 9)
+            pdf.cell(0, 5, f"Fisiologia: {etapa} | Genetica: {raza_L}", 0, 1)
+            pdf.cell(0, 5, f"Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE: {gain} kg/dia | Dias Proyectados: {dias:.0f}", 0, 1)
+            pdf.ln(3)
             
             # Corrida Financiera
-            pdf.set_font("Arial", "B", 11)
-            pdf.cell(0, 7, "2. Corrida Financiera", 0, 1)
-            pdf.set_font("Arial", "", 10)
-            pdf.cell(0, 6, f"Costo Optimo por Tonelada de Alimento: ${costo_ton:,.2f} MXN", 0, 1)
-            pdf.ln(4)
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(0, 6, "2. Corrida Financiera y Costo Optimo", 0, 1)
+            pdf.set_font("Arial", "", 9)
+            pdf.cell(0, 5, f"Costo Optimo por Tonelada de Alimento: ${costo_ton:,.2f} MXN", 0, 1)
+            pdf.ln(3)
             
-            # Tabla de ingredientes seleccionados
-            pdf.set_font("Arial", "B", 11)
-            pdf.cell(0, 7, "3. Orden Exacta de Ingredientes Seleccionados por Tonelada (1,000 kg)", 0, 1)
-            pdf.set_font("Arial", "B", 9)
-            pdf.cell(80, 7, "Ingrediente", 1)
-            pdf.cell(30, 7, "Inclusion (%)", 1)
-            pdf.cell(35, 7, "Kg / Tonelada", 1)
-            pdf.cell(45, 7, "Costo Parcial ($)", 1)
+            # Salud Ruminal y NASEM
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(0, 6, "3. Validacion Nutricional Avanzada (Estandares NASEM/NRC)", 0, 1)
+            pdf.set_font("Arial", "", 9)
+            pdf.cell(0, 5, f"Proteina Cruda: {a_pc:.2f}% | Energia Neta (NEg): {a_neg:.2f} Mcal/kg", 0, 1)
+            pdf.cell(0, 5, f"Fibra FND: {a_fnd:.1f}% | Fibra peNDF (Salud Ruminal): {a_pendf:.1f}%", 0, 1)
+            pdf.cell(0, 5, f"Proteina Degradable (PDR): {a_pdr:.1f}% | Proteina Bypass (PND): {a_pnd:.1f}%", 0, 1)
+            pdf.cell(0, 5, f"Minerales - Calcio (Ca): {a_ca:.2f}% | Fosforo (P): {a_p:.2f}% | Relacion Ca:P: {r_cap:.2f}:1", 0, 1)
+            pdf.cell(0, 5, f"Sodio (Na): {a_na:.2f}% | Magnesio (Mg): {a_mg:.2f}%", 0, 1)
+            pdf.ln(3)
+            
+            # Tabla de ingredientes
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(0, 6, "4. Mezcla Exacta por Tonelada (1,000 kg)", 0, 1)
+            pdf.set_font("Arial", "B", 8)
+            pdf.cell(80, 6, "Ingrediente", 1)
+            pdf.cell(30, 6, "Inclusion (%)", 1)
+            pdf.cell(35, 6, "Kg / Tonelada", 1)
+            pdf.cell(45, 6, "Costo Parcial ($)", 1)
             pdf.ln()
             
-            pdf.set_font("Arial", "", 9)
+            pdf.set_font("Arial", "", 8)
             for _, row in df_resumen.iterrows():
-                pdf.cell(80, 6, str(row["Ingrediente"]), 1)
-                pdf.cell(30, 6, f"{row['Inclusión (%)']}%", 1)
-                pdf.cell(35, 6, f"{row['Kg por Tonelada (1,000 kg)']}", 1)
-                pdf.cell(45, 6, str(row['Aporte al Costo Total ($)']), 1)
+                pdf.cell(80, 5, str(row["Ingrediente"]), 1)
+                pdf.cell(30, 5, f"{row['Inclusión (%)']}%", 1)
+                pdf.cell(35, 5, f"{row['Kg por Tonelada (1,000 kg)']}", 1)
+                pdf.cell(45, 5, str(row['Aporte al Costo Total ($)']), 1)
                 pdf.ln()
                 
-            pdf.ln(5)
-            pdf.set_font("Arial", "B", 11)
-            pdf.cell(0, 7, "4. Instrucciones de Mezclado para los Operarios del Corral", 0, 1)
-            pdf.set_font("Arial", "", 9)
-            pdf.multi_cell(0, 5, 
-                "1. Orden de carga en la batea: Agregar primero los forrajes secos disponibles (ej. rastrojo).\n"
-                "2. Incorporar los granos energeticos, concentrados proteicos (ej. harina de soya) y subproductos.\n"
-                "3. Agregar con precision los aditivos especiales (Sales Minerales, Grasa de paso Lactomil y Urea).\n"
-                "4. Verter la melaza liquida al final junto con el agua de batea para asegurar palatabilidad y evitar polvos.\n"
-                "5. Tiempo de mezcla recomendado: 8 a 10 minutos posteriores a la adicion del ultimo ingrediente."
+            pdf.ln(3)
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(0, 6, "5. Protocolo de Mezclado para los Operarios", 0, 1)
+            pdf.set_font("Arial", "", 8)
+            pdf.multi_cell(0, 4, 
+                "1. Orden en batea: Forrajes secos (rastrojo) para asegurar peNDF y evitar acidosis.\n"
+                "2. Incorporar granos energeticos y fuentes de proteina (soya/canola).\n"
+                "3. Agregar aditivos y minerales especializados (Sales y Urea con cuidado).\n"
+                "4. Anadir melaza liquida al final con agua para adherencia y palatabilidad.\n"
+                "5. Tiempo de mezcla recomendado: 8 a 10 minutos."
             )
             return bytes(pdf.output())
 
-        pdf_data = generar_pdf_ejecutivo(df_mezcla_final, resultado.fun, fase, raza_seleccionada, peso_actual, peso_objetivo, gde, dias_a_meta)
+        pdf_data = generar_pdf_ejecutivo(
+            df_mezcla_final, resultado.fun, fase, raza_seleccionada, peso_actual, peso_objetivo, gde, dias_a_meta,
+            aporte_pc, aporte_neg, aporte_fnd, aporte_pendf, aporte_pdr, aporte_pnd, aporte_ca, aporte_p, aporte_na, aporte_mg, relacion_ca_p
+        )
         
         st.markdown("---")
-        st.subheader("📥 Descarga de Reporte Ejecutivo PDF")
-        st.markdown("Haz clic en el siguiente botón para generar y descargar el reporte oficial con tu receta personalizada y corrida financiera:")
+        st.subheader("📥 Descarga de Reporte Ejecutivo PDF NASEM")
+        st.markdown("Haz clic en el botón para descargar el reporte oficial con la corrida financiera, salud ruminal y protocolo de carga:")
         
         st.download_button(
-            label="📄 Descargar Reporte Ejecutivo PDF (Operarios y Corrida Financiera)",
+            label="📄 Descargar Reporte Ejecutivo PDF (NASEM/NRC & Operarios)",
             data=pdf_data,
-            file_name=f"Reporte_GanaderIA_{fase.replace(' ', '_')}.pdf",
+            file_name=f"Reporte_GanaderIA_NASEM_{fase.replace(' ', '_')}.pdf",
             mime="application/pdf",
             use_container_width=True
         )
@@ -426,22 +522,8 @@ with tab3:
         fig_pie.update_layout(font=dict(family="Inter", color="#2b2d42"))
         st.plotly_chart(fig_pie, use_container_width=True)
                 
-        st.markdown("---")
-        st.subheader("📈 Aportes Nutricionales vs. Requerimientos Raciales Ajustados")
-        
-        aporte_pc = np.sum(resultado.x * pc) * 100
-        aporte_neg = np.sum(resultado.x * neg)
-        
-        df_chart = pd.DataFrame({
-            "Parámetro Nutricional": ["Proteína Cruda (%)", "Energía Neta (Mcal/kg)"],
-            "Aporte de la Dieta": [aporte_pc, aporte_neg],
-            "Requerimiento Ajustado": [meta_pc_min * 100, meta_neg_min]
-        }).set_index("Parámetro Nutricional")
-        
-        st.bar_chart(df_chart)
-        
     else:
         st.error(
-            "⚠️ **Aviso del Optimizador:** Con los ingredientes que seleccionaste o los límites mínimos/máximos impuestos, no se encontró una solución matemática 100% factible para cumplir con los requerimientos nutricionales de esta etapa. "
-            "Por favor, revisa en la pestaña **Selección de Ingredientes y Lab** que tengas suficientes fuentes de proteína (como soya) y energía activadas, o ajusta los rangos permitidos."
+            "⚠️ **Aviso del Optimizador NASEM:** Con los ingredientes seleccionados y los límites estrictos de FND (prevención de acidosis), peNDF o minerales, "
+            "no se encontró una solución matemática factible. Te sugerimos activar más fuentes de forraje en la pestaña anterior, incluir harina de soya o ampliar los rangos mínimos y máximos de inclusión."
         )
