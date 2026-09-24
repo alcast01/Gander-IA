@@ -72,7 +72,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# --- 3. BASE DE DATOS INICIAL CON MINERALES DE TLALTENANGO ---
+# --- 3. BASE DE DATOS INICIAL CON MINERALES DE TLALTENANGO (Min 0% para flexibilidad) ---
 data_respaldo = {
     "Nombre del Ingrediente": [
         "Rastrojo de maiz molido", 
@@ -100,7 +100,7 @@ data_respaldo = {
     "Sodio (Na %)": [0.02, 0.03, 0.02, 0.0, 0.02, 0.05, 0.10, 10.0, 9.0, 0.0],
     "Magnesio (Mg %)": [0.15, 0.28, 0.12, 0.0, 0.18, 0.50, 0.40, 2.0, 2.5, 0.0],
     "Lípidos / Extracto Etéreo (%)": [1.5, 1.8, 3.8, 0.0, 3.0, 3.5, 0.5, 0.0, 0.0, 99.0],
-    "Min Inclusión (%)": [20.0, 5.0, 10.0, 0.0, 0.0, 0.0, 2.0, 1.0, 1.0, 0.0],
+    "Min Inclusión (%)": [20.0, 5.0, 10.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0],
     "Max Inclusión (%)": [60.0, 35.0, 50.0, 1.5, 0.0, 30.0, 6.0, 3.0, 3.0, 3.0]
 }
 df_base = pd.DataFrame(data_respaldo)
