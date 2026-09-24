@@ -5,9 +5,9 @@ from scipy.optimize import linprog
 import plotly.express as px
 from fpdf import FPDF
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL CORPORATIVO ---
 st.set_page_config(
-    page_title="Ganader-IA Pro",
+    page_title="Ganader-IA Pro | Nutrición Bovina Inteligente",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -15,15 +15,34 @@ st.set_page_config(
 
 st.markdown("""
     <style>
+    /* Estilos generales del fondo y tipografía */
     .main {
-        background-color: #f8f9fa;
+        background-color: #f4f6f9;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     }
+    
+    /* Contenedores de tarjetas métricas ejecutivas */
     .stMetric {
         background-color: #ffffff;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        border-left: 4px solid #2e7d32;
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        border-left: 5px solid #1b5e20;
+        transition: transform 0.2s ease;
+    }
+    .stMetric:hover {
+        transform: translateY(-2px);
+    }
+    
+    /* Encabezados y títulos */
+    h1, h2, h3 {
+        color: #1a252c;
+        font-weight: 700;
+    }
+    
+    /* Tarjetas de información y alertas */
+    .element-container {
+        color: #2c3e50;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -33,30 +52,31 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    st.title("🔐 Ganader-IA - Acceso Comercial")
-    st.markdown("##### Sistema Inteligente de Optimización y Nutrición Bovina")
-    st.info("Introduce tu clave de licencia comercial o membresía activa para acceder al sistema:")
-    
-    licencia_input = st.text_input("Clave de Licencia / Membresía", type="password")
-    
-    col_l1, col_l2 = st.columns(2)
-    with col_l1:
-        if st.button("Validar Acceso"):
-            # Validación mediante Secrets de Streamlit o clave de prueba 'demo'
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    col_c1, col_c2, col_c3 = st.columns([1, 2, 1])
+    with col_c2:
+        st.markdown("<h2 style='text-align: center;'>🔐 Ganader-IA Pro</h2>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; color: #666;'>Plataforma Inteligente de Optimización y Nutrición Bovina</p>", unsafe_allow_html=True)
+        st.markdown("---")
+        
+        st.info("Introduce tu clave de licencia comercial o membresía institucional para acceder:")
+        licencia_input = st.text_input("Clave de Acceso / Licencia", type="password", placeholder="Ingresa tu clave...")
+        
+        if st.button("🚀 Entrar al Sistema", use_container_width=True):
             admin_pwd = st.secrets.get("ADMIN_PASSWORD", "demo")
             if licencia_input == admin_pwd or licencia_input == "GANADERIA-PRO-2026":
                 st.session_state.authenticated = True
                 st.rerun()
             else:
-                st.error("❌ Licencia inválida o membresía expirada. Contacta al administrador.")
-    with col_l2:
-        st.markdown("<br><small>🔑 <i>Usa la clave <b>demo</b> para pruebas.</i></small>", unsafe_allow_html=True)
-    
+                st.error("❌ Licencia inválida o membresía expirada.")
+                
+        st.markdown("<div style='text-align: center; margin-top: 15px;'><small>🔑 <i>Usa la clave <b>demo</b> para pruebas académicas.</i></small></div>", unsafe_allow_html=True)
     st.stop()
 
 # --- APLICACIÓN PRINCIPAL (POST-AUTENTICACIÓN) ---
 st.title("🐄 Ganader-IA Pro")
-st.markdown("##### Sistema Inteligente de Optimización y Predicción Nutricional Bovina")
+st.markdown("##### Sistema Inteligente de Optimización, Costos y Predicción Nutricional Bovina")
+st.markdown("---")
 
 # --- 3. CARGA DE LA BASE DE DATOS DESDE GOOGLE SHEETS (V4) ---
 sheet_url = "https://docs.google.com/spreadsheets/d/1yCuTmDi1wEzdeMHoAbuxMewwo0Pe1neyjntMgAhMzhA/export?format=csv"
@@ -149,16 +169,17 @@ meta_neg_min = meta_neg_base * factor_neg
 
 # Botón para cerrar sesión en barra lateral
 st.sidebar.markdown("---")
-if st.sidebar.button("🔒 Cerrar Sesión / Licencia"):
+if st.sidebar.button("🔒 Cerrar Sesión", use_container_width=True):
     st.session_state.authenticated = False
     st.rerun()
 
-# Créditos profesionales
+# Créditos profesionales institucionales
+st.sidebar.markdown("---")
 st.sidebar.markdown(
     "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px;'>"
     "<b>Ganader-IA Pro</b><br>"
     "Creado por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
-    "Para Nutriólogos, Técnicos, Estudiantes Universitarios y Ganaderos."
+    "Diseñado para Nutriólogos, Técnicos, Estudiantes Universitarios y Ganaderos."
     "</div>",
     unsafe_allow_html=True
 )
@@ -203,7 +224,7 @@ with tab1:
         markers=True,
         title="Trayectoria de Engorda del Lote hacia el Peso Objetivo"
     )
-    fig_line.update_layout(plot_bgcolor="#ffffff", paper_bgcolor="#ffffff")
+    fig_line.update_layout(plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Helvetica"))
     st.plotly_chart(fig_line, use_container_width=True)
 
 with tab2:
@@ -257,6 +278,7 @@ with tab3:
         with col_res2:
             st.metric(label="Estado del Proceso", value="Factible (Máxima Eficiencia) 🟢")
         
+        st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("#### 📋 Tabla de Ingredientes y Mezcla Exacta por Tonelada:")
         
         tabla_mezcla = []
@@ -282,7 +304,7 @@ with tab3:
         df_mezcla_final = pd.DataFrame(tabla_mezcla)
         st.dataframe(df_mezcla_final, use_container_width=True, hide_index=True)
         
-        # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO (CORREGIDA PARA FPDF2) ---
+        # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ---
         def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, p_act, p_obj, gain, dias):
             pdf = FPDF()
             pdf.add_page()
@@ -340,7 +362,6 @@ with tab3:
                 "4. Verter la melaza liquida al final junto con el agua de batea para asegurar palatabilidad y evitar polvos.\n"
                 "5. Tiempo de mezcla recomendado: 8 a 10 minutos posteriores a la adicion del ultimo ingrediente."
             )
-            # CORRECCIÓN DE FPDF2: Retornar directamente bytes()
             return bytes(pdf.output())
 
         pdf_data = generar_pdf_ejecutivo(df_mezcla_final, resultado.fun, fase, raza_seleccionada, peso_actual, peso_objetivo, gde, dias_a_meta)
@@ -353,7 +374,8 @@ with tab3:
             label="📄 Descargar Reporte Ejecutivo PDF (Operarios y Corrida Financiera)",
             data=pdf_data,
             file_name=f"Reporte_GanaderIA_{fase.replace(' ', '_')}.pdf",
-            mime="application/pdf"
+            mime="application/pdf",
+            use_container_width=True
         )
         
         # --- GRÁFICAS DE PASTEL Y BARRAS ---
@@ -361,6 +383,7 @@ with tab3:
         st.subheader("🥧 Composición Porcentual de la Dieta por Categoría")
         df_pie = pd.DataFrame(list(categorias_pie.items()), columns=["Categoría", "Porcentaje"])
         fig_pie = px.pie(df_pie, names="Categoría", values="Porcentaje", hole=0.4, title="Distribución de Insumos en la Mezcla")
+        fig_pie.update_layout(font=dict(family="Helvetica"))
         st.plotly_chart(fig_pie, use_container_width=True)
                 
         st.markdown("---")
