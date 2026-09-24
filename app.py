@@ -104,7 +104,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y PLANES DE SUSCRIPCIÓN ---
-USERS_FILE = "usuarios_ganaderia_elite_planes.json"
+USERS_FILE = "usuarios_ganaderia_elite_planes_valor.json"
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -122,14 +122,14 @@ def cargar_usuarios_persistentes():
             "password": hash_password("1234"),
             "email": "admin@ganaderiaelite.com",
             "subscription_active": True,
-            "plan": "Anual (12 Meses) - $4,500 MXN",
+            "plan": "Anual (12 Meses) - $7,200 MXN",
             "fecha_registro": "2026-01-01"
         },
         "alejandro": {
             "password": hash_password("elite360"),
             "email": "alejandro.castaneda@ganaderiaelite.com",
             "subscription_active": True,
-            "plan": "Anual (12 Meses) - $4,500 MXN",
+            "plan": "Anual (12 Meses) - $7,200 MXN",
             "fecha_registro": "2026-01-01"
         }
     }
@@ -175,7 +175,7 @@ if not st.session_state.authenticated:
         </p>
     """, unsafe_allow_html=True)
 
-    tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "💳 Elegir Plan y Registrarse"])
+    tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "💳 Planes Elite y Registro"])
 
     with tab_login:
         st.markdown("### Acceso a Usuarios Registrados")
@@ -193,20 +193,20 @@ if not st.session_state.authenticated:
                     st.success(f"¡Bienvenido de nuevo, {user_input}!")
                     st.rerun()
                 else:
-                    st.error("Tu suscripción se encuentra inactiva. Elige un plan y realiza el pago para renovar acceso.")
+                    st.error("Tu suscripción se encuentra inactiva. Selecciona un plan y realiza el pago para renovar.")
             else:
                 st.error("Usuario o contraseña incorrectos. Verifica tus datos.")
 
     with tab_register:
-        st.markdown("### 🌟 Selección de Plan y Registro de Cuenta")
-        st.markdown("Elige libremente el plan de suscripción que mejor se adapte a tus requerimientos operativos:")
+        st.markdown("### 🌟 Selección de Plan y Alta de Cuenta")
+        st.markdown("Elige el esquema de suscripción que mejor se adapte a la escala productiva de tu rancho:")
         
         plan_elegido = st.radio(
-            "Planes de Suscripción Elite Disponibles:",
+            "Planes de Suscripción Elite:",
             [
-                "Trimestral (3 Meses) - $1,800 MXN",
-                "Semestral (6 Meses) - $2,500 MXN",
-                "Anual (12 Meses) - $4,500 MXN"
+                "Trimestral (3 Meses) - $2,400 MXN ($800.00/mes)",
+                "Semestral (6 Meses) - $4,200 MXN ($700.00/mes - 12.5% Ahorro)",
+                "Anual (12 Meses) - $7,200 MXN ($600.00/mes - ⭐ MEJOR VALOR Y 25% AHORRO)"
             ],
             index=2
         )
@@ -217,7 +217,7 @@ if not st.session_state.authenticated:
         col_r1, col_r2 = st.columns(2)
         with col_r1:
             new_user = st.text_input("Nombre de Usuario Deseado", key="reg_user")
-            new_email = st.text_input("Correo Electrónico (para notificaciones)", key="reg_email")
+            new_email = st.text_input("Correo Electrónico (para notificaciones y recibo)", key="reg_email")
         with col_r2:
             new_pass = st.text_input("Contraseña", type="password", key="reg_pass")
             confirm_pass = st.text_input("Confirma Contraseña", type="password", key="reg_conf")
@@ -233,10 +233,15 @@ if not st.session_state.authenticated:
         
         st.markdown("")
         
-        # Extraer costo según plan
-        costo_str = plan_elegido.split("-")[1].strip()
+        # Extraer costo exacto
+        if "Trimestral" in plan_elegido:
+            costo_str = "$2,400 MXN"
+        elif "Semestral" in plan_elegido:
+            costo_str = "$4,200 MXN"
+        else:
+            costo_str = "$7,200 MXN"
         
-        if st.button(f"💳 Pagar {costo_str} y Activar Suscripción", use_container_width=True):
+        if st.button(f"💳 Pagar {costo_str} y Activar Licencia Elite", use_container_width=True):
             db_usuarios = cargar_usuarios_persistentes()
             
             if not new_user or not new_email or not new_pass or not num_tarjeta:
@@ -248,7 +253,7 @@ if not st.session_state.authenticated:
             elif len(num_tarjeta.replace(" ", "")) < 15:
                 st.error("⚠️ Número de tarjeta inválido. Verifica los dígitos.")
             else:
-                # Guardar nuevo usuario con plan seleccionado y suscripción activa
+                # Guardar usuario con plan y suscripción activa
                 db_usuarios[new_user] = {
                     "password": hash_password(new_pass),
                     "email": new_email,
@@ -260,7 +265,7 @@ if not st.session_state.authenticated:
                 
                 # Simulación de notificación por correo y cobro exitoso
                 st.success(f"🎉 **¡Pago Exitoso de {costo_str} ({plan_elegido})!** Transacción aprobada.")
-                st.success(f"📧 **Notificación Enviada:** Se ha enviado un correo electrónico de confirmación y factura a **{new_email}**, junto con los detalles de activación de tu cuenta.")
+                st.success(f"📧 **Notificación Enviada:** Se ha enviado un correo electrónico de confirmación de pago, comprobante fiscal y tus accesos a **{new_email}**.")
                 
                 st.session_state.authenticated = True
                 st.session_state.current_user = new_user
