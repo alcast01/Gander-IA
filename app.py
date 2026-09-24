@@ -9,7 +9,7 @@ from fpdf import FPDF
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (CAMPO Y GANADERÍA) ---
 st.set_page_config(
-    page_title="Ganader-IA Pro | Nutrición de Precisión y Balance Automático Ca:P",
+    page_title="Ganader-IA Pro | Nutrición de Precisión, Bonos de Carbono y Bunk Management",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -65,8 +65,8 @@ st.markdown("""
             </svg>
         </div>
         <div style="flex-grow: 1; min-width: 250px;">
-            <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">PRO 360</span></h1>
-            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Nutrición de Precisión, Balance Automático Ca:P y Sostenibilidad</p>
+            <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">ELITE 360</span></h1>
+            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Nutrición de Precisión, Bonos de Carbono y Gestión Inteligente de Corrales</p>
             <p style="margin: 6px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
         </div>
     </div>
@@ -105,7 +105,8 @@ data_respaldo = {
 df_base = pd.DataFrame(data_respaldo)
 
 # --- 4. CONTROLES GENERALES Y VARIABLES AVANZADAS EN LA BARRA LATERAL ---
-st.sidebar.header("⚙️ Parámetros del Lote y Ambientales")
+st.sidebar.header("⚙️ Parámetros del Lote y Población")
+cantidad_animales = st.sidebar.number_input("Número de Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
 peso_actual = st.sidebar.slider("Peso Vivo Actual (kg)", min_value=200.0, max_value=450.0, value=250.0, step=10.0)
 peso_objetivo = st.sidebar.slider("Peso de Venta / Meta (kg)", min_value=450.0, max_value=600.0, value=520.0, step=10.0)
 gde = st.sidebar.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=1.0, max_value=2.0, value=1.4, step=0.1)
@@ -208,38 +209,38 @@ meta_neg_min = meta_neg_base * factor_neg * factor_sexo_neg * factor_marco * fac
 st.sidebar.markdown("---")
 st.sidebar.markdown(
     "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px; font-family: Inter, sans-serif;'>"
-    "<b>Ganader-IA Pro 360</b><br>"
+    "<b>Ganader-IA Elite 360</b><br>"
     "Creado por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
-    "Modelo Integral Zootécnico."
+    "SaaS de Nutrición y Sostenibilidad."
     "</div>",
     unsafe_allow_html=True
 )
 
-# --- 5. INTERFAZ MODULAR POR PESTAÑAS (3 TABS) ---
-tab1, tab2, tab3 = st.tabs([
-    "📋 1. Resumen y Predicciones", 
-    "🧪 2. Laboratorio y Selección Regional", 
-    "📊 3. Resultados, Minerales y Reporte PDF"
+# --- 5. INTERFAZ MODULAR POR PESTAÑAS (4 TABS ELITE) ---
+tab1, tab2, tab3, tab4 = st.tabs([
+    "📋 1. Resumen y Sensibilidad", 
+    "🧪 2. Laboratorio y Perfiles", 
+    "📊 3. Balance Mineral y Bonos de Carbono", 
+    "🚜 4. Bunk Management y Operarios"
 ])
 
 with tab1:
-    st.subheader("Predicciones de Parámetros Productivos y Crecimiento")
-    st.markdown("Proyecciones biológicas del lote ajustadas por genética, sexo, manejo y condiciones ambientales:")
+    st.subheader("Predicciones de Parámetros Productivos y Análisis de Sensibilidad")
+    st.markdown("Proyecciones biológicas del lote y simulación de impacto financiero ante volatilidad de precios en materias primas:")
     
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Etapa Fisiológica", fase)
         st.metric("Ganancia Esperada (GDE)", f"{gde} kg/día")
     with col2:
-        st.metric("Consumo MS Inicial", f"{cms_estimado:.2f} kg/día")
+        st.metric("Consumo MS por Cabeza", f"{cms_estimado:.2f} kg/día")
         st.metric("Días Proyectados a Meta", f"{dias_a_meta:.0f} días")
     with col3:
-        st.metric("Ganancia Total Esperada", f"{kg_por_ganar:.1f} kg")
-        st.metric("Perfil Lote", f"{sexo_lote.split()[0]} | {raza_seleccionada.split()[0]}")
+        st.metric("Cabezas en el Lote", f"{cantidad_animales} animales")
+        st.metric("Ganancia Total Esperada", f"{kg_por_ganar:.1f} kg/cab")
     
     st.markdown("---")
     st.subheader("📈 Gráfica de Comportamiento: Peso y Consumo de Materia Seca en el Tiempo")
-    st.markdown(f"Evolución semanal del lote desde el **Peso Inicial ({peso_actual} kg)** hasta el **Peso Final ({peso_objetivo} kg)** considerando una GDE constante de **{gde} kg/día**:")
     
     semanas = int(np.ceil(dias_a_meta / 7)) if dias_a_meta > 0 else 1
     semanas = max(semanas, 4)
@@ -257,54 +258,11 @@ with tab1:
         lista_cms.append(round(cms_proy, 2))
     
     fig_comportamiento = make_subplots(specs=[[{"secondary_y": True}]])
-
-    fig_comportamiento.add_trace(
-        go.Scatter(
-            x=lista_semanas,
-            y=lista_pesos,
-            name="Peso Proyectado (kg)",
-            mode="lines+markers",
-            line=dict(color="#2d5a27", width=3.5),
-            marker=dict(size=8, color="#2d5a27")
-        ),
-        secondary_y=False,
-    )
-
-    fig_comportamiento.add_trace(
-        go.Scatter(
-            x=lista_semanas,
-            y=lista_cms,
-            name="Consumo Materia Seca (kg/día)",
-            mode="lines+markers",
-            line=dict(color="#bc6c25", width=3, dash="dash"),
-            marker=dict(size=8, color="#bc6c25")
-        ),
-        secondary_y=True,
-    )
-
-    fig_comportamiento.update_layout(
-        title=dict(
-            text=f"Dinámica de Engorda (GDE: {gde} kg/d | Clima: {estacion} | Lodo: {condicion_lodo.split()[0]})", 
-            font=dict(family="Inter", size=13),
-            x=0.5,
-            xanchor="center"
-        ),
-        plot_bgcolor="#ffffff",
-        paper_bgcolor="#ffffff",
-        font=dict(family="Inter", color="#2b2d42"),
-        legend=dict(
-            orientation="h", 
-            yanchor="top", 
-            y=-0.25, 
-            xanchor="center", 
-            x=0.5
-        ),
-        margin=dict(l=20, r=20, t=60, b=70)
-    )
-
+    fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_pesos, name="Peso Proyectado (kg)", mode="lines+markers", line=dict(color="#2d5a27", width=3.5)), secondary_y=False)
+    fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_cms, name="Consumo Materia Seca (kg/día)", mode="lines+markers", line=dict(color="#bc6c25", width=3, dash="dash")), secondary_y=True)
+    fig_comportamiento.update_layout(title=dict(text=f"Dinámica de Engorda (GDE: {gde} kg/d | Clima: {estacion})", font=dict(family="Inter", size=13), x=0.5), plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Inter", color="#2b2d42"), legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5), margin=dict(l=20, r=20, t=60, b=70))
     fig_comportamiento.update_yaxes(title_text="<b>Peso Vivo del Animal (kg)</b>", secondary_y=False, color="#2d5a27")
     fig_comportamiento.update_yaxes(title_text="<b>Consumo de Materia Seca (kg/día)</b>", secondary_y=True, color="#bc6c25")
-
     st.plotly_chart(fig_comportamiento, use_container_width=True)
 
 with tab2:
@@ -312,8 +270,7 @@ with tab2:
     st.markdown(
         "**Personaliza por completo los perfiles nutricionales y de minerales de tus materias primas.** "
         "Selecciona cuáles insumos están disponibles en tu rancho (`✓`), ajusta sus límites de inclusión, "
-        "y edita directamente en la tabla los valores de **Proteína, Energía, FND, peNDF, PDR, PND, Calcio, Fósforo, Sodio, Magnesio y Lípidos** "
-        "según los análisis de tu laboratorio local:"
+        "y edita directamente en la tabla los valores según los análisis de tu laboratorio local:"
     )
     
     df_ingredientes = st.data_editor(
@@ -361,48 +318,24 @@ for idx, row in df_ingredientes.iterrows():
 A_eq = np.ones((1, len(c)))
 b_eq = np.array([1.0])
 
-# Función de restricciones automáticas Ca:P (1.5:1 a 2.0:1)
-# Ca >= 1.5 * P => -Ca + 1.5 * P <= 0
+# Restricciones Ca:P automáticas (1.5:1 a 2.0:1)
 row_ca_p_min = -ca + 1.5 * p_min_ing
-# Ca <= 2.0 * P => Ca - 2.0 * P <= 0
 row_ca_p_max = ca - 2.0 * p_min_ing
 
-A_ub = np.array([
-    -pc,
-    -neg,
-    -fnd,
-    -pendf,
-    -pdr,
-    -pnd,
-    -ca,
-    -p_min_ing,
-    row_ca_p_min,
-    row_ca_p_max
-])
-b_ub = np.array([
-    -meta_pc_min,
-    -meta_neg_min,
-    -meta_fnd_min,
-    -meta_pendf_min,
-    -meta_pdr_min,
-    -meta_pnd_min,
-    -meta_ca_min,
-    -meta_p_min,
-    0.0,
-    0.0
-])
+A_ub = np.array([-pc, -neg, -fnd, -pendf, -pdr, -pnd, -ca, -p_min_ing, row_ca_p_min, row_ca_p_max])
+b_ub = np.array([-meta_pc_min, -meta_neg_min, -meta_fnd_min, -meta_pendf_min, -meta_pdr_min, -meta_pnd_min, -meta_ca_min, -meta_p_min, 0.0, 0.0])
 
 resultado = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
 
 with tab3:
-    st.subheader("Reporte Financiero, Balance Mineral y Mitigación de Metano")
+    st.subheader("Reporte Financiero, Balance Mineral y Monetización de Bonos de Carbono")
     
     if resultado.success:
         col_res1, col_res2 = st.columns(2)
         with col_res1:
             st.metric(label="Costo Óptimo por Tonelada", value=f"${resultado.fun:,.2f} MXN")
         with col_res2:
-            st.metric(label="Estado del Proceso", value="Factible (Balance Automático Ca:P) 🟢")
+            st.metric(label="Estado del Proceso", value="Factible (Elite 360) 🟢")
         
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("#### 📋 Tabla de Ingredientes y Mezcla Exacta por Tonelada:")
@@ -423,11 +356,9 @@ with tab3:
                     "Costo Unitario ($/ton)": f"${c[i]:,.2f}",
                     "Aporte al Costo Total ($)": f"${costo_parcial:,.2f}"
                 })
-                
                 cat_ing = str(df_ingredientes.iloc[i].get("Categoria", "Otros"))
                 categorias_pie[cat_ing] = categorias_pie.get(cat_ing, 0) + porcentaje
         
-        # --- CÁLCULO DE TOTALES PARA LA TABLA ---
         total_porcentaje = sum([row["Inclusion (%)"] for row in tabla_mezcla])
         total_kilos = sum([row["Kg por Tonelada (1,000 kg)"] for row in tabla_mezcla])
         total_costo = resultado.fun
@@ -444,7 +375,7 @@ with tab3:
         df_mezcla_final = pd.DataFrame(tabla_mezcla_con_totales)
         st.dataframe(df_mezcla_final, use_container_width=True, hide_index=True)
         
-        # --- CÁLCULOS AVANZADOS ---
+        # --- CÁLCULOS AVANZADOS Y BONOS DE CARBONO ---
         aporte_pc = np.sum(resultado.x * pc) * 100
         aporte_neg = np.sum(resultado.x * neg)
         aporte_fnd = np.sum(resultado.x * fnd) * 100
@@ -458,9 +389,9 @@ with tab3:
         aporte_lipidos = np.sum(resultado.x * lipidos) * 100
         
         relacion_ca_p = (aporte_ca / aporte_p) if aporte_p > 0 else 0
-        status_ca_p = "🟢 Óptimo Automático (1.5 - 2.0:1)" if (1.4 <= relacion_ca_p <= 2.1) else "🟢 Ajustado por Algoritmo"
+        status_ca_p = "🟢 Óptimo Automático (1.5 - 2.0:1)"
         
-        # Estimación de Metano IPCC Tier 2
+        # Estimación Metano IPCC y Bonos de Carbono ($300 MXN / tonelada de CO2e evitada)
         ge_diaria = cms_estimado * 18.4 
         reduccion_lipidica = max(0.0, (aporte_lipidos - 3.0) * 0.003)
         factor_fnd_ym = 0.035 + (aporte_fnd / 100.0) * 0.035
@@ -470,138 +401,161 @@ with tab3:
         ch4_g_kg_ganancia = ch4_g_dia / gde if gde > 0 else 0
         co2e_anual = (ch4_g_dia * 365 / 1000.0) * 28.0 
         
+        # Valor estimado de bonos de carbono por animal/año (asumiendo 15% de mitigación bajo estándar vs línea base convencional de 4.2 t CO2e/año)
+        linea_base_co2e = 4200.0 # kg CO2e tradicional
+        ahorro_co2e_kg = max(0.0, linea_base_co2e - co2e_anual)
+        valor_bono_mxn = (ahorro_co2e_kg / 1000.0) * 350.0 # Ej. $350 MXN por tCO2e
+        
         st.markdown("---")
-        st.subheader("🛡️ Validación de Minerales Mayores, Relación Ca:P y Salud Ruminal")
+        st.subheader("🛡️ Validación Mineral, Salud Ruminal y Monetización Verde")
         
         col_m1, col_m2, col_m3, col_m4 = st.columns(4)
         with col_m1:
             st.metric("Calcio (Ca)", f"{aporte_ca:.2f}%", "Mineral Mayor")
-            st.metric("Fibra FND", f"{aporte_fnd:.1f}%")
+            st.metric("Relación Ca:P", f"{relacion_ca_p:.2f}:1", status_ca_p)
         with col_m2:
             st.metric("Fósforo (P)", f"{aporte_p:.2f}%", "Mineral Mayor")
             st.metric("Fibra peNDF", f"{aporte_pendf:.1f}%", "Anti-acidosis")
         with col_m3:
-            st.metric("Relación Ca:P", f"{relacion_ca_p:.2f}:1", status_ca_p)
-            st.metric("Lípidos Totales", f"{aporte_lipidos:.1f}%")
+            st.metric("Emisión $CH_4$", f"{ch4_g_dia:.1f} g/día", "IPCC Tier 2")
+            st.metric("Equivalente $CO_2e$", f"{co2e_anual:,.1f} kg/año")
         with col_m4:
-            st.metric("Sodio (Na)", f"{aporte_na:.2f}%")
-            st.metric("Magnesio (Mg)", f"{aporte_mg:.2f}%")
+            st.metric("Valor Bonos Carbono", f"${valor_bono_mxn:,.2f} MXN", "Potencial Anual/Cab")
+            st.metric("Lípidos Totales", f"{aporte_lipidos:.1f}%", "Mitigador")
 
-        # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ---
-        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, sexo_L, marco_L, p_act, p_obj, gain, dias, a_pc, a_neg, a_ca, a_p, a_na, a_mg, r_cap, a_fnd, a_pendf, ch4_d, co2e):
-            pdf = FPDF()
-            pdf.add_page()
-            
-            # Encabezado
-            pdf.set_font("Arial", "B", 15)
-            pdf.cell(0, 8, "Ganader-IA Pro 360 - Reporte Ejecutivo Nutricional", 0, 1, "C")
-            pdf.set_font("Arial", "I", 9)
-            pdf.cell(0, 5, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
-            pdf.ln(3)
-            
-            # Datos del Lote
-            pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "1. Parametros Biologicos, Sexo y Manejo del Lote", 0, 1)
-            pdf.set_font("Arial", "", 9)
-            pdf.cell(0, 5, f"Fisiologia: {etapa} | Genetica: {raza_L} | Sexo: {sexo_L} | Marco: {marco_L}", 0, 1)
-            pdf.cell(0, 5, f"Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE: {gain} kg/dia | Dias: {dias:.0f}", 0, 1)
-            pdf.ln(3)
-            
-            # Corrida Financiera
-            pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "2. Corrida Financiera y Costo Optimo", 0, 1)
-            pdf.set_font("Arial", "", 9)
-            pdf.cell(0, 5, f"Costo Optimo por Tonelada de Alimento: ${costo_ton:,.2f} MXN", 0, 1)
-            pdf.ln(3)
-            
-            # Balance Mineral y Salud Ruminal
-            pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "3. Balance Automatico de Minerales Mayores y Salud Ruminal (NASEM)", 0, 1)
-            pdf.set_font("Arial", "", 9)
-            pdf.cell(0, 5, f"Calcio (Ca): {a_ca:.2f}% | Fosforo (P): {a_p:.2f}% | Relacion Ca:P: {r_cap:.2f}:1 (Balanceado Automatico 1.5 - 2.0)", 0, 1)
-            pdf.cell(0, 5, f"Sodio (Na): {a_na:.2f}% | Magnesio (Mg): {a_mg:.2f}%", 0, 1)
-            pdf.cell(0, 5, f"Fibra FND: {a_fnd:.1f}% | Fibra peNDF (Anti-acidosis): {a_pendf:.1f}%", 0, 1)
-            pdf.cell(0, 5, f"Emision Metano (CH4): {ch4_d:.1f} g/dia | CO2e Anual: {co2e:,.1f} kg/ano", 0, 1)
-            pdf.ln(3)
-            
-            # Tabla de ingredientes
-            pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "4. Mezcla Exacta por Tonelada (1,000 kg)", 0, 1)
-            pdf.set_font("Arial", "B", 8)
-            pdf.cell(80, 6, "Ingrediente", 1)
-            pdf.cell(30, 6, "Inclusion (%)", 1)
-            pdf.cell(35, 6, "Kg / Tonelada", 1)
-            pdf.cell(45, 6, "Costo Parcial ($)", 1)
-            pdf.ln()
-            
-            pdf.set_font("Arial", "", 8)
-            for _, row in df_resumen.iterrows():
+with tab4:
+    st.subheader("🚜 Bunk Management y Gestión Logística de Alimento")
+    st.markdown("Control total de inventarios, requerimientos de toneladas totales para el lote y guía de mezcla para el personal del corral:")
+    
+    # Cálculos logísticos para todo el lote
+    cms_total_lote = cms_estimado * cantidad_animales
+    alimento_total_ciclo = cms_total_lote * dias_a_meta
+    costo_total_lote = (alimento_total_ciclo / 1000.0) * resultado.fun
+    
+    col_l1, col_l2, col_l3 = st.columns(3)
+    with col_l1:
+        st.metric("Consumo Diario del Lote", f"{cms_total_lote:,.1f} kg MS/día")
+    with col_l2:
+        st.metric("Alimento Total Requerido", f"{alimento_total_ciclo:,.1f} kg ({alimento_total_ciclo/1000.0:,.1f} tons)")
+    with col_l3:
+        st.metric("Costo Total de Alimentación", f"${costo_total_lote:,.2f} MXN")
+        
+    st.markdown("---")
+    st.markdown("#### 📋 Protocolo y Orden de Carga en Batea para Operarios:")
+    st.info(
+        f"**Lote Activo:** {cantidad_animales} animales | **Duración Estimada:** {dias_a_meta:.0f} días\n\n"
+        "1. **Paso 1 (Forrajes Secos / Fibra Larga):** Cargar rastrojos o harinas fibrosas al inicio para asegurar el peNDF y evitar acidosis metabólica.\n"
+        "2. **Paso 2 (Ingredientes Húmedos / Ensilados):** Agregar ensilados o subproductos húmedos calculando la corrección por materia seca.\n"
+        "3. **Paso 3 (Granos Energéticos y Proteicos):** Incorporar maíz molido, pasta de soya y canola.\n"
+        "4. **Paso 4 (Núcleos, Minerales y Urea):** Agregar las sales minerales especializadas y la urea (previa dilución o mezclado homogéneo para evitar toxicidad).\n"
+        "5. **Paso 5 (Líquidos):** Verter la melaza líquida con un chorro de agua al final para garantizar adherencia, evitar polvaderas y elevar la palatabilidad.\n"
+        "6. **Tiempo de Mezclado:** Operar el carro mezclador de 8 a 10 minutos continuos antes de la distribución en comederos."
+    )
+
+    # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ELITE ---
+    def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, sexo_L, marco_L, p_act, p_obj, gain, dias, cabezas, a_ca, a_p, r_cap, a_fnd, a_pendf, ch4_d, co2e, bonos, cost_lote, tons_lote):
+        pdf = FPDF()
+        pdf.add_page()
+        
+        pdf.set_font("Arial", "B", 15)
+        pdf.cell(0, 8, "Ganader-IA Elite 360 - Reporte Ejecutivo y Bonos de Carbono", 0, 1, "C")
+        pdf.set_font("Arial", "I", 9)
+        pdf.cell(0, 5, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
+        pdf.ln(3)
+        
+        pdf.set_font("Arial", "B", 10)
+        pdf.cell(0, 6, "1. Parametros Biologicos y Poblacionales del Lote", 0, 1)
+        pdf.set_font("Arial", "", 9)
+        pdf.cell(0, 5, f"Fisiologia: {etapa} | Cabezas: {cabezas} | Genetica: {raza_L} | Sexo: {sexo_L}", 0, 1)
+        pdf.cell(0, 5, f"Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE: {gain} kg/dia | Dias: {dias:.0f}", 0, 1)
+        pdf.ln(3)
+        
+        pdf.set_font("Arial", "B", 10)
+        pdf.cell(0, 6, "2. Corrida Financiera y Logistica de Alimento", 0, 1)
+        pdf.set_font("Arial", "", 9)
+        pdf.cell(0, 5, f"Costo Optimo por Tonelada: ${costo_ton:,.2f} MXN | Alimento Total Lote: {tons_lote:,.1f} tons", 0, 1)
+        pdf.cell(0, 5, f"Costo Total de Alimentacion del Ciclo: ${cost_lote:,.2f} MXN", 0, 1)
+        pdf.ln(3)
+        
+        pdf.set_font("Arial", "B", 10)
+        pdf.cell(0, 6, "3. Balance Mineral, Salud Ruminal y Sostenibilidad (IPCC)", 0, 1)
+        pdf.set_font("Arial", "", 9)
+        pdf.cell(0, 5, f"Calcio (Ca): {a_ca:.2f}% | Fosforo (P): {a_p:.2f}% | Relacion Ca:P: {r_cap:.2f}:1 (Ideal 1.5 - 2.0)", 0, 1)
+        pdf.cell(0, 5, f"Fibra FND: {a_fnd:.1f}% | peNDF (Anti-acidosis): {a_pendf:.1f}%", 0, 1)
+        pdf.cell(0, 5, f"Emision Metano (CH4): {ch4_d:.1f} g/dia | CO2e Anual: {co2e:,.1f} kg/ano", 0, 1)
+        pdf.cell(0, 5, f"Valor Potencial Bonos de Carbono: ${bonos:,.2f} MXN por animal/ano", 0, 1)
+        pdf.ln(3)
+        
+        pdf.set_font("Arial", "B", 10)
+        pdf.cell(0, 6, "4. Mezcla Exacta por Tonelada (1,000 kg)", 0, 1)
+        pdf.set_font("Arial", "B", 8)
+        pdf.cell(80, 6, "Ingrediente", 1)
+        pdf.cell(30, 6, "Inclusion (%)", 1)
+        pdf.cell(35, 6, "Kg / Tonelada", 1)
+        pdf.cell(45, 6, "Costo Parcial ($)", 1)
+        pdf.ln()
+        
+        pdf.set_font("Arial", "", 8)
+        for _, row in df_resumen.iterrows():
+            if row["Ingrediente"] != "TOTALES / MEZCLA FINAL":
                 pdf.cell(80, 5, str(row["Ingrediente"]), 1)
                 pdf.cell(30, 5, f"{row['Inclusion (%)']}%", 1)
                 pdf.cell(35, 5, f"{row['Kg por Tonelada (1,000 kg)']}", 1)
                 pdf.cell(45, 5, str(row['Aporte al Costo Total ($)']), 1)
                 pdf.ln()
+        
+        tot_inc = df_resumen[df_resumen["Ingrediente"] != "TOTALES / MEZCLA FINAL"]['Inclusion (%)'].sum()
+        tot_kg = df_resumen[df_resumen["Ingrediente"] != "TOTALES / MEZCLA FINAL"]['Kg por Tonelada (1,000 kg)'].sum()
+        pdf.set_font("Arial", "B", 8)
+        pdf.cell(80, 5, "TOTALES / MEZCLA FINAL", 1)
+        pdf.cell(30, 5, f"{tot_inc:.1f}%", 1)
+        pdf.cell(35, 5, f"{tot_kg:.1f} kg", 1)
+        pdf.cell(45, 5, f"${costo_ton:,.2f}", 1)
+        pdf.ln()
             
-            tot_inc = df_resumen['Inclusion (%)'].sum()
-            tot_kg = df_resumen['Kg por Tonelada (1,000 kg)'].sum()
-            pdf.set_font("Arial", "B", 8)
-            pdf.cell(80, 5, "TOTALES / MEZCLA FINAL", 1)
-            pdf.cell(30, 5, f"{tot_inc:.1f}%", 1)
-            pdf.cell(35, 5, f"{tot_kg:.1f} kg", 1)
-            pdf.cell(45, 5, f"${costo_ton:,.2f}", 1)
-            pdf.ln()
-                
-            pdf.ln(3)
-            pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "5. Protocolo de Mezclado para Operarios", 0, 1)
-            pdf.set_font("Arial", "", 8)
-            pdf.multi_cell(0, 4, 
-                "1. Orden en batea: Forrajes secos (rastrojo) para asegurar peNDF y evitar acidosis.\n"
-                "2. Incorporar granos energeticos y fuentes de proteina (soya/canola).\n"
-                "3. Agregar aditivos y minerales especializados (Sales y Urea con cuidado).\n"
-                "4. Anadir melaza liquida al final con agua para adherencia y palatabilidad.\n"
-                "5. Tiempo de mezcla recomendado: 8 a 10 minutos."
-            )
-            return bytes(pdf.output())
+        pdf.ln(3)
+        pdf.set_font("Arial", "B", 10)
+        pdf.cell(0, 6, "5. Protocolo de Mezclado para Operarios", 0, 1)
+        pdf.set_font("Arial", "", 8)
+        pdf.multi_cell(0, 4, 
+            "1. Orden en batea: Forrajes secos (rastrojo) para asegurar peNDF y evitar acidosis.\n"
+            "2. Incorporar ensilados y subproductos humedos.\n"
+            "3. Anadir granos energeticos y fuentes de proteina (soya/canola).\n"
+            "4. Agregar aditivos y minerales especializados (Sales y Urea con cuidado).\n"
+            "5. Anadir melaza liquida al final con agua y mezclar de 8 a 10 minutos."
+        )
+        return bytes(pdf.output())
 
-        df_mezcla_pdf = pd.DataFrame(tabla_mezcla)
-        pdf_data = generar_pdf_ejecutivo(
-            df_mezcla_pdf, resultado.fun, fase, raza_seleccionada, sexo_lote, marco_lote, peso_actual, peso_objetivo, gde, dias_a_meta,
-            aporte_pc, aporte_neg, aporte_ca, aporte_p, aporte_na, aporte_mg, relacion_ca_p, aporte_fnd, aporte_pendf,
-            ch4_g_dia, co2e_anual
-        )
-        
-        st.markdown("---")
-        st.subheader("📥 Descarga de Reporte Ejecutivo PDF 360")
-        st.markdown("Haz clic en el botón para descargar el reporte oficial con el balance mineral automático, corrida financiera y protocolo de carga:")
-        
-        st.download_button(
-            label="📄 Descargar Reporte Ejecutivo PDF (360, Minerales & Operarios)",
-            data=pdf_data,
-            file_name=f"Reporte_GanaderIA_360_{fase.replace(' ', '_')}.pdf",
-            mime="application/pdf",
-            use_container_width=True
-        )
-        
-        st.markdown("---")
-        st.subheader("🥧 Composición Porcentual de la Dieta por Categoría")
-        df_pie = pd.DataFrame(list(categorias_pie.items()), columns=["Categoría", "Porcentaje"])
-        
-        colores_campo = ['#2d5a27', '#bc6c25', '#dda15e', '#606c38', '#283618', '#e76f51']
-        fig_pie = px.pie(
-            df_pie, 
-            names="Categoría", 
-            values="Porcentaje", 
-            hole=0.4, 
-            title="Distribución de Insumos Seleccionados en la Mezcla",
-            color_discrete_sequence=colores_campo
-        )
-        fig_pie.update_layout(font=dict(family="Inter", color="#2b2d42"))
-        st.plotly_chart(fig_pie, use_container_width=True)
-                
-    else:
-        st.error(
-            "⚠️ **Aviso del Optimizador 360:** Con los ingredientes seleccionados o restricciones muy cerradas, no se encontró una solución matemática factible "
-            "que cumpla simultáneamente con energía, proteína, fibra y la proporción automática Ca:P de 1.5 a 2.0. "
-            "Asegúrate de tener activa una fuente mineral especializada en la Pestaña 2."
-        )
+    df_mezcla_pdf = pd.DataFrame(tabla_mezcla_con_totales)
+    pdf_data = generar_pdf_ejecutivo(
+        df_mezcla_pdf, resultado.fun, fase, raza_seleccionada, sexo_lote, marco_lote, peso_actual, peso_objetivo, gde, dias_a_meta,
+        cantidad_animales, aporte_ca, aporte_p, relacion_ca_p, aporte_fnd, aporte_pendf,
+        ch4_g_dia, co2e_anual, valor_bono_mxn, costo_total_lote, alimento_total_ciclo / 1000.0
+    )
+    
+    st.markdown("---")
+    st.subheader("📥 Descarga de Reporte Ejecutivo PDF Elite 360")
+    st.markdown("Haz clic en el botón para descargar el reporte oficial con bonos de carbono, logística de lote, balance mineral y protocolo de carga:")
+    
+    st.download_button(
+        label="📄 Descargar Reporte Ejecutivo PDF (Elite, Carbono & Bunk Management)",
+        data=pdf_data,
+        file_name=f"Reporte_GanaderIA_Elite_{fase.replace(' ', '_')}.pdf",
+        mime="application/pdf",
+        use_container_width=True
+    )
+    
+    st.markdown("---")
+    st.subheader("🥧 Composición Porcentual de la Dieta por Categoría")
+    df_pie = pd.DataFrame(list(categorias_pie.items()), columns=["Categoría", "Porcentaje"])
+    colores_campo = ['#2d5a27', '#bc6c25', '#dda15e', '#606c38', '#283618', '#e76f51']
+    fig_pie = px.pie(df_pie, names="Categoría", values="Porcentaje", hole=0.4, title="Distribución de Insumos Seleccionados en la Mezcla", color_discrete_sequence=colores_campo)
+    fig_pie.update_layout(font=dict(family="Inter", color="#2b2d42"))
+    st.plotly_chart(fig_pie, use_container_width=True)
+            
+else:
+    st.error(
+        "⚠️ **Aviso del Optimizador Elite 360:** Con los ingredientes seleccionados o restricciones muy cerradas, no se encontró una solución matemática factible "
+        "que cumpla simultáneamente con energía, proteína, fibra y la proporción automática Ca:P de 1.5 a 2.0. "
+        "Asegúrate de tener activa una fuente mineral especializada en la Pestaña 2."
+    )
