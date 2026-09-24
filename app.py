@@ -9,7 +9,7 @@ from fpdf import FPDF
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (CAMPO Y GANADERÍA) ---
 st.set_page_config(
-    page_title="Ganader-IA Elite 360 | Nutrición y Vanguardia Científica",
+    page_title="Ganader-IA Elite 360 | Nutrición, Economía y Sostenibilidad",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -66,7 +66,7 @@ st.markdown("""
         </div>
         <div style="flex-grow: 1; min-width: 250px;">
             <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">ELITE 360</span></h1>
-            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización Avanzada, Aminoácidos (JDS) y Sostenibilidad</p>
+            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización, Evaluación Económica Financiera y Sostenibilidad</p>
             <p style="margin: 6px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
         </div>
     </div>
@@ -108,9 +108,16 @@ df_base = pd.DataFrame(data_respaldo)
 # --- 4. CONTROLES GENERALES Y VARIABLES AVANZADAS EN LA BARRA LATERAL ---
 st.sidebar.header("⚙️ Parámetros del Lote y Población")
 cantidad_animales = st.sidebar.number_input("Número de Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
-peso_actual = st.sidebar.slider("Peso Vivo Actual (kg)", min_value=200.0, max_value=650.0, value=250.0, step=10.0)
+peso_actual = st.sidebar.slider("Peso Vivo Actual / Compra (kg)", min_value=200.0, max_value=650.0, value=250.0, step=10.0)
 peso_objetivo = st.sidebar.slider("Peso de Venta / Meta (kg)", min_value=400.0, max_value=750.0, value=520.0, step=10.0)
 gde = st.sidebar.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=0.8, max_value=2.2, value=1.4, step=0.1)
+
+st.sidebar.markdown("---")
+st.sidebar.header("💰 Parámetros Económicos y de Mercado")
+precio_compra_kg = st.sidebar.number_input("Precio de Compra Becerro (MXN/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
+precio_venta_kg = st.sidebar.number_input("Precio de Venta Ganado Gordo (MXN/kg)", min_value=30.0, max_value=100.0, value=50.0, step=1.0)
+costo_sanidad_fijo = st.sidebar.number_input("Gastos Fijos Sanidad/Manejo (MXN/cab)", min_value=0.0, max_value=2000.0, value=350.0, step=50.0)
+costo_mano_obra_fijo = st.sidebar.number_input("Mano de Obra / Indirectos (MXN/cab)", min_value=0.0, max_value=3000.0, value=450.0, step=50.0)
 
 sistema_produccion = st.sidebar.selectbox("Sistema de Producción", ["Corral / Engorda Intensiva (Feedlot)", "Semi-estabulado (Mixto / Suplementación en Pastoreo)", "Pastoreo Extensivo (Praderas / Agostadero)"])
 
@@ -281,7 +288,7 @@ st.sidebar.markdown(
 tab1, tab2, tab3, tab4 = st.tabs([
     "📋 1. Resumen y Sensibilidad", 
     "🧪 2. Laboratorio y Google Sheets", 
-    "📊 3. Balance Mineral y Bonos de Carbono", 
+    "📊 3. Balance Económico, Mineral y Carbono", 
     "🚜 4. Bunk Management y Operarios"
 ])
 
@@ -335,7 +342,7 @@ with tab2:
     )
     
     st.markdown(
-        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V6)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
+        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V7)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
         unsafe_allow_html=True
     )
     st.markdown("<br>", unsafe_allow_html=True)
@@ -416,20 +423,44 @@ if not resultado.success:
         modo_tolerancia_activo = True
 
 with tab3:
-    st.subheader("Reporte Financiero, Balance Mineral y Monetización de Bonos de Carbono")
+    st.subheader("📊 Evaluación Económica Financiera y Rentabilidad del Negocio")
     
     if resultado.success:
         if modo_tolerancia_activo:
-            st.warning("⚠️ **Aviso de Auto-Recuperación Elite:** El sistema ajustó automáticamente los márgenes de tolerancia de minerales y energía para garantizar una solución factible y de costo mínimo con los ingredientes actuales.")
+            st.warning("⚠️ **Aviso de Auto-Recuperación Elite:** El sistema ajustó automáticamente los márgenes de tolerancia de minerales y energía para garantizar una solución factible.")
         
-        col_res1, col_res2 = st.columns(2)
-        with col_res1:
-            st.metric(label="Costo Óptimo Mínimo por Tonelada", value=f"${resultado.fun:,.2f} MXN")
-        with col_res2:
-            st.metric(label="Estado del Proceso", value="Factible (Costo Mínimo Elite) 🟢")
+        # --- CÁLCULOS ECONÓMICOS DETALLADOS ---
+        costo_ton_alimento = resultado.fun
+        consumo_total_ciclo_cab = cms_estimado * dias_a_meta
+        costo_alimentacion_cab = (consumo_total_ciclo_cab / 1000.0) * costo_ton_alimento
         
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("#### 📋 Tabla de Ingredientes y Mezcla Exacta por Tonelada:")
+        costo_compra_cab = peso_actual * precio_compra_kg
+        costo_total_cab = costo_compra_cab + costo_alimentacion_cab + costo_sanidad_fijo + costo_mano_obra_fijo
+        
+        ingreso_venta_cab = peso_objetivo * precio_venta_kg
+        utilidad_neta_cab = ingreso_venta_cab - costo_total_cab
+        roi_cab = (utilidad_neta_cab / costo_total_cab) * 100 if costo_total_cab > 0 else 0
+        
+        costo_por_kg_ganado = costo_alimentacion_cab / kg_por_ganar if kg_por_ganar > 0 else 0
+        
+        status_rentabilidad = "🟢 Negocio Rentable" if utilidad_neta_cab > 0 else "🔴 Margen Negativo (Revisar Costos/Precios)"
+        
+        col_ec1, col_ec2, col_ec3, col_ec4 = st.columns(4)
+        with col_ec1:
+            st.metric("Costo Compra Becerro", f"${costo_compra_cab:,.2f} MXN")
+            st.metric("Costo de Alimento/Cab", f"${costo_alimentacion_cab:,.2f} MXN")
+        with col_ec2:
+            st.metric("Costo Total por Animal", f"${costo_total_cab:,.2f} MXN")
+            st.metric("Costo por kg Ganado", f"${costo_por_kg_ganado:,.2f} MXN/kg")
+        with col_ec3:
+            st.metric("Ingreso por Venta/Cab", f"${ingreso_venta_cab:,.2f} MXN")
+            st.metric("Utilidad Neta / Animal", f"${utilidad_neta_cab:,.2f} MXN")
+        with col_ec4:
+            st.metric("ROI del Ciclo", f"{roi_cab:.2f}%", "Retorno Inversión")
+            st.metric("Estatus Comercial", status_rentabilidad)
+            
+        st.markdown("---")
+        st.markdown("#### 📋 Desglose Analítico de Costos de Producción por Tonelada de Alimento:")
         
         tabla_mezcla = []
         categorias_pie = {}
@@ -466,7 +497,7 @@ with tab3:
         df_mezcla_final = pd.DataFrame(tabla_mezcla_con_totales)
         st.dataframe(df_mezcla_final, use_container_width=True, hide_index=True)
         
-        # --- CÁLCULOS AVANZADOS Y BONOS DE CARBONO ---
+        # --- CÁLCULOS DE SOSTENIBILIDAD Y CARBONO ---
         aporte_pc = np.sum(resultado.x * pc) * 100
         aporte_neg = np.sum(resultado.x * neg)
         aporte_fnd = np.sum(resultado.x * fnd) * 100
@@ -481,8 +512,6 @@ with tab3:
         
         relacion_ca_p = (aporte_ca / aporte_p) if aporte_p > 0 else 0
         status_ca_p = "🟢 Óptimo Automático"
-        
-        # Indicador de Riesgo SARA basado en literatura (peNDF mínimo seguro >= 18-20%)
         riesgo_sara = "🟢 Bajo (Seguro)" if aporte_pendf >= 18.0 else ("🟡 Moderado (Monitorear Buffer)" if aporte_pendf >= 14.0 else "🔴 Alto Riesgo SARA (Aumentar Fibra E.F.)")
         
         ge_diaria = cms_estimado * 18.4 
@@ -493,9 +522,7 @@ with tab3:
         ym_ajustado = max(0.025, factor_fnd_ym - reduccion_lipidica - reduccion_ionoforo)
         
         ch4_g_dia = (ge_diaria * ym_ajustado / 55.65) * 1000
-        ch4_g_kg_ganancia = ch4_g_dia / gde if gde > 0 else 0
         co2e_anual = (ch4_g_dia * 365 / 1000.0) * 28.0 
-        
         linea_base_co2e = 4200.0
         ahorro_co2e_kg = max(0.0, linea_base_co2e - co2e_anual)
         valor_bono_mxn = (ahorro_co2e_kg / 1000.0) * 350.0
@@ -554,39 +581,35 @@ with tab4:
         )
 
         # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ELITE ---
-        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, sistema_prod, cond_past, est_pasto, perf_aa, raza_L, sexo_L, marco_L, cc_val, thi_val, adit_val, p_act, p_obj, gain, dias, cabezas, a_ca, a_p, r_cap, a_fnd, a_pendf, ch4_d, co2e, bonos, cost_lote, tons_lote):
+        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, sistema_prod, cond_past, est_pasto, perf_aa, raza_L, sexo_L, marco_L, cc_val, thi_val, adit_val, p_act, p_obj, gain, dias, cabezas, util_neta, roi_c, c_kg_ganado, a_ca, a_p, r_cap, a_fnd, a_pendf, ch4_d, co2e, bonos, cost_lote, tons_lote):
             pdf = FPDF()
             pdf.add_page()
             
             pdf.set_font("Arial", "B", 15)
-            pdf.cell(0, 8, "Ganader-IA Elite 360 - Reporte Ejecutivo y Vanguardia JDS", 0, 1, "C")
+            pdf.cell(0, 8, "Ganader-IA Elite 360 - Reporte Económico y Ejecutivo", 0, 1, "C")
             pdf.set_font("Arial", "I", 9)
             pdf.cell(0, 5, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
             pdf.ln(3)
             
             pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "1. Parametros Biologicos y Poblacionales del Lote", 0, 1)
+            pdf.cell(0, 6, "1. Evaluacion Economica y Rentabilidad del Negocio", 0, 1)
+            pdf.set_font("Arial", "", 9)
+            pdf.cell(0, 5, f"Utilidad Neta por Animal: ${util_neta:,.2f} MXN | ROI del Ciclo: {roi_c:.2f}%", 0, 1)
+            pdf.cell(0, 5, f"Costo por kg Ganado: ${c_kg_ganado:,.2f} MXN/kg | Costo Alimento Ton: ${costo_ton:,.2f} MXN", 0, 1)
+            pdf.ln(3)
+            
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(0, 6, "2. Parametros Biologicos y Poblacionales del Lote", 0, 1)
             pdf.set_font("Arial", "", 9)
             pdf.cell(0, 5, f"Fisiologia: {etapa} | Sistema: {sistema_prod} | Perfil AA: {perf_aa}", 0, 1)
-            pdf.cell(0, 5, f"Pastoreo: {cond_past} | Estado Pasto: {est_pasto}", 0, 1)
-            pdf.cell(0, 5, f"Cabezas: {cabezas} | Genetica: {raza_L} | Categoria: {sexo_L}", 0, 1)
-            pdf.cell(0, 5, f"Condicion Corporal (CC): {cc_val} | THI: {thi_val} | Aditivos: {adit_val}", 0, 1)
-            pdf.cell(0, 5, f"Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE: {gain} kg/dia | Dias: {dias:.0f}", 0, 1)
+            pdf.cell(0, 5, f"Cabezas: {cabezas} | Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE: {gain} kg/d", 0, 1)
             pdf.ln(3)
             
             pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "2. Corrida Financiera y Logistica de Alimento", 0, 1)
-            pdf.set_font("Arial", "", 9)
-            pdf.cell(0, 5, f"Costo Optimo por Tonelada: ${costo_ton:,.2f} MXN | Alimento Total Lote: {tons_lote:,.1f} tons", 0, 1)
-            pdf.cell(0, 5, f"Costo Total de Alimentacion del Ciclo: ${cost_lote:,.2f} MXN", 0, 1)
-            pdf.ln(3)
-            
-            pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "3. Balance Mineral, Salud Ruminal (JDS) y Sostenibilidad (IPCC)", 0, 1)
+            pdf.cell(0, 6, "3. Balance Mineral, Salud Ruminal y Sostenibilidad (IPCC)", 0, 1)
             pdf.set_font("Arial", "", 9)
             pdf.cell(0, 5, f"Calcio (Ca): {a_ca:.2f}% | Fosforo (P): {a_p:.2f}% | Relacion Ca:P: {r_cap:.2f}:1", 0, 1)
-            pdf.cell(0, 5, f"Fibra FND: {a_fnd:.1f}% | peNDF (Anti-acidosis): {a_pendf:.1f}%", 0, 1)
-            pdf.cell(0, 5, f"Emision Metano (CH4): {ch4_d:.1f} g/dia | CO2e Anual: {co2e:,.1f} kg/ano", 0, 1)
+            pdf.cell(0, 5, f"Fibra peNDF: {a_pendf:.1f}% | Emision CH4: {ch4_d:.1f} g/dia", 0, 1)
             pdf.cell(0, 5, f"Valor Potencial Bonos de Carbono: ${bonos:,.2f} MXN por animal/ano", 0, 1)
             pdf.ln(3)
             
@@ -616,35 +639,23 @@ with tab4:
             pdf.cell(35, 5, f"{tot_kg:.1f} kg", 1)
             pdf.cell(45, 5, f"${costo_ton:,.2f}", 1)
             pdf.ln()
-                
-            pdf.ln(3)
-            pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "5. Protocolo de Mezclado para Operarios", 0, 1)
-            pdf.set_font("Arial", "", 8)
-            pdf.multi_cell(0, 4, 
-                "1. Orden en batea: Forrajes secos (rastrojo) para asegurar peNDF y evitar acidosis.\n"
-                "2. Incorporar ensilados y subproductos humedos.\n"
-                "3. Anadir granos energeticos y fuentes de proteina (soya/canola).\n"
-                "4. Agregar aditivos y minerales especializados de Tlaltenango.\n"
-                "5. Anadir melaza liquida al final con agua y mezclar de 8 a 10 minutos."
-            )
             return bytes(pdf.output())
 
         df_mezcla_pdf = pd.DataFrame(tabla_mezcla_con_totales)
         pdf_data = generar_pdf_ejecutivo(
             df_mezcla_pdf, resultado.fun, fase, sistema_produccion, condiciones_pastoreo, estado_pasto, perfil_aa, raza_seleccionada, sexo_lote, marco_lote, condicion_corporal, nivel_thi, aditivo_ruminal, peso_actual, peso_objetivo, gde, dias_a_meta,
-            cantidad_animales, aporte_ca, aporte_p, relacion_ca_p, aporte_fnd, aporte_pendf,
+            cantidad_animales, utilidad_neta_cab, roi_cab, costo_por_kg_ganado, aporte_ca, aporte_p, relacion_ca_p, aporte_fnd, aporte_pendf,
             ch4_g_dia, co2e_anual, valor_bono_mxn, costo_total_lote, alimento_total_ciclo / 1000.0
         )
         
         st.markdown("---")
-        st.subheader("📥 Descarga de Reporte Ejecutivo PDF Elite 360")
-        st.markdown("Haz clic en el botón para descargar el reporte oficial con bonos de carbono, logística de lote, balance mineral y protocolo de carga:")
+        st.subheader("📥 Descarga de Reporte Ejecutivo y Económico PDF")
+        st.markdown("Haz clic en el botón para descargar el reporte oficial con la evaluación económica completa, rentabilidad y mezcla óptima:")
         
         st.download_button(
-            label="📄 Descargar Reporte Ejecutivo PDF (Elite, Carbono & Bunk Management)",
+            label="📄 Descargar Reporte Económico y Ejecutivo PDF",
             data=pdf_data,
-            file_name=f"Reporte_GanaderIA_Elite_{fase.replace(' ', '_')}.pdf",
+            file_name=f"Reporte_Economico_GanaderIA_{fase.replace(' ', '_')}.pdf",
             mime="application/pdf",
             use_container_width=True
         )
@@ -657,4 +668,4 @@ with tab4:
         fig_pie.update_layout(font=dict(family="Inter", color="#2b2d42"))
         st.plotly_chart(fig_pie, use_container_width=True)
     else:
-        st.warning("⚠️ Genere un balance factible en la Pestaña 3 para desbloquear los cálculos de Bunk Management y el Reporte PDF.")
+        st.warning("⚠️ Genere un balance factible en la Pestaña 3 para desbloquear los cálculos económicos y el Reporte PDF.")
