@@ -467,7 +467,14 @@ def generar_pdf_reporte():
         pdf.cell(100, 6, safe_str("COSTO TOTAL POR TONELADA"), 1, 0, 'L')
         pdf.cell(90, 6, safe_str(f"${costo_ton_optimizado:,.2f} MXN"), 1, 1, 'C')
 
-    return pdf.output(dest='S').encode('latin1')
+    # Salida compatible con fpdf y fpdf2
+    output = pdf.output()
+    if isinstance(output, bytes):
+        return output
+    elif isinstance(output, bytearray):
+        return bytes(output)
+    else:
+        return output.encode('latin1')
 
 # --- EXPORTACIÓN EN BARRA LATERAL ---
 st.sidebar.markdown("---")
