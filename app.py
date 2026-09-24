@@ -42,8 +42,9 @@ if not st.session_state.authenticated:
     col_l1, col_l2 = st.columns(2)
     with col_l1:
         if st.button("Validar Acceso"):
-            # Licencia comercial de ejemplo (puedes cambiarla o conectarla a una BD de clientes)
-            if licencia_input == "GANADERIA-PRO-2026" or licencia_input == "demo":
+            # Validación mediante Secrets de Streamlit o clave de prueba 'demo'
+            admin_pwd = st.secrets.get("ADMIN_PASSWORD", "demo")
+            if licencia_input == admin_pwd or licencia_input == "GANADERIA-PRO-2026":
                 st.session_state.authenticated = True
                 st.rerun()
             else:
@@ -157,7 +158,7 @@ st.sidebar.markdown(
     "<div style='text-align: center; color: #555; font-size: 0.85em; padding: 5px;'>"
     "<b>Ganader-IA Pro</b><br>"
     "Creado por el <b>Dr. Alejandro Castañeda Correa</b>.<br><br>"
-    "Para Nutriólogos, Técnicos, Estudiantes y Ganaderos."
+    "Para Nutriólogos, Técnicos, Estudiantes Universitarios y Ganaderos."
     "</div>",
     unsafe_allow_html=True
 )
@@ -281,7 +282,7 @@ with tab3:
         df_mezcla_final = pd.DataFrame(tabla_mezcla)
         st.dataframe(df_mezcla_final, use_container_width=True, hide_index=True)
         
-        # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ---
+        # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO (CORREGIDA PARA FPDF2) ---
         def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, p_act, p_obj, gain, dias):
             pdf = FPDF()
             pdf.add_page()
@@ -339,7 +340,8 @@ with tab3:
                 "4. Verter la melaza liquida al final junto con el agua de batea para asegurar palatabilidad y evitar polvos.\n"
                 "5. Tiempo de mezcla recomendado: 8 a 10 minutos posteriores a la adicion del ultimo ingrediente."
             )
-            return pdf.output(dest='S').encode('latin1')
+            # CORRECCIÓN DE FPDF2: Retornar directamente bytes()
+            return bytes(pdf.output())
 
         pdf_data = generar_pdf_ejecutivo(df_mezcla_final, resultado.fun, fase, raza_seleccionada, peso_actual, peso_objetivo, gde, dias_a_meta)
         
