@@ -28,36 +28,41 @@ st.markdown("""
         background-color: #f8fafc;
     }
     
-    /* Tarjetas de Métricas Estilo Claro y Alta Legibilidad */
+    /* Tarjetas de Métricas con Tamaño de Letra Reducido y Fijo en Recuadro */
     .stMetric {
         background: #ffffff;
-        padding: 12px 14px !important;
-        border-radius: 14px;
-        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+        padding: 8px 10px !important;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px -2px rgba(15, 23, 42, 0.06);
         border: 1px solid #cbd5e1;
-        border-left: 5px solid #059669;
-        margin-bottom: 8px !important;
+        border-left: 4px solid #059669;
+        margin-bottom: 6px !important;
+        overflow: hidden;
         transition: all 0.3s ease;
     }
     
     .stMetric:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.15);
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px -5px rgba(5, 150, 105, 0.12);
         border-color: #059669;
     }
     
     .stMetric label {
-        font-size: 0.7rem !important;
+        font-size: 0.6rem !important;
         color: #475569 !important;
         font-weight: 700 !important;
         text-transform: uppercase;
-        letter-spacing: 0.8px;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .stMetric [data-testid="stMetricValue"] {
-        font-size: 1rem !important;
+        font-size: 0.85rem !important;
         color: #0f172a !important;
         font-weight: 800 !important;
+        word-break: break-word;
     }
     
     h1, h2, h3, h4 {
@@ -465,7 +470,7 @@ def generar_pdf_reporte():
     else:
         return output.encode('latin1')
 
-# --- 5. INTERFAZ MODULAR POR PESTAÑAS (6 TABS ELITE CON REPORTE PDF AL LADO DEL SIMULADOR) ---
+# --- 5. INTERFAZ MODULAR POR PESTAÑAS (6 TABS ELITE) ---
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "📋 1. Resumen", 
     "🧪 2. Nutrición", 
