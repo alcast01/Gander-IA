@@ -9,7 +9,7 @@ from fpdf import FPDF
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (CAMPO Y GANADERÍA) ---
 st.set_page_config(
-    page_title="Ganader-IA Elite | Optimización de Costos y Tolerancia Ca:P",
+    page_title="Ganader-IA Elite | Nutrición de Precisión y Costo Mínimo",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -66,7 +66,7 @@ st.markdown("""
         </div>
         <div style="flex-grow: 1; min-width: 250px;">
             <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">ELITE 360</span></h1>
-            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización Máxima de Costos, Tolerancia Elástica Ca:P y Sostenibilidad</p>
+            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización Máxima de Costos, Auto-Recuperación y Sostenibilidad</p>
             <p style="margin: 6px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
         </div>
     </div>
@@ -292,7 +292,7 @@ with tab2:
         key="editor_ingredientes"
     )
 
-# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL (CON TOLERANCIA ELÁSTICA Ca:P Y RESPALDO) ---
+# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL (CON AUTO-RECUPERACIÓN Y TOLERANCIA) ---
 try:
     nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
     c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
@@ -325,22 +325,33 @@ for idx, row in df_ingredientes.iterrows():
 A_eq = np.ones((1, len(c)))
 b_eq = np.array([1.0])
 
-# Intento 1: Rango ideal estricto Ca:P (1.5 a 2.0)
+# Estrategia de Auto-Recuperación por Niveles de Tolerancia
+resultado = None
+modo_tolerancia_activo = False
+
+# Intento 1: Restricciones ideales (Ca:P 1.5-2.0, metas exactas)
 row_ca_p_min = -ca + 1.5 * p_min_ing
 row_ca_p_max = ca - 2.0 * p_min_ing
-
 A_ub = np.array([-pc, -neg, -fnd, -pendf, -pdr, -pnd, -ca, -p_min_ing, row_ca_p_min, row_ca_p_max])
 b_ub = np.array([-meta_pc_min, -meta_neg_min, -meta_fnd_min, -meta_pendf_min, -meta_pdr_min, -meta_pnd_min, -meta_ca_min, -meta_p_min, 0.0, 0.0])
 
 resultado = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
 
-# Respaldo automático: Si no es factible con 1.5-2.0, relajar a 1.3-2.2 para garantizar solución operativa
-modo_tolerancia_activo = False
+# Intento 2: Si falla, relajar Ca:P a 1.2-2.5
 if not resultado.success:
-    row_ca_p_min_rel = -ca + 1.3 * p_min_ing
-    row_ca_p_max_rel = ca - 2.2 * p_min_ing
+    row_ca_p_min_rel = -ca + 1.2 * p_min_ing
+    row_ca_p_max_rel = ca - 2.5 * p_min_ing
     A_ub_rel = np.array([-pc, -neg, -fnd, -pendf, -pdr, -pnd, -ca, -p_min_ing, row_ca_p_min_rel, row_ca_p_max_rel])
     resultado = linprog(c, A_ub=A_ub_rel, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
+    if resultado.success:
+        modo_tolerancia_activo = True
+
+# Intento 3: Si aún falla, relajar metas nutricionales en un 10% (Auto-recuperación total)
+if not resultado.success:
+    meta_pc_min_rel = meta_pc_min * 0.90
+    meta_neg_min_rel = meta_neg_min * 0.90
+    b_ub_rel2 = np.array([-meta_pc_min_rel, -meta_neg_min_rel, -meta_fnd_min, -meta_pendf_min, -meta_pdr_min, -meta_pnd_min, -meta_ca_min, -meta_p_min, 0.0, 0.0])
+    resultado = linprog(c, A_ub=A_ub_rel, b_ub=b_ub_rel2, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
     if resultado.success:
         modo_tolerancia_activo = True
 
@@ -349,7 +360,7 @@ with tab3:
     
     if resultado.success:
         if modo_tolerancia_activo:
-            st.warning("⚠️ **Aviso de Tolerancia Elástica Ca:P:** Se ajustó temporalmente el rango de Calcio a Fósforo a 1.3:1 - 2.2:1 para garantizar una solución matemática factible y de costo mínimo con los insumos actuales.")
+            st.warning("⚠️ **Aviso de Auto-Recuperación Elite:** El sistema ajustó automáticamente los márgenes de tolerancia de minerales y energía para garantizar una solución factible y de costo mínimo con los ingredientes actuales.")
         
         col_res1, col_res2 = st.columns(2)
         with col_res1:
@@ -443,8 +454,8 @@ with tab3:
 
     else:
         st.error(
-            "⚠️ **Aviso del Optimizador Elite 360:** Las restricciones de energía, proteína y fibra superan la capacidad de combinación de los ingredientes actuales. "
-            "Verifica que tengas habilitadas al menos una fuente de energía (maíz/ensilado), proteína (soya/canola) y una sal mineral especializada en la Pestaña 2."
+            "⚠️ **Aviso del Optimizador Elite 360:** Las restricciones son demasiado restrictivas para los ingredientes habilitados. "
+            "Asegúrate de tener marcadas como disponibles al menos una fuente de forraje, un grano energético, una fuente proteica y una sal mineral en la Pestaña 2."
         )
 
 with tab4:
