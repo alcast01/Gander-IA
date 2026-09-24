@@ -391,7 +391,6 @@ with tab3:
         relacion_ca_p = (aporte_ca / aporte_p) if aporte_p > 0 else 0
         status_ca_p = "🟢 Óptimo Automático (1.5 - 2.0:1)"
         
-        # Estimación Metano IPCC y Bonos de Carbono ($300 MXN / tonelada de CO2e evitada)
         ge_diaria = cms_estimado * 18.4 
         reduccion_lipidica = max(0.0, (aporte_lipidos - 3.0) * 0.003)
         factor_fnd_ym = 0.035 + (aporte_fnd / 100.0) * 0.035
@@ -401,10 +400,9 @@ with tab3:
         ch4_g_kg_ganancia = ch4_g_dia / gde if gde > 0 else 0
         co2e_anual = (ch4_g_dia * 365 / 1000.0) * 28.0 
         
-        # Valor estimado de bonos de carbono por animal/año (asumiendo 15% de mitigación bajo estándar vs línea base convencional de 4.2 t CO2e/año)
-        linea_base_co2e = 4200.0 # kg CO2e tradicional
+        linea_base_co2e = 4200.0
         ahorro_co2e_kg = max(0.0, linea_base_co2e - co2e_anual)
-        valor_bono_mxn = (ahorro_co2e_kg / 1000.0) * 350.0 # Ej. $350 MXN por tCO2e
+        valor_bono_mxn = (ahorro_co2e_kg / 1000.0) * 350.0
         
         st.markdown("---")
         st.subheader("🛡️ Validación Mineral, Salud Ruminal y Monetización Verde")
@@ -423,139 +421,141 @@ with tab3:
             st.metric("Valor Bonos Carbono", f"${valor_bono_mxn:,.2f} MXN", "Potencial Anual/Cab")
             st.metric("Lípidos Totales", f"{aporte_lipidos:.1f}%", "Mitigador")
 
+    else:
+        st.error(
+            "⚠️ **Aviso del Optimizador Elite 360:** Con los ingredientes seleccionados o restricciones muy cerradas, no se encontró una solución matemática factible "
+            "que cumpla simultáneamente con energía, proteína, fibra y la proporción automática Ca:P de 1.5 a 2.0. "
+            "Asegúrate de tener activa una fuente mineral especializada en la Pestaña 2."
+        )
+
 with tab4:
     st.subheader("🚜 Bunk Management y Gestión Logística de Alimento")
     st.markdown("Control total de inventarios, requerimientos de toneladas totales para el lote y guía de mezcla para el personal del corral:")
     
-    # Cálculos logísticos para todo el lote
-    cms_total_lote = cms_estimado * cantidad_animales
-    alimento_total_ciclo = cms_total_lote * dias_a_meta
-    costo_total_lote = (alimento_total_ciclo / 1000.0) * resultado.fun
-    
-    col_l1, col_l2, col_l3 = st.columns(3)
-    with col_l1:
-        st.metric("Consumo Diario del Lote", f"{cms_total_lote:,.1f} kg MS/día")
-    with col_l2:
-        st.metric("Alimento Total Requerido", f"{alimento_total_ciclo:,.1f} kg ({alimento_total_ciclo/1000.0:,.1f} tons)")
-    with col_l3:
-        st.metric("Costo Total de Alimentación", f"${costo_total_lote:,.2f} MXN")
+    if resultado.success:
+        cms_total_lote = cms_estimado * cantidad_animales
+        alimento_total_ciclo = cms_total_lote * dias_a_meta
+        costo_total_lote = (alimento_total_ciclo / 1000.0) * resultado.fun
         
-    st.markdown("---")
-    st.markdown("#### 📋 Protocolo y Orden de Carga en Batea para Operarios:")
-    st.info(
-        f"**Lote Activo:** {cantidad_animales} animales | **Duración Estimada:** {dias_a_meta:.0f} días\n\n"
-        "1. **Paso 1 (Forrajes Secos / Fibra Larga):** Cargar rastrojos o harinas fibrosas al inicio para asegurar el peNDF y evitar acidosis metabólica.\n"
-        "2. **Paso 2 (Ingredientes Húmedos / Ensilados):** Agregar ensilados o subproductos húmedos calculando la corrección por materia seca.\n"
-        "3. **Paso 3 (Granos Energéticos y Proteicos):** Incorporar maíz molido, pasta de soya y canola.\n"
-        "4. **Paso 4 (Núcleos, Minerales y Urea):** Agregar las sales minerales especializadas y la urea (previa dilución o mezclado homogéneo para evitar toxicidad).\n"
-        "5. **Paso 5 (Líquidos):** Verter la melaza líquida con un chorro de agua al final para garantizar adherencia, evitar polvaderas y elevar la palatabilidad.\n"
-        "6. **Tiempo de Mezclado:** Operar el carro mezclador de 8 a 10 minutos continuos antes de la distribución en comederos."
-    )
-
-    # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ELITE ---
-    def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, sexo_L, marco_L, p_act, p_obj, gain, dias, cabezas, a_ca, a_p, r_cap, a_fnd, a_pendf, ch4_d, co2e, bonos, cost_lote, tons_lote):
-        pdf = FPDF()
-        pdf.add_page()
-        
-        pdf.set_font("Arial", "B", 15)
-        pdf.cell(0, 8, "Ganader-IA Elite 360 - Reporte Ejecutivo y Bonos de Carbono", 0, 1, "C")
-        pdf.set_font("Arial", "I", 9)
-        pdf.cell(0, 5, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
-        pdf.ln(3)
-        
-        pdf.set_font("Arial", "B", 10)
-        pdf.cell(0, 6, "1. Parametros Biologicos y Poblacionales del Lote", 0, 1)
-        pdf.set_font("Arial", "", 9)
-        pdf.cell(0, 5, f"Fisiologia: {etapa} | Cabezas: {cabezas} | Genetica: {raza_L} | Sexo: {sexo_L}", 0, 1)
-        pdf.cell(0, 5, f"Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE: {gain} kg/dia | Dias: {dias:.0f}", 0, 1)
-        pdf.ln(3)
-        
-        pdf.set_font("Arial", "B", 10)
-        pdf.cell(0, 6, "2. Corrida Financiera y Logistica de Alimento", 0, 1)
-        pdf.set_font("Arial", "", 9)
-        pdf.cell(0, 5, f"Costo Optimo por Tonelada: ${costo_ton:,.2f} MXN | Alimento Total Lote: {tons_lote:,.1f} tons", 0, 1)
-        pdf.cell(0, 5, f"Costo Total de Alimentacion del Ciclo: ${cost_lote:,.2f} MXN", 0, 1)
-        pdf.ln(3)
-        
-        pdf.set_font("Arial", "B", 10)
-        pdf.cell(0, 6, "3. Balance Mineral, Salud Ruminal y Sostenibilidad (IPCC)", 0, 1)
-        pdf.set_font("Arial", "", 9)
-        pdf.cell(0, 5, f"Calcio (Ca): {a_ca:.2f}% | Fosforo (P): {a_p:.2f}% | Relacion Ca:P: {r_cap:.2f}:1 (Ideal 1.5 - 2.0)", 0, 1)
-        pdf.cell(0, 5, f"Fibra FND: {a_fnd:.1f}% | peNDF (Anti-acidosis): {a_pendf:.1f}%", 0, 1)
-        pdf.cell(0, 5, f"Emision Metano (CH4): {ch4_d:.1f} g/dia | CO2e Anual: {co2e:,.1f} kg/ano", 0, 1)
-        pdf.cell(0, 5, f"Valor Potencial Bonos de Carbono: ${bonos:,.2f} MXN por animal/ano", 0, 1)
-        pdf.ln(3)
-        
-        pdf.set_font("Arial", "B", 10)
-        pdf.cell(0, 6, "4. Mezcla Exacta por Tonelada (1,000 kg)", 0, 1)
-        pdf.set_font("Arial", "B", 8)
-        pdf.cell(80, 6, "Ingrediente", 1)
-        pdf.cell(30, 6, "Inclusion (%)", 1)
-        pdf.cell(35, 6, "Kg / Tonelada", 1)
-        pdf.cell(45, 6, "Costo Parcial ($)", 1)
-        pdf.ln()
-        
-        pdf.set_font("Arial", "", 8)
-        for _, row in df_resumen.iterrows():
-            if row["Ingrediente"] != "TOTALES / MEZCLA FINAL":
-                pdf.cell(80, 5, str(row["Ingrediente"]), 1)
-                pdf.cell(30, 5, f"{row['Inclusion (%)']}%", 1)
-                pdf.cell(35, 5, f"{row['Kg por Tonelada (1,000 kg)']}", 1)
-                pdf.cell(45, 5, str(row['Aporte al Costo Total ($)']), 1)
-                pdf.ln()
-        
-        tot_inc = df_resumen[df_resumen["Ingrediente"] != "TOTALES / MEZCLA FINAL"]['Inclusion (%)'].sum()
-        tot_kg = df_resumen[df_resumen["Ingrediente"] != "TOTALES / MEZCLA FINAL"]['Kg por Tonelada (1,000 kg)'].sum()
-        pdf.set_font("Arial", "B", 8)
-        pdf.cell(80, 5, "TOTALES / MEZCLA FINAL", 1)
-        pdf.cell(30, 5, f"{tot_inc:.1f}%", 1)
-        pdf.cell(35, 5, f"{tot_kg:.1f} kg", 1)
-        pdf.cell(45, 5, f"${costo_ton:,.2f}", 1)
-        pdf.ln()
+        col_l1, col_l2, col_l3 = st.columns(3)
+        with col_l1:
+            st.metric("Consumo Diario del Lote", f"{cms_total_lote:,.1f} kg MS/día")
+        with col_l2:
+            st.metric("Alimento Total Requerido", f"{alimento_total_ciclo:,.1f} kg ({alimento_total_ciclo/1000.0:,.1f} tons)")
+        with col_l3:
+            st.metric("Costo Total de Alimentación", f"${costo_total_lote:,.2f} MXN")
             
-        pdf.ln(3)
-        pdf.set_font("Arial", "B", 10)
-        pdf.cell(0, 6, "5. Protocolo de Mezclado para Operarios", 0, 1)
-        pdf.set_font("Arial", "", 8)
-        pdf.multi_cell(0, 4, 
-            "1. Orden en batea: Forrajes secos (rastrojo) para asegurar peNDF y evitar acidosis.\n"
-            "2. Incorporar ensilados y subproductos humedos.\n"
-            "3. Anadir granos energeticos y fuentes de proteina (soya/canola).\n"
-            "4. Agregar aditivos y minerales especializados (Sales y Urea con cuidado).\n"
-            "5. Anadir melaza liquida al final con agua y mezclar de 8 a 10 minutos."
+        st.markdown("---")
+        st.markdown("#### 📋 Protocolo y Orden de Carga en Batea para Operarios:")
+        st.info(
+            f"**Lote Activo:** {cantidad_animales} animales | **Duración Estimada:** {dias_a_meta:.0f} días\n\n"
+            "1. **Paso 1 (Forrajes Secos / Fibra Larga):** Cargar rastrojos o harinas fibrosas al inicio para asegurar el peNDF y evitar acidosis metabólica.\n"
+            "2. **Paso 2 (Ingredientes Húmedos / Ensilados):** Agregar ensilados o subproductos húmedos calculando la corrección por materia seca.\n"
+            "3. **Paso 3 (Granos Energéticos y Proteicos):** Incorporar maíz molido, pasta de soya y canola.\n"
+            "4. **Paso 4 (Núcleos, Minerales y Urea):** Agregar las sales minerales especializadas y la urea (previa dilución o mezclado homogéneo para evitar toxicidad).\n"
+            "5. **Paso 5 (Líquidos):** Verter la melaza líquida con un chorro de agua al final para garantizar adherencia, evitar polvaderas y elevar la palatabilidad.\n"
+            "6. **Tiempo de Mezclado:** Operar el carro mezclador de 8 a 10 minutos continuos antes de la distribución en comederos."
         )
-        return bytes(pdf.output())
 
-    df_mezcla_pdf = pd.DataFrame(tabla_mezcla_con_totales)
-    pdf_data = generar_pdf_ejecutivo(
-        df_mezcla_pdf, resultado.fun, fase, raza_seleccionada, sexo_lote, marco_lote, peso_actual, peso_objetivo, gde, dias_a_meta,
-        cantidad_animales, aporte_ca, aporte_p, relacion_ca_p, aporte_fnd, aporte_pendf,
-        ch4_g_dia, co2e_anual, valor_bono_mxn, costo_total_lote, alimento_total_ciclo / 1000.0
-    )
-    
-    st.markdown("---")
-    st.subheader("📥 Descarga de Reporte Ejecutivo PDF Elite 360")
-    st.markdown("Haz clic en el botón para descargar el reporte oficial con bonos de carbono, logística de lote, balance mineral y protocolo de carga:")
-    
-    st.download_button(
-        label="📄 Descargar Reporte Ejecutivo PDF (Elite, Carbono & Bunk Management)",
-        data=pdf_data,
-        file_name=f"Reporte_GanaderIA_Elite_{fase.replace(' ', '_')}.pdf",
-        mime="application/pdf",
-        use_container_width=True
-    )
-    
-    st.markdown("---")
-    st.subheader("🥧 Composición Porcentual de la Dieta por Categoría")
-    df_pie = pd.DataFrame(list(categorias_pie.items()), columns=["Categoría", "Porcentaje"])
-    colores_campo = ['#2d5a27', '#bc6c25', '#dda15e', '#606c38', '#283618', '#e76f51']
-    fig_pie = px.pie(df_pie, names="Categoría", values="Porcentaje", hole=0.4, title="Distribución de Insumos Seleccionados en la Mezcla", color_discrete_sequence=colores_campo)
-    fig_pie.update_layout(font=dict(family="Inter", color="#2b2d42"))
-    st.plotly_chart(fig_pie, use_container_width=True)
+        # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ELITE ---
+        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, sexo_L, marco_L, p_act, p_obj, gain, dias, cabezas, a_ca, a_p, r_cap, a_fnd, a_pendf, ch4_d, co2e, bonos, cost_lote, tons_lote):
+            pdf = FPDF()
+            pdf.add_page()
             
-else:
-    st.error(
-        "⚠️ **Aviso del Optimizador Elite 360:** Con los ingredientes seleccionados o restricciones muy cerradas, no se encontró una solución matemática factible "
-        "que cumpla simultáneamente con energía, proteína, fibra y la proporción automática Ca:P de 1.5 a 2.0. "
-        "Asegúrate de tener activa una fuente mineral especializada en la Pestaña 2."
-    )
+            pdf.set_font("Arial", "B", 15)
+            pdf.cell(0, 8, "Ganader-IA Elite 360 - Reporte Ejecutivo y Bonos de Carbono", 0, 1, "C")
+            pdf.set_font("Arial", "I", 9)
+            pdf.cell(0, 5, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
+            pdf.ln(3)
+            
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(0, 6, "1. Parametros Biologicos y Poblacionales del Lote", 0, 1)
+            pdf.set_font("Arial", "", 9)
+            pdf.cell(0, 5, f"Fisiologia: {etapa} | Cabezas: {cabezas} | Genetica: {raza_L} | Sexo: {sexo_L}", 0, 1)
+            pdf.cell(0, 5, f"Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE: {gain} kg/dia | Dias: {dias:.0f}", 0, 1)
+            pdf.ln(3)
+            
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(0, 6, "2. Corrida Financiera y Logistica de Alimento", 0, 1)
+            pdf.set_font("Arial", "", 9)
+            pdf.cell(0, 5, f"Costo Optimo por Tonelada: ${costo_ton:,.2f} MXN | Alimento Total Lote: {tons_lote:,.1f} tons", 0, 1)
+            pdf.cell(0, 5, f"Costo Total de Alimentacion del Ciclo: ${cost_lote:,.2f} MXN", 0, 1)
+            pdf.ln(3)
+            
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(0, 6, "3. Balance Mineral, Salud Ruminal y Sostenibilidad (IPCC)", 0, 1)
+            pdf.set_font("Arial", "", 9)
+            pdf.cell(0, 5, f"Calcio (Ca): {a_ca:.2f}% | Fosforo (P): {a_p:.2f}% | Relacion Ca:P: {r_cap:.2f}:1 (Ideal 1.5 - 2.0)", 0, 1)
+            pdf.cell(0, 5, f"Fibra FND: {a_fnd:.1f}% | peNDF (Anti-acidosis): {a_pendf:.1f}%", 0, 1)
+            pdf.cell(0, 5, f"Emision Metano (CH4): {ch4_d:.1f} g/dia | CO2e Anual: {co2e:,.1f} kg/ano", 0, 1)
+            pdf.cell(0, 5, f"Valor Potencial Bonos de Carbono: ${bonos:,.2f} MXN por animal/ano", 0, 1)
+            pdf.ln(3)
+            
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(0, 6, "4. Mezcla Exacta por Tonelada (1,000 kg)", 0, 1)
+            pdf.set_font("Arial", "B", 8)
+            pdf.cell(80, 6, "Ingrediente", 1)
+            pdf.cell(30, 6, "Inclusion (%)", 1)
+            pdf.cell(35, 6, "Kg / Tonelada", 1)
+            pdf.cell(45, 6, "Costo Parcial ($)", 1)
+            pdf.ln()
+            
+            pdf.set_font("Arial", "", 8)
+            for _, row in df_resumen.iterrows():
+                if row["Ingrediente"] != "TOTALES / MEZCLA FINAL":
+                    pdf.cell(80, 5, str(row["Ingrediente"]), 1)
+                    pdf.cell(30, 5, f"{row['Inclusion (%)']}%", 1)
+                    pdf.cell(35, 5, f"{row['Kg por Tonelada (1,000 kg)']}", 1)
+                    pdf.cell(45, 5, str(row['Aporte al Costo Total ($)']), 1)
+                    pdf.ln()
+            
+            tot_inc = df_resumen[df_resumen["Ingrediente"] != "TOTALES / MEZCLA FINAL"]['Inclusion (%)'].sum()
+            tot_kg = df_resumen[df_resumen["Ingrediente"] != "TOTALES / MEZCLA FINAL"]['Kg por Tonelada (1,000 kg)'].sum()
+            pdf.set_font("Arial", "B", 8)
+            pdf.cell(80, 5, "TOTALES / MEZCLA FINAL", 1)
+            pdf.cell(30, 5, f"{tot_inc:.1f}%", 1)
+            pdf.cell(35, 5, f"{tot_kg:.1f} kg", 1)
+            pdf.cell(45, 5, f"${costo_ton:,.2f}", 1)
+            pdf.ln()
+                
+            pdf.ln(3)
+            pdf.set_font("Arial", "B", 10)
+            pdf.cell(0, 6, "5. Protocolo de Mezclado para Operarios", 0, 1)
+            pdf.set_font("Arial", "", 8)
+            pdf.multi_cell(0, 4, 
+                "1. Orden en batea: Forrajes secos (rastrojo) para asegurar peNDF y evitar acidosis.\n"
+                "2. Incorporar ensilados y subproductos humedos.\n"
+                "3. Anadir granos energeticos y fuentes de proteina (soya/canola).\n"
+                "4. Agregar aditivos y minerales especializados (Sales y Urea con cuidado).\n"
+                "5. Anadir melaza liquida al final con agua y mezclar de 8 a 10 minutos."
+            )
+            return bytes(pdf.output())
+
+        df_mezcla_pdf = pd.DataFrame(tabla_mezcla_con_totales)
+        pdf_data = generar_pdf_ejecutivo(
+            df_mezcla_pdf, resultado.fun, fase, raza_seleccionada, sexo_lote, marco_lote, peso_actual, peso_objetivo, gde, dias_a_meta,
+            cantidad_animales, aporte_ca, aporte_p, relacion_ca_p, aporte_fnd, aporte_pendf,
+            ch4_g_dia, co2e_anual, valor_bono_mxn, costo_total_lote, alimento_total_ciclo / 1000.0
+        )
+        
+        st.markdown("---")
+        st.subheader("📥 Descarga de Reporte Ejecutivo PDF Elite 360")
+        st.markdown("Haz clic en el botón para descargar el reporte oficial con bonos de carbono, logística de lote, balance mineral y protocolo de carga:")
+        
+        st.download_button(
+            label="📄 Descargar Reporte Ejecutivo PDF (Elite, Carbono & Bunk Management)",
+            data=pdf_data,
+            file_name=f"Reporte_GanaderIA_Elite_{fase.replace(' ', '_')}.pdf",
+            mime="application/pdf",
+            use_container_width=True
+        )
+        
+        st.markdown("---")
+        st.subheader("🥧 Composición Porcentual de la Dieta por Categoría")
+        df_pie = pd.DataFrame(list(categorias_pie.items()), columns=["Categoría", "Porcentaje"])
+        colores_campo = ['#2d5a27', '#bc6c25', '#dda15e', '#606c38', '#283618', '#e76f51']
+        fig_pie = px.pie(df_pie, names="Categoría", values="Porcentaje", hole=0.4, title="Distribución de Insumos Seleccionados en la Mezcla", color_discrete_sequence=colores_campo)
+        fig_pie.update_layout(font=dict(family="Inter", color="#2b2d42"))
+        st.plotly_chart(fig_pie, use_container_width=True)
+    else:
+        st.warning("⚠️ Genere un balance factible en la Pestaña 3 para desbloquear los cálculos de Bunk Management y el Reporte PDF.")
