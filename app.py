@@ -28,7 +28,6 @@ st.markdown("""
         background-color: #f8fafc;
     }
     
-    /* Tarjetas de Métricas con Tamaño de Letra Reducido y Fijo en Recuadro */
     .stMetric {
         background: #ffffff;
         padding: 8px 10px !important;
@@ -78,7 +77,6 @@ st.markdown("""
         line-height: 1.6;
     }
     
-    /* Estilización de pestañas claras */
     .stTabs [data-baseweb="tab-list"] {
         gap: 6px;
         background-color: #e2e8f0;
@@ -102,7 +100,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. LOGOTIPO REDISEÑADO Y ENCABEZADO CLARO DE ALTA VISIBILIDAD ---
+# --- 2. LOGOTIPO Y ENCABEZADO ---
 st.markdown("""
     <div style="display: flex; align-items: center; background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); padding: 26px 30px; border-radius: 20px; box-shadow: 0 15px 35px -10px rgba(5, 150, 105, 0.12); margin-bottom: 24px; border: 2px solid #a7f3d0; flex-wrap: wrap; gap: 20px;">
         <div style="flex-shrink: 0; background: #059669; padding: 12px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px rgba(5, 150, 105, 0.25);">
@@ -131,40 +129,33 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# --- 3. BASE DE DATOS INICIAL CON MINERALES DE TLALTENANGO ---
-data_respaldo = {
-    "Nombre del Ingrediente": [
-        "Rastrojo de maiz molido", 
-        "Harina de soya", 
-        "Grano de maiz molido", 
-        "Urea", 
-        "Ensilado de maiz", 
-        "Canola (pasta)", 
-        "Melaza liquida",
-        "Purina Mineral Tech (Tlaltenango)", 
-        "Malta Cleyton Ganafos", 
-        "Grasa de paso Lactomil"
-    ],
-    "Categoria": ["Forraje", "Suplemento Proteico", "Grano Energetico", "Suplemento NPN", "Forraje Humedo", "Suplemento Proteico", "Subproducto / Energetico", "Suplemento Mineral", "Suplemento Mineral", "Suplemento Energetico"],
-    "Disponible": [True, True, True, True, True, True, True, True, True, True],
-    "Precio Estimado (MXN/ton)": [2500.0, 12500.0, 5800.0, 16000.0, 1200.0, 8500.0, 4800.0, 19000.0, 18500.0, 32000.0],
-    "Proteina Cruda (PC % MS)": [5.5, 48.0, 8.5, 281.0, 8.0, 38.0, 4.8, 0.0, 0.0, 1.0],
-    "NEg (Mcal/kg)": [0.35, 1.48, 1.55, 0.0, 0.85, 1.15, 1.22, 0.0, 0.0, 1.65],
-    "FND (% MS)": [75.0, 12.0, 9.0, 0.0, 45.0, 28.0, 0.0, 0.0, 0.0, 0.0],
-    "peNDF (% MS)": [65.0, 2.0, 3.0, 0.0, 30.0, 10.0, 0.0, 0.0, 0.0, 0.0],
-    "PDR (% MS)": [3.5, 33.6, 5.5, 281.0, 5.0, 24.0, 4.5, 0.0, 0.0, 0.0],
-    "PND (% MS)": [2.0, 14.4, 3.0, 0.0, 3.0, 14.0, 0.3, 0.0, 0.0, 1.0],
-    "Calcio (Ca %)": [0.35, 0.30, 0.02, 0.0, 0.25, 0.70, 0.80, 14.0, 16.0, 1.0],
-    "Fosforo (P %)": [0.10, 0.65, 0.30, 0.0, 0.22, 1.10, 0.08, 7.0, 8.0, 0.1],
-    "Sodio (Na %)": [0.02, 0.03, 0.02, 0.0, 0.02, 0.05, 0.10, 10.0, 9.0, 0.0],
-    "Magnesio (Mg %)": [0.15, 0.28, 0.12, 0.0, 0.18, 0.50, 0.40, 2.0, 2.5, 0.0],
-    "Lípidos / Extracto Etéreo (%)": [1.5, 1.8, 3.8, 0.0, 3.0, 3.5, 0.5, 0.0, 0.0, 99.0],
-    "Min Inclusión (%)": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-    "Max Inclusión (%)": [100.0, 100.0, 100.0, 1.5, 100.0, 100.0, 100.0, 5.0, 5.0, 5.0]
-}
-df_base = pd.DataFrame(data_respaldo)
+# --- 3. BASE DE DATOS INICIAL CON PERSISTENCIA (SESSION STATE) ---
+if "df_ingredientes_state" not in st.session_state:
+    st.session_state.df_ingredientes_state = pd.DataFrame({
+        "Nombre del Ingrediente": [
+            "Rastrojo de maiz molido", "Harina de soya", "Grano de maiz molido", 
+            "Urea", "Ensilado de maiz", "Canola (pasta)", "Melaza liquida",
+            "Purina Mineral Tech (Tlaltenango)", "Malta Cleyton Ganafos", "Grasa de paso Lactomil"
+        ],
+        "Categoria": ["Forraje", "Suplemento Proteico", "Grano Energetico", "Suplemento NPN", "Forraje Humedo", "Suplemento Proteico", "Subproducto / Energetico", "Suplemento Mineral", "Suplemento Mineral", "Suplemento Energetico"],
+        "Disponible": [True, True, True, True, True, True, True, True, True, True],
+        "Precio Estimado (MXN/ton)": [2500.0, 12500.0, 5800.0, 16000.0, 1200.0, 8500.0, 4800.0, 19000.0, 18500.0, 32000.0],
+        "Proteina Cruda (PC % MS)": [5.5, 48.0, 8.5, 281.0, 8.0, 38.0, 4.8, 0.0, 0.0, 1.0],
+        "NEg (Mcal/kg)": [0.35, 1.48, 1.55, 0.0, 0.85, 1.15, 1.22, 0.0, 0.0, 1.65],
+        "FND (% MS)": [75.0, 12.0, 9.0, 0.0, 45.0, 28.0, 0.0, 0.0, 0.0, 0.0],
+        "peNDF (% MS)": [65.0, 2.0, 3.0, 0.0, 30.0, 10.0, 0.0, 0.0, 0.0, 0.0],
+        "PDR (% MS)": [3.5, 33.6, 5.5, 281.0, 5.0, 24.0, 4.5, 0.0, 0.0, 0.0],
+        "PND (% MS)": [2.0, 14.4, 3.0, 0.0, 3.0, 14.0, 0.3, 0.0, 0.0, 1.0],
+        "Calcio (Ca %)": [0.35, 0.30, 0.02, 0.0, 0.25, 0.70, 0.80, 14.0, 16.0, 1.0],
+        "Fosforo (P %)": [0.10, 0.65, 0.30, 0.0, 0.22, 1.10, 0.08, 7.0, 8.0, 0.1],
+        "Sodio (Na %)": [0.02, 0.03, 0.02, 0.0, 0.02, 0.05, 0.10, 10.0, 9.0, 0.0],
+        "Magnesio (Mg %)": [0.15, 0.28, 0.12, 0.0, 0.18, 0.50, 0.40, 2.0, 2.5, 0.0],
+        "Lípidos / Extracto Etéreo (%)": [1.5, 1.8, 3.8, 0.0, 3.0, 3.5, 0.5, 0.0, 0.0, 99.0],
+        "Min Inclusión (%)": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        "Max Inclusión (%)": [100.0, 100.0, 100.0, 1.5, 100.0, 100.0, 100.0, 5.0, 5.0, 5.0]
+    })
 
-# --- 4. BARRA LATERAL ORGANIZADA EN MENÚS DESPLEGABLES ---
+# --- 4. BARRA LATERAL ---
 st.sidebar.markdown("### 🎛️ Panel de Control Elite")
 
 with st.sidebar.expander("🐄 1. Lote, Pesos y Población", expanded=True):
@@ -204,7 +195,9 @@ with st.sidebar.expander("🌡️ 5. Variables Avanzadas y JDS", expanded=False)
     promotor_crecimiento = st.selectbox("Promotores Crecimiento", ["Ninguno", "Implante Hormonal", "Agonista β-adrenérgico (Finalización)"])
     condicion_lodo = st.selectbox("Condición de Corral / Lodo", ["Seco y Confortable", "Lodo Moderado (10-15 cm)", "Lodo Severo (>20 cm)"])
 
-# --- EXTRACCIÓN DE DATOS Y BOUNDS ---
+# --- EXTRACCIÓN DE DATOS DESDE SESSION STATE ---
+df_base = st.session_state.df_ingredientes_state
+
 try:
     nombres = df_base["Nombre del Ingrediente"].astype(str).values
     c = df_base["Precio Estimado (MXN/ton)"].astype(float).values
@@ -385,7 +378,7 @@ factor_compensatorio = 0.93 if "Compensatorio" in historial_nutricional else 1.0
 meta_pc_min = meta_pc_base * factor_pc * factor_sexo_pc * factor_promotor
 meta_neg_min = meta_neg_base * factor_neg * factor_sexo_neg * factor_marco * factor_lodo * factor_compensatorio
 
-# --- EJECUCIÓN DEL MOTOR LINEAL FINAL ---
+# --- EJECUCIÓN DEL MOTOR LINEAL ---
 resultado = None
 modo_tolerancia_activo = False
 
@@ -414,7 +407,7 @@ if not resultado.success:
 
 costo_ton_optimizado = resultado.fun if resultado.success else 4500.0 
 
-# Cálculos económicos para reportes
+# Cálculos económicos
 consumo_total_ciclo_cab = cms_estimado * dias_a_meta
 costo_alimentacion_cab = (consumo_total_ciclo_cab / 1000.0) * costo_ton_optimizado
 costo_compra_cab = peso_actual * precio_compra_kg
@@ -510,7 +503,7 @@ def generar_pdf_reporte():
     else:
         return output.encode('latin1')
 
-# --- 5. INTERFAZ MODULAR POR PESTAÑAS (6 TABS ELITE) ---
+# --- 6. INTERFAZ MODULAR POR PESTAÑAS (6 TABS ELITE) ---
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "📋 1. Resumen", 
     "🧪 2. Nutrición & Multietapa", 
@@ -565,11 +558,12 @@ with tab2:
     st.subheader("🧪 Laboratorio de Nutrición y Base de Datos de Ingredientes")
     st.markdown(
         "**Personaliza por completo los perfiles nutricionales y de minerales de tus materias primas.** "
-        "El sistema optimiza automáticamente para maximizar la GDE al menor costo posible."
+        "Los cambios realizados aquí se guardan de forma persistente durante tu sesión."
     )
     
-    df_ingredientes = st.data_editor(
-        df_base, 
+    # Editor conectado a st.session_state para evitar reinicios al cambiar sliders laterales
+    st.session_state.df_ingredientes_state = st.data_editor(
+        st.session_state.df_ingredientes_state, 
         num_rows="dynamic", 
         use_container_width=True,
         column_config={
@@ -577,7 +571,7 @@ with tab2:
             "Min Inclusión (%)": st.column_config.NumberColumn("Min (%)", min_value=0.0, max_value=100.0, step=0.5),
             "Max Inclusión (%)": st.column_config.NumberColumn("Max (%)", min_value=0.0, max_value=100.0, step=0.5),
         },
-        key="editor_ingredientes"
+        key="editor_ingredientes_persisted"
     )
 
 with tab3:
