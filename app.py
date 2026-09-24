@@ -109,7 +109,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y PLANES DE SUSCRIPCIÓN PROPORCIONALES ---
-USERS_FILE = "usuarios_ganaderia_elite_planes_proportional.json"
+USERS_FILE = "usuarios_ganaderia_elite_proportional.json"
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -182,6 +182,19 @@ if not st.session_state.authenticated:
     tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "💳 Planes Elite y Registro"])
 
     with tab_login:
+        # --- BOTÓN DE ACCESO DIRECTO EXCLUSIVO PARA EL CREADOR ---
+        st.markdown("""
+            <div style="background: #ecfdf5; padding: 14px 18px; border-radius: 12px; border: 1.5px solid #059669; margin-bottom: 20px;">
+                <p style="margin: 0 0 8px 0; font-size: 0.9rem; font-weight: 700; color: #064e3b;">👑 Acceso Rápido del Creador (Dr. Alejandro Castañeda)</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("🚀 Entrar Directamente como Creador (Dr. Alejandro)", use_container_width=True):
+            st.session_state.authenticated = True
+            st.session_state.current_user = "alejandro"
+            st.rerun()
+            
+        st.markdown("---")
         st.markdown("### Acceso a Usuarios Registrados")
         user_input = st.text_input("Nombre de Usuario", key="login_user")
         pass_input = st.text_input("Contraseña", type="password", key="login_pass")
@@ -199,7 +212,7 @@ if not st.session_state.authenticated:
                 else:
                     st.error("Tu suscripción se encuentra inactiva. Selecciona un plan y realiza el pago para renovar.")
             else:
-                st.error("Usuario or contraseña incorrectos. Verifica tus datos.")
+                st.error("Usuario o contraseña incorrectos. Verifica tus datos.")
 
     with tab_register:
         st.markdown("### 🌟 Selección de Plan Proporcional")
