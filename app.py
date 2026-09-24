@@ -122,17 +122,15 @@ df_base = pd.DataFrame(data_respaldo)
 # --- 4. CONTROLES GENERALES Y VARIABLES AGRUPADAS EN LA BARRA LATERAL ---
 st.sidebar.header("⚙️ Configuración del Sistema")
 
-with st.sidebar.expander("👥 1. Población e Inventario Inicial", expanded=True):
+with st.sidebar.expander("👥 1. Población e Inventario", expanded=True):
     cantidad_animales = st.number_input("Número de Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
-    sexo_lote = st.selectbox("Tipo / Categoría Zootécnica", ["Novillos (Castrados)", "Toros Enteros", "Vaquillas de Repasto/Engorda", "Vacas de Desecho / Finalización"])
 
 with st.sidebar.expander("⚖️ 2. Pesos y Metas de Crecimiento", expanded=True):
     peso_actual = st.slider("Peso Vivo Actual / Compra (kg)", min_value=200.0, max_value=650.0, value=250.0, step=10.0)
     peso_objetivo = st.slider("Peso de Venta / Meta (kg)", min_value=400.0, max_value=750.0, value=520.0, step=10.0)
     gde = st.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=0.8, max_value=2.2, value=1.4, step=0.1)
-    condicion_corporal = st.slider("Condición Corporal Inicial (CC 1.0 - 5.0)", min_value=1.0, max_value=5.0, value=2.5, step=0.5)
 
-with st.sidebar.expander("🧬 3. Genética, Marco y Estructura", expanded=False):
+with st.sidebar.expander("🧬 3. Genética, Sexo y Marco", expanded=False):
     raza_seleccionada = st.selectbox(
         "Predominancia Racial",
         [
@@ -143,7 +141,9 @@ with st.sidebar.expander("🧬 3. Genética, Marco y Estructura", expanded=False
             "Ganado Criollo / Local"
         ]
     )
+    sexo_lote = st.selectbox("Tipo / Categoría Zootécnica", ["Novillos (Castrados)", "Toros Enteros", "Vaquillas de Repasto/Engorda", "Vacas de Desecho / Finalización"])
     marco_lote = st.selectbox("Tamaño de Marco", ["Mediano (Standard)", "Precoz / Engrase rápido", "Grande (Continental / Retrasado)"])
+    condicion_corporal = st.slider("Condición Corporal Inicial (CC 1.0 - 5.0)", min_value=1.0, max_value=5.0, value=2.5, step=0.5)
 
 with st.sidebar.expander("🌍 4. Sistema, Clima y Entorno", expanded=False):
     sistema_produccion = st.selectbox("Sistema de Producción", ["Corral / Engorda Intensiva (Feedlot)", "Semi-estabulado (Mixto / Suplementación en Pastoreo)", "Pastoreo Extensivo (Praderas / Agostadero)"])
@@ -355,7 +355,7 @@ with tab2:
     )
     
     st.markdown(
-        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V11)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
+        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V10)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
         unsafe_allow_html=True
     )
     st.markdown("<br>", unsafe_allow_html=True)
