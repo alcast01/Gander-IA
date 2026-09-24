@@ -176,7 +176,7 @@ with st.sidebar.expander("🐄 1. Lote, Pesos y Población", expanded=True):
     if modo_gde == "Manual (Fijo)":
         gde = st.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=0.8, max_value=2.2, value=1.4, step=0.1)
     else:
-        gde = 1.6 # Valor inicial referencial antes del algoritmo de optimización dual
+        gde = 1.6
 
 with st.sidebar.expander("💰 2. Parámetros Económicos y de Mercado", expanded=False):
     precio_compra_kg = st.number_input("Compra Becerro Base (MXN/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
@@ -247,7 +247,7 @@ factor_sistema_energ = 1.10 if "Pastoreo" in sistema_produccion else (1.05 if "S
 
 if "Árido" in condiciones_pastoreo:
     factor_pastoreo_energia = 1.10
-elif "Temporal" in conditions_pastoreo if 'conditions_pastoreo' in locals() else "Temporal" in condiciones_pastoreo:
+elif "Temporal" in condiciones_pastoreo:
     factor_pastoreo_energia = 1.05
 elif "Silvopastoril" in condiciones_pastoreo:
     factor_pastoreo_energia = 1.03
@@ -267,14 +267,12 @@ else:
 factor_lodo = 1.00 if condicion_lodo == "Seco y Confortable" else (1.12 if "Moderado" in condicion_lodo else 1.25)
 cms_estimado = peso_actual * 0.024 * factor_clima * factor_thi * factor_cc * factor_sistema_cms / (factor_lodo if "Severo" in condicion_lodo else 1.0)
 
-# Algoritmo de Búsqueda del GDE Óptimo (Maximizar GDE al Mínimo Costo por kg de Ganancia)
 if modo_gde == "Automático Elite (Máxima GDE al Mínimo Costo x kg)":
     mejor_gde = 1.2
     menor_costo_kg_ganado = float('inf')
     gde_candidatos = np.arange(1.0, 2.2, 0.05)
     
     for g_test in gde_candidatos:
-        # Calcular metas temporales para g_test
         if peso_actual < 280:
             mpc = (0.135 + (g_test * 0.015)) * factor_fenologia_pc
             mneg = (0.70 + (g_test * 0.09)) * factor_sistema_energ * factor_pastoreo_energia * factor_fenologia_energ
@@ -298,8 +296,6 @@ if modo_gde == "Automático Elite (Máxima GDE al Mínimo Costo x kg)":
             costo_ton_t = res_t.fun
             costo_alim_dia = (cms_estimado / 1000.0) * costo_ton_t
             costo_por_kg = costo_alim_dia / g_test
-            # Buscamos maximizar GDE pero manteniendo el costo por kg de ganancia en niveles altamente eficientes
-            # Función de eficiencia económica dual (Penaliza costos excesivos y premia alta GDE)
             indice_eficiencia = costo_por_kg - (g_test * 150.0) 
             if indice_eficiencia < menor_costo_kg_ganado:
                 menor_costo_kg_ganado = indice_eficiencia
@@ -448,7 +444,6 @@ def generar_pdf_reporte():
     def safe_str(txt):
         return str(txt).encode('latin-1', 'replace').decode('latin-1')
 
-    # Datos Generales
     pdf.set_font('Arial', 'B', 11)
     pdf.set_text_color(15, 23, 42)
     pdf.cell(0, 8, safe_str("1. Resumen Zootecnico y Productivo"), 0, 1)
@@ -787,7 +782,7 @@ with tab5:
         return optimo, pd.DataFrame(matriz_resultados)
     
     resultado_optimo, df_simulacion = calcular_peso_optimo_financiero(
-        precio_compra_base=precio_comp_kg, 
+        precio_compra_base=precio_compra_kg, 
         precio_venta_base=precio_venta_kg,
         costo_ton_alim=costo_ton_optimizado, 
         gde_fijo=gde, 
