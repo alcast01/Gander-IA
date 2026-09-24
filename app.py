@@ -5,7 +5,7 @@ from scipy.optimize import linprog
 import plotly.express as px
 from fpdf import FPDF
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (CAMPO Y GANADERÍA) ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (LIMPIO Y ANTICAPAS) ---
 st.set_page_config(
     page_title="Ganader-IA Pro | Nutrición Bovina Inteligente",
     page_icon="🐄",
@@ -26,78 +26,53 @@ st.markdown("""
         background-color: #fcfbf9;
     }
     
+    /* Contenedores de tarjetas métricas con separación estricta para evitar empalmes */
     .stMetric {
         background-color: #ffffff;
-        padding: 18px;
+        padding: 20px 16px;
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(45, 90, 39, 0.08);
         border-left: 5px solid #2d5a27;
         border-top: 1px solid #e6e2dd;
         border-right: 1px solid #e6e2dd;
         border-bottom: 1px solid #e6e2dd;
-        transition: transform 0.2s ease;
-    }
-    .stMetric:hover {
-        transform: translateY(-2px);
+        margin-bottom: 12px;
     }
     
+    /* Encabezados con altura de línea adecuada para evitar solapamientos */
     h1, h2, h3, h4 {
         color: #1f2421;
         font-family: 'Inter', sans-serif !important;
         font-weight: 700;
+        line-height: 1.3;
     }
 
     p, span, label {
         font-family: 'Inter', sans-serif !important;
         color: #333333;
+        line-height: 1.5;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. SISTEMA DE SEGURIDAD Y CONTROL DE ACCESOS (MEMBRESÍAS / LICENCIAS) ---
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-
-if not st.session_state.authenticated:
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    col_c1, col_c2, col_c3 = st.columns([1, 2, 1])
-    with col_c2:
-        st.markdown("<h2 style='text-align: center; color: #2d5a27;'>🔐 Ganader-IA Pro</h2>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #666;'>Sistema Inteligente de Optimización y Nutrición Bovina</p>", unsafe_allow_html=True)
-        st.markdown("---")
-        
-        st.info("Introduce tu clave de licencia comercial o membresía institucional para acceder:")
-        licencia_input = st.text_input("Clave de Acceso / Licencia", type="password", placeholder="Ingresa tu clave...")
-        
-        if st.button("🚀 Entrar al Sistema", use_container_width=True):
-            admin_pwd = st.secrets.get("ADMIN_PASSWORD", "demo")
-            if licencia_input == admin_pwd or licencia_input == "GANADERIA-PRO-2026":
-                st.session_state.authenticated = True
-                st.rerun()
-            else:
-                st.error("❌ Licencia inválida o membresía expirada.")
-                
-        st.markdown("<div style='text-align: center; margin-top: 15px;'><small>🔑 <i>Usa la clave <b>demo</b> para pruebas académicas y profesionales.</i></small></div>", unsafe_allow_html=True)
-    st.stop()
-
-# --- 3. LOGOTIPO VECTORIAL CON SLOGAN DE VANGUARDIA ---
+# --- 2. LOGOTIPO VECTORIAL CON DISEÑO ANTICAPAS (FLEXIBLE) ---
 st.markdown("""
-    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #2d5a27 0%, #bc6c25 100%); padding: 25px; border-radius: 16px; box-shadow: 0 6px 20px rgba(45,90,39,0.15); margin-bottom: 25px; color: white;">
-        <div style="flex-shrink: 0; margin-right: 20px;">
+    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #2d5a27 0%, #bc6c25 100%); padding: 25px; border-radius: 16px; box-shadow: 0 6px 20px rgba(45,90,39,0.15); margin-bottom: 25px; color: white; flex-wrap: wrap; gap: 15px;">
+        <div style="flex-shrink: 0;">
             <svg width="70" height="70" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="#ffffff"/>
                 <circle cx="12" cy="12" r="3" fill="#dda15e"/>
             </svg>
         </div>
-        <div>
+        <div style="flex-grow: 1; min-width: 250px;">
             <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">PRO</span></h1>
-            <p style="margin: 5px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Plataforma de Precisión Zootécnica y Optimización de Raciones</p>
-            <p style="margin: 4px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
+            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Plataforma de Precisión Zootécnica y Optimización de Raciones</p>
+            <p style="margin: 6px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
-# --- 4. CARGA DE LA BASE DE DATOS DESDE GOOGLE SHEETS (V4) ---
+# --- 3. CARGA DE LA BASE DE DATOS DESDE GOOGLE SHEETS (V4) ---
 sheet_url = "https://docs.google.com/spreadsheets/d/1yCuTmDi1wEzdeMHoAbuxMewwo0Pe1neyjntMgAhMzhA/export?format=csv"
 
 @st.cache_data(ttl=10)
@@ -130,7 +105,7 @@ except Exception:
 
 st.caption(source_status)
 
-# --- 5. CONTROLES GENERALES Y PARÁMETROS PRODUCTIVOS EN LA BARRA LATERAL ---
+# --- 4. CONTROLES GENERALES Y PARÁMETROS PRODUCTIVOS EN LA BARRA LATERAL ---
 st.sidebar.header("⚙️ Parámetros del Lote")
 peso_actual = st.sidebar.slider("Peso Vivo Actual (kg)", min_value=200.0, max_value=450.0, value=250.0, step=10.0)
 peso_objetivo = st.sidebar.slider("Peso de Venta / Meta (kg)", min_value=450.0, max_value=600.0, value=520.0, step=10.0)
@@ -157,7 +132,6 @@ cms_estimado = peso_actual * 0.024 * factor_clima
 kg_por_ganar = max(0.0, peso_objetivo - peso_actual)
 dias_a_meta = kg_por_ganar / gde if gde > 0 else 0
 
-# Requerimientos base ajustados dinámicamente por la GDE seleccionada (a mayor GDE, mayores requerimientos nutricionales)
 if peso_actual < 300:
     fase = "Crecimiento (Becerro Ligero)"
     meta_pc_base = 0.130 + (gde * 0.015)
@@ -187,12 +161,6 @@ else:
 meta_pc_min = meta_pc_base * factor_pc
 meta_neg_min = meta_neg_base * factor_neg
 
-# Botón para cerrar sesión en barra lateral
-st.sidebar.markdown("---")
-if st.sidebar.button("🔒 Cerrar Sesión", use_container_width=True):
-    st.session_state.authenticated = False
-    st.rerun()
-
 # Créditos profesionales institucionales
 st.sidebar.markdown("---")
 st.sidebar.markdown(
@@ -204,7 +172,7 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-# --- 6. INTERFAZ MODULAR POR PESTAÑAS (3 TABS) ---
+# --- 5. INTERFAZ MODULAR POR PESTAÑAS (3 TABS) ---
 tab1, tab2, tab3 = st.tabs([
     "📋 1. Resumen y Predicciones", 
     "🧪 2. Catálogo y Lab", 
@@ -262,7 +230,7 @@ with tab2:
         key="editor_ingredientes"
     )
 
-# --- 7. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL ---
+# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL ---
 try:
     nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
     c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
