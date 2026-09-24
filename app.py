@@ -108,8 +108,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y PLANES DE SUSCRIPCIÓN COMERCIALES (+40%) ---
-USERS_FILE = "usuarios_ganaderia_elite_planes_40pc.json"
+# --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y PLANES DE SUSCRIPCIÓN COMERCIALES ---
+USERS_FILE = "usuarios_ganaderia_elite_planes_unified.json"
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -237,11 +237,10 @@ if not st.session_state.authenticated:
         
         st.markdown("")
         
-        if "Trimestral" in plan_elegido:
-            costo_str = "$3,024 MXN"
-        elif "Semestral" in plan_elegido:
-            costo_str = "$4,200 MXN"
-        else:
+        # Extracción dinámica y exacta del costo seleccionado por el cliente
+        try:
+            costo_str = plan_elegido.split("-")[1].split("|")[0].strip()
+        except Exception:
             costo_str = "$7,560 MXN"
         
         if st.button(f"💳 Pagar {costo_str} y Activar Licencia Elite", use_container_width=True):
