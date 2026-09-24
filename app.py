@@ -39,11 +39,6 @@ st.markdown("""
         color: #1a252c;
         font-weight: 700;
     }
-    
-    /* Tarjetas de información y alertas */
-    .element-container {
-        color: #2c3e50;
-    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -73,12 +68,23 @@ if not st.session_state.authenticated:
         st.markdown("<div style='text-align: center; margin-top: 15px;'><small>🔑 <i>Usa la clave <b>demo</b> para pruebas académicas.</i></small></div>", unsafe_allow_html=True)
     st.stop()
 
-# --- APLICACIÓN PRINCIPAL (POST-AUTENTICACIÓN) ---
-st.title("🐄 Ganader-IA Pro")
-st.markdown("##### Sistema Inteligente de Optimización, Costos y Predicción Nutricional Bovina")
-st.markdown("---")
+# --- 3. LOGOTIPO VECTORIAL DE VANGUARDIA (CABECERA PRINCIPAL) ---
+st.markdown("""
+    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #1b5e20 0%, #0288d1 100%); padding: 25px; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); margin-bottom: 25px; color: white;">
+        <div style="flex-shrink: 0; margin-right: 20px;">
+            <svg width="70" height="70" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="#ffffff"/>
+                <circle cx="12" cy="12" r="3" fill="#aed581"/>
+            </svg>
+        </div>
+        <div>
+            <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px;">Ganader-IA <span style="background-color: #aed581; color: #1b5e20; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">PRO</span></h1>
+            <p style="margin: 5px 0 0 0; font-size: 1.05em; color: #e0f2f1; font-weight: 300;">Sistema Inteligente de Optimización, Costos y Predicción Nutricional Bovina</p>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
 
-# --- 3. CARGA DE LA BASE DE DATOS DESDE GOOGLE SHEETS (V4) ---
+# --- 4. CARGA DE LA BASE DE DATOS DESDE GOOGLE SHEETS (V4) ---
 sheet_url = "https://docs.google.com/spreadsheets/d/1yCuTmDi1wEzdeMHoAbuxMewwo0Pe1neyjntMgAhMzhA/export?format=csv"
 
 @st.cache_data(ttl=10)
@@ -111,7 +117,7 @@ except Exception:
 
 st.caption(source_status)
 
-# --- 4. CONTROLES GENERALES Y PARÁMETROS PRODUCTIVOS EN LA BARRA LATERAL ---
+# --- 5. CONTROLES GENERALES Y PARÁMETROS PRODUCTIVOS EN LA BARRA LATERAL ---
 st.sidebar.header("⚙️ Parámetros del Lote")
 peso_actual = st.sidebar.slider("Peso Vivo Actual (kg)", min_value=200.0, max_value=450.0, value=250.0, step=10.0)
 peso_objetivo = st.sidebar.slider("Peso de Venta / Meta (kg)", min_value=450.0, max_value=600.0, value=520.0, step=10.0)
@@ -184,7 +190,7 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-# --- 5. INTERFAZ MODULAR POR PESTAÑAS (3 TABS) ---
+# --- 6. INTERFAZ MODULAR POR PESTAÑAS (3 TABS) ---
 tab1, tab2, tab3 = st.tabs([
     "📋 1. Resumen y Predicciones", 
     "🧪 2. Catálogo y Lab", 
@@ -237,7 +243,7 @@ with tab2:
         key="editor_ingredientes"
     )
 
-# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL ---
+# --- 7. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL ---
 try:
     nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
     c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
