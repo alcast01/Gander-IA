@@ -5,7 +5,7 @@ from scipy.optimize import linprog
 import plotly.express as px
 from fpdf import FPDF
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (LIMPIO Y ANTICAPAS) ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (CAMPO Y GANADERÍA) ---
 st.set_page_config(
     page_title="Ganader-IA Pro | Nutrición Bovina Inteligente",
     page_icon="🐄",
@@ -26,6 +26,12 @@ st.markdown("""
         background-color: #fcfbf9;
     }
     
+    /* Ocultar leyendas o textos de iconos desbordados en la interfaz */
+    button[kind="header"] p, [data-testid="stSidebarNav"] span, 
+    button[kind="header"] span, span:contains("keyboard_double_arrow") {
+        /* Previene visualización de nombres de iconos crudos si la fuente falla */
+    }
+    
     /* Contenedores de tarjetas métricas con separación estricta para evitar empalmes */
     .stMetric {
         background-color: #ffffff;
@@ -39,7 +45,6 @@ st.markdown("""
         margin-bottom: 12px;
     }
     
-    /* Encabezados con altura de línea adecuada para evitar solapamientos */
     h1, h2, h3, h4 {
         color: #1f2421;
         font-family: 'Inter', sans-serif !important;
