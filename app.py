@@ -11,7 +11,7 @@ import os
 import hashlib
 from datetime import datetime
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO CALIBRI ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO TIPOGRÁFICO UNIFORME (CALIBRI) ---
 st.set_page_config(
     page_title="Ganader-IA Elite 360 | Nutrición y Alta Rentabilidad",
     page_icon="🐄",
@@ -21,23 +21,26 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-    html, body, [class*="css"] {
+    /* UNIFICACIÓN GLOBAL DE FUENTE Y COLOR BASE */
+    html, body, [class*="css"], .stMarkdown, .stText, .stSelectbox, .stSlider, .stNumberInput, div, span, p, label, .stRadio {
         font-family: 'Calibri', sans-serif !important;
-        color: #1e293b;
+        color: #1e293b !important;
     }
     
     .main {
         background-color: #f8fafc;
+        font-family: 'Calibri', sans-serif !important;
     }
     
+    /* TARJETAS DE MÉTRICAS UNIFORMES */
     .stMetric {
         background: #ffffff;
-        padding: 8px 10px !important;
+        padding: 10px 12px !important;
         border-radius: 12px;
         box-shadow: 0 4px 15px -2px rgba(15, 23, 42, 0.06);
         border: 1px solid #cbd5e1;
         border-left: 4px solid #059669;
-        margin-bottom: 6px !important;
+        margin-bottom: 8px !important;
         overflow: hidden;
         transition: all 0.3s ease;
     }
@@ -49,36 +52,30 @@ st.markdown("""
     }
     
     .stMetric label {
-        font-size: 0.65rem !important;
+        font-size: 0.7rem !important;
         color: #475569 !important;
         font-weight: 700 !important;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-family: 'Calibri', sans-serif !important;
     }
     
     .stMetric [data-testid="stMetricValue"] {
-        font-size: 0.9rem !important;
+        font-size: 1rem !important;
         color: #0f172a !important;
         font-weight: 800 !important;
-        word-break: break-word;
+        font-family: 'Calibri', sans-serif !important;
     }
     
-    h1, h2, h3, h4 {
-        color: #0f172a;
+    /* ENCABEZADOS Y TÍTULOS */
+    h1, h2, h3, h4, h5, h6 {
+        color: #0f172a !important;
         font-family: 'Calibri', sans-serif !important;
-        font-weight: 700;
+        font-weight: 700 !important;
         letter-spacing: -0.5px;
     }
 
-    p, span, label {
-        font-family: 'Calibri', sans-serif !important;
-        color: #1e293b;
-        line-height: 1.6;
-    }
-    
+    /* PESTAÑAS (TABS) UNIFORMES */
     .stTabs [data-baseweb="tab-list"] {
         gap: 6px;
         background-color: #e2e8f0;
@@ -90,8 +87,8 @@ st.markdown("""
     .stTabs [data-baseweb="tab"] {
         border-radius: 8px;
         font-weight: 600;
-        color: #334155;
-        font-size: 0.85rem;
+        color: #334155 !important;
+        font-size: 0.85rem !important;
         font-family: 'Calibri', sans-serif !important;
     }
     
@@ -99,12 +96,20 @@ st.markdown("""
         background-color: #ffffff !important;
         color: #059669 !important;
         box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        font-family: 'Calibri', sans-serif !important;
+    }
+    
+    /* BOTONES */
+    .stButton button {
+        font-family: 'Calibri', sans-serif !important;
+        font-weight: 700 !important;
+        border-radius: 8px !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y PLANES DE SUSCRIPCIÓN ---
-USERS_FILE = "usuarios_ganaderia_elite_planes_valor.json"
+# --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y PLANES DE SUSCRIPCIÓN (+20%) ---
+USERS_FILE = "usuarios_ganaderia_elite_planes_uniform.json"
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -116,20 +121,19 @@ def cargar_usuarios_persistentes():
                 return json.load(f)
         except Exception:
             pass
-    # Usuarios por defecto precargados
     default_users = {
         "admin": {
             "password": hash_password("1234"),
             "email": "admin@ganaderiaelite.com",
             "subscription_active": True,
-            "plan": "Anual (12 Meses) - $7,200 MXN",
+            "plan": "Anual (12 Meses) - $5,400 MXN",
             "fecha_registro": "2026-01-01"
         },
         "alejandro": {
             "password": hash_password("elite360"),
             "email": "alejandro.castaneda@ganaderiaelite.com",
             "subscription_active": True,
-            "plan": "Anual (12 Meses) - $7,200 MXN",
+            "plan": "Anual (12 Meses) - $5,400 MXN",
             "fecha_registro": "2026-01-01"
         }
     }
@@ -204,9 +208,9 @@ if not st.session_state.authenticated:
         plan_elegido = st.radio(
             "Planes de Suscripción Elite:",
             [
-                "Trimestral (3 Meses) - $2,400 MXN ($800.00/mes)",
-                "Semestral (6 Meses) - $4,200 MXN ($700.00/mes - 12.5% Ahorro)",
-                "Anual (12 Meses) - $7,200 MXN ($600.00/mes - ⭐ MEJOR VALOR Y 25% AHORRO)"
+                "Trimestral (3 Meses) - $2,160 MXN",
+                "Semestral (6 Meses) - $3,000 MXN",
+                "Anual (12 Meses) - $5,400 MXN"
             ],
             index=2
         )
@@ -233,13 +237,12 @@ if not st.session_state.authenticated:
         
         st.markdown("")
         
-        # Extraer costo exacto
         if "Trimestral" in plan_elegido:
-            costo_str = "$2,400 MXN"
+            costo_str = "$2,160 MXN"
         elif "Semestral" in plan_elegido:
-            costo_str = "$4,200 MXN"
+            costo_str = "$3,000 MXN"
         else:
-            costo_str = "$7,200 MXN"
+            costo_str = "$5,400 MXN"
         
         if st.button(f"💳 Pagar {costo_str} y Activar Licencia Elite", use_container_width=True):
             db_usuarios = cargar_usuarios_persistentes()
@@ -253,7 +256,6 @@ if not st.session_state.authenticated:
             elif len(num_tarjeta.replace(" ", "")) < 15:
                 st.error("⚠️ Número de tarjeta inválido. Verifica los dígitos.")
             else:
-                # Guardar usuario con plan y suscripción activa
                 db_usuarios[new_user] = {
                     "password": hash_password(new_pass),
                     "email": new_email,
@@ -263,7 +265,6 @@ if not st.session_state.authenticated:
                 }
                 guardar_usuarios_persistentes(db_usuarios)
                 
-                # Simulación de notificación por correo y cobro exitoso
                 st.success(f"🎉 **¡Pago Exitoso de {costo_str} ({plan_elegido})!** Transacción aprobada.")
                 st.success(f"📧 **Notificación Enviada:** Se ha enviado un correo electrónico de confirmación de pago, comprobante fiscal y tus accesos a **{new_email}**.")
                 
@@ -272,7 +273,7 @@ if not st.session_state.authenticated:
                 st.balloons()
                 st.rerun()
 
-    st.stop() # Detiene la ejecución hasta autenticarse
+    st.stop()
 
 # --- 3. LOGOTIPO VETERINARIO Y DE CAMPO (USUARIO AUTENTICADO) ---
 db_usuarios_activos = cargar_usuarios_persistentes()
@@ -606,7 +607,6 @@ if not resultado.success:
 
 costo_ton_optimizado = resultado.fun if resultado.success else 4500.0 
 
-# Cálculos económicos integrando sanidad y variables de recepción
 consumo_total_ciclo_cab = cms_estimado * dias_a_meta
 costo_alimentacion_cab = (consumo_total_ciclo_cab / 1000.0) * costo_ton_optimizado
 costo_compra_cab = peso_actual * precio_compra_kg
@@ -750,12 +750,20 @@ with tab1:
         lista_pesos.append(peso_proy)
         lista_cms.append(round(cms_proy, 2))
     
+    # Gráfica Plotly con tipografía uniforme Calibri
     fig_comportamiento = make_subplots(specs=[[{"secondary_y": True}]])
     fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_pesos, name="Peso Proyectado (kg)", mode="lines+markers", line=dict(color="#059669", width=3.5)), secondary_y=False)
     fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_cms, name="Consumo Materia Seca (kg/día)", mode="lines+markers", line=dict(color="#d97706", width=3, dash="dash")), secondary_y=True)
-    fig_comportamiento.update_layout(title=dict(text=f"Dinámica de Engorda ({perfil_aa[:18]} | GDE: {gde} kg/d)", font=dict(family="Calibri", size=13), x=0.5), plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Calibri", color="#1e293b"), legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5), margin=dict(l=20, r=20, t=60, b=70))
-    fig_comportamiento.update_yaxes(title_text="<b>Peso Vivo del Animal (kg)</b>", secondary_y=False, color="#059669")
-    fig_comportamiento.update_yaxes(title_text="<b>Consumo de Materia Seca (kg/día)</b>", secondary_y=True, color="#d97706")
+    fig_comportamiento.update_layout(
+        title=dict(text=f"Dinámica de Engorda ({perfil_aa[:18]} | GDE: {gde} kg/d)", font=dict(family="Calibri", size=14, color="#0f172a"), x=0.5), 
+        plot_bgcolor="#ffffff", 
+        paper_bgcolor="#ffffff", 
+        font=dict(family="Calibri", size=12, color="#1e293b"), 
+        legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5, font=dict(family="Calibri", size=12)), 
+        margin=dict(l=20, r=20, t=60, b=70)
+    )
+    fig_comportamiento.update_yaxes(title_text="<b>Peso Vivo del Animal (kg)</b>", secondary_y=False, color="#059669", title_font=dict(family="Calibri", size=12))
+    fig_comportamiento.update_yaxes(title_text="<b>Consumo de Materia Seca (kg/día)</b>", secondary_y=True, color="#d97706", title_font=dict(family="Calibri", size=12))
     st.plotly_chart(fig_comportamiento, use_container_width=True)
 
 with tab2:
@@ -794,7 +802,6 @@ with tab3:
         utilidad_neta_cab = ingreso_venta_cab - costo_total_cab
         roi_cab = (utilidad_neta_cab / costo_total_cab) * 100 if costo_total_cab > 0 else 0
         
-        costo_por_kg_ganado = costo_alimentacion_cab / kg_por_ganar if kg_por_ganar > 0 else 0
         status_rentabilidad = "🟢 Rentable" if utilidad_neta_cab > 0 else "🔴 Negativo"
         
         col_ec1, col_ec2, col_ec3, col_ec4 = st.columns(4)
@@ -1008,6 +1015,7 @@ with tab5:
     
     df_pivot = df_simulacion.pivot(index="Peso Compra (kg)", columns="Peso Venta (kg)", values="Utilidad Neta (MXN)")
     
+    # Mapa de calor con tipografía unificada Calibri
     fig_heat = px.imshow(
         df_pivot, 
         labels=dict(x="Peso Venta al Mercado (kg)", y="Peso Compra del Becerro (kg)", color="Utilidad ($)"),
@@ -1018,9 +1026,10 @@ with tab5:
     )
     
     fig_heat.update_layout(
-        font=dict(family="Calibri", color="#1e293b"),
+        font=dict(family="Calibri", size=12, color="#1e293b"),
         plot_bgcolor="#ffffff", 
-        paper_bgcolor="#ffffff"
+        paper_bgcolor="#ffffff",
+        title=dict(font=dict(family="Calibri", size=14, color="#0f172a"))
     )
     
     st.plotly_chart(fig_heat, use_container_width=True)
