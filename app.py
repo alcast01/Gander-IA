@@ -7,9 +7,9 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from fpdf import FPDF
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL COMPACTO ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO VANGUARDISTA ---
 st.set_page_config(
-    page_title="Ganader-IA Elite 360 | Nutrición, Economía y Control Mensual",
+    page_title="Ganader-IA Elite 360 | Nutrición y Alta Rentabilidad",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -17,71 +17,76 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif !important;
-        color: #2b2d42;
+        color: #1f2421;
     }
     
     .main {
-        background-color: #fcfbf9;
+        background-color: #f8f6f0;
     }
     
-    /* Métricas ultra compactas para evitar cortes */
+    /* Tarjetas de Métricas de Alta Conversión */
     .stMetric {
-        background-color: #ffffff;
-        padding: 6px 8px !important;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(45, 90, 39, 0.05);
-        border-left: 3px solid #2d5a27;
-        border-top: 1px solid #e6e2dd;
-        border-right: 1px solid #e6e2dd;
-        border-bottom: 1px solid #e6e2dd;
-        margin-bottom: 6px !important;
+        background: linear-gradient(145deg, #ffffff 0%, #fcfbf9 100%);
+        padding: 10px 14px !important;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(45, 90, 39, 0.07);
+        border-left: 4px solid #2d5a27;
+        border-top: 1px solid #eae5df;
+        border-right: 1px solid #eae5df;
+        border-bottom: 1px solid #eae5df;
+        margin-bottom: 8px !important;
+        transition: transform 0.2s ease;
+    }
+    
+    .stMetric:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(45, 90, 39, 0.12);
     }
     
     .stMetric label {
-        font-size: 0.68rem !important;
-        color: #666666 !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
+        font-size: 0.72rem !important;
+        color: #555555 !important;
+        font-weight: 600 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
     .stMetric [data-testid="stMetricValue"] {
-        font-size: 0.95rem !important;
+        font-size: 1.1rem !important;
         color: #1f2421 !important;
-        font-weight: 700 !important;
+        font-weight: 800 !important;
     }
     
     h1, h2, h3, h4 {
         color: #1f2421;
         font-family: 'Inter', sans-serif !important;
         font-weight: 700;
-        line-height: 1.2;
     }
 
     p, span, label {
         font-family: 'Inter', sans-serif !important;
         color: #333333;
-        line-height: 1.4;
+        line-height: 1.5;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. LOGOTIPO VECTORIAL INSTITUCIONAL ---
+# --- 2. LOGOTIPO Y ENCABEZADO COMERCIAL DE ALTO IMPACTO ---
 st.markdown("""
-    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #2d5a27 0%, #bc6c25 100%); padding: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(45,90,39,0.15); margin-bottom: 15px; color: white; flex-wrap: wrap; gap: 10px;">
-        <div style="flex-shrink: 0;">
-            <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #1b4332 0%, #2d5a27 50%, #bc6c25 100%); padding: 22px; border-radius: 16px; box-shadow: 0 8px 25px rgba(27,67,50,0.25); margin-bottom: 20px; color: white; flex-wrap: wrap; gap: 15px;">
+        <div style="flex-shrink: 0; background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 12px; backdrop-filter: blur(5px);">
+            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="#ffffff"/>
                 <circle cx="12" cy="12" r="3" fill="#dda15e"/>
             </svg>
         </div>
-        <div style="flex-grow: 1; min-width: 200px;">
-            <h1 style="margin: 0; font-size: 1.5em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 6px; border-radius: 4px; font-size: 0.55em; vertical-align: middle;">ELITE 360</span></h1>
-            <p style="margin: 2px 0 0 0; font-size: 0.85em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización, Control Mensual (30 Días) y Sostenibilidad</p>
+        <div style="flex-grow: 1; min-width: 220px;">
+            <h1 style="margin: 0; font-size: 1.85em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.55em; vertical-align: middle; font-weight: 800;">ELITE 360</span></h1>
+            <p style="margin: 4px 0 0 0; font-size: 0.9em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Plataforma SaaS de Precisión Nutricional, Economía y Sostenibilidad Pecuaria</p>
         </div>
     </div>
 """, unsafe_allow_html=True)
@@ -119,7 +124,7 @@ data_respaldo = {
 }
 df_base = pd.DataFrame(data_respaldo)
 
-# --- 4. BARRA LATERAL ORGANIZADA EN MENÚS DESPLEGABLES (EXPANDERS) ---
+# --- 4. BARRA LATERAL ORGANIZADA EN MENÚS DESPLEGABLES ---
 st.sidebar.markdown("### 🎛️ Panel de Control Elite")
 
 with st.sidebar.expander("📅 Etapas y Control Mensual (30 Días)", expanded=True):
@@ -135,7 +140,6 @@ with st.sidebar.expander("📅 Etapas y Control Mensual (30 Días)", expanded=Tr
             "Mes 6+ - Cierre y Venta (502 - 520+ kg)"
         ]
     )
-    # Asignación automática de peso sugerido según el mes seleccionado
     pesos_sugeridos = {
         "Mes 0": 250.0, "Mes 1": 292.0, "Mes 2": 334.0, 
         "Mes 3": 376.0, "Mes 4": 418.0, "Mes 5": 460.0, "Mes 6+": 502.0
@@ -355,7 +359,7 @@ with tab2:
     )
     
     st.markdown(
-        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V11)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
+        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V12)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
         unsafe_allow_html=True
     )
     st.markdown("<br>", unsafe_allow_html=True)
@@ -676,7 +680,7 @@ with tab4:
         st.markdown("---")
         st.subheader("🥧 Composición Porcentual de la Dieta por Categoría")
         df_pie = pd.DataFrame(list(categorias_pie.items()), columns=["Categoría", "Porcentaje"])
-        colores_campo = ['#2d5a27', '#bc6c25', '#dda15e', '#606c38', '#283618', '#e76f51']
+        colores_campo = ['#1b4332', '#2d5a27', '#bc6c25', '#dda15e', '#606c38', '#e76f51']
         fig_pie = px.pie(df_pie, names="Categoría", values="Porcentaje", hole=0.4, title="Distribución de Insumos Seleccionados en la Mezcla", color_discrete_sequence=colores_campo)
         fig_pie.update_layout(font=dict(family="Inter", color="#2b2d42"))
         st.plotly_chart(fig_pie, use_container_width=True)
