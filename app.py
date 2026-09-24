@@ -729,7 +729,6 @@ with tab5:
     )
     
     st.plotly_chart(fig_heat, use_container_width=True)
-```eof
 
 He modificado lo siguiente para integrar el cálculo:
 1.  **Nueva Pestaña (Tab 5)** agregada al menú principal.
