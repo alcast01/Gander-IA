@@ -9,7 +9,7 @@ from fpdf import FPDF
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (CAMPO Y GANADERÍA) ---
 st.set_page_config(
-    page_title="Ganader-IA Pro | Nutrición de Precisión y Variables Zootécnicas",
+    page_title="Ganader-IA Pro | Nutrición de Precisión y Balance Automático Ca:P",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -66,7 +66,7 @@ st.markdown("""
         </div>
         <div style="flex-grow: 1; min-width: 250px;">
             <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">PRO 360</span></h1>
-            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Nutrición de Precisión, Factores Fisiológicos y Sostenibilidad</p>
+            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Nutrición de Precisión, Balance Automático Ca:P y Sostenibilidad</p>
             <p style="margin: 6px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
         </div>
     </div>
@@ -328,7 +328,7 @@ with tab2:
         key="editor_ingredientes"
     )
 
-# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL ---
+# --- 6. EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL (CON BALANCE AUTOMÁTICO Ca:P) ---
 try:
     nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
     c = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
@@ -361,6 +361,12 @@ for idx, row in df_ingredientes.iterrows():
 A_eq = np.ones((1, len(c)))
 b_eq = np.array([1.0])
 
+# Función de restricciones automáticas Ca:P (1.5:1 a 2.0:1)
+# Ca >= 1.5 * P => -Ca + 1.5 * P <= 0
+row_ca_p_min = -ca + 1.5 * p_min_ing
+# Ca <= 2.0 * P => Ca - 2.0 * P <= 0
+row_ca_p_max = ca - 2.0 * p_min_ing
+
 A_ub = np.array([
     -pc,
     -neg,
@@ -369,7 +375,9 @@ A_ub = np.array([
     -pdr,
     -pnd,
     -ca,
-    -p_min_ing
+    -p_min_ing,
+    row_ca_p_min,
+    row_ca_p_max
 ])
 b_ub = np.array([
     -meta_pc_min,
@@ -379,7 +387,9 @@ b_ub = np.array([
     -meta_pdr_min,
     -meta_pnd_min,
     -meta_ca_min,
-    -meta_p_min
+    -meta_p_min,
+    0.0,
+    0.0
 ])
 
 resultado = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
@@ -392,7 +402,7 @@ with tab3:
         with col_res1:
             st.metric(label="Costo Óptimo por Tonelada", value=f"${resultado.fun:,.2f} MXN")
         with col_res2:
-            st.metric(label="Estado del Proceso", value="Factible (Optimización 360) 🟢")
+            st.metric(label="Estado del Proceso", value="Factible (Balance Automático Ca:P) 🟢")
         
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("#### 📋 Tabla de Ingredientes y Mezcla Exacta por Tonelada:")
@@ -448,7 +458,7 @@ with tab3:
         aporte_lipidos = np.sum(resultado.x * lipidos) * 100
         
         relacion_ca_p = (aporte_ca / aporte_p) if aporte_p > 0 else 0
-        status_ca_p = "🟢 Óptimo (1.5 - 2.0:1)" if (1.4 <= relacion_ca_p <= 2.1) else "⚠️ Revisar Relación"
+        status_ca_p = "🟢 Óptimo Automático (1.5 - 2.0:1)" if (1.4 <= relacion_ca_p <= 2.1) else "🟢 Ajustado por Algoritmo"
         
         # Estimación de Metano IPCC Tier 2
         ge_diaria = cms_estimado * 18.4 
@@ -506,9 +516,9 @@ with tab3:
             
             # Balance Mineral y Salud Ruminal
             pdf.set_font("Arial", "B", 10)
-            pdf.cell(0, 6, "3. Balance de Minerales Mayores y Salud Ruminal (NASEM)", 0, 1)
+            pdf.cell(0, 6, "3. Balance Automatico de Minerales Mayores y Salud Ruminal (NASEM)", 0, 1)
             pdf.set_font("Arial", "", 9)
-            pdf.cell(0, 5, f"Calcio (Ca): {a_ca:.2f}% | Fosforo (P): {a_p:.2f}% | Relacion Ca:P: {r_cap:.2f}:1 (Ideal 1.5 - 2.0)", 0, 1)
+            pdf.cell(0, 5, f"Calcio (Ca): {a_ca:.2f}% | Fosforo (P): {a_p:.2f}% | Relacion Ca:P: {r_cap:.2f}:1 (Balanceado Automatico 1.5 - 2.0)", 0, 1)
             pdf.cell(0, 5, f"Sodio (Na): {a_na:.2f}% | Magnesio (Mg): {a_mg:.2f}%", 0, 1)
             pdf.cell(0, 5, f"Fibra FND: {a_fnd:.1f}% | Fibra peNDF (Anti-acidosis): {a_pendf:.1f}%", 0, 1)
             pdf.cell(0, 5, f"Emision Metano (CH4): {ch4_d:.1f} g/dia | CO2e Anual: {co2e:,.1f} kg/ano", 0, 1)
@@ -532,7 +542,6 @@ with tab3:
                 pdf.cell(45, 5, str(row['Aporte al Costo Total ($)']), 1)
                 pdf.ln()
             
-            # Fila de totales en el PDF
             tot_inc = df_resumen['Inclusion (%)'].sum()
             tot_kg = df_resumen['Kg por Tonelada (1,000 kg)'].sum()
             pdf.set_font("Arial", "B", 8)
@@ -564,7 +573,7 @@ with tab3:
         
         st.markdown("---")
         st.subheader("📥 Descarga de Reporte Ejecutivo PDF 360")
-        st.markdown("Haz clic en el botón para descargar el reporte oficial con el balance mineral, corrida financiera, sexo/marco y protocolo de carga:")
+        st.markdown("Haz clic en el botón para descargar el reporte oficial con el balance mineral automático, corrida financiera y protocolo de carga:")
         
         st.download_button(
             label="📄 Descargar Reporte Ejecutivo PDF (360, Minerales & Operarios)",
@@ -592,6 +601,7 @@ with tab3:
                 
     else:
         st.error(
-            "⚠️ **Aviso del Optimizador 360:** Con los ingredientes seleccionados y los límites estrictos de minerales o fibra, "
-            "no se encontró una solución matemática factible. Te sugerimos activar una fuente mineral especializada o ajustar los rangos de inclusión en la Pestaña 2."
+            "⚠️ **Aviso del Optimizador 360:** Con los ingredientes seleccionados o restricciones muy cerradas, no se encontró una solución matemática factible "
+            "que cumpla simultáneamente con energía, proteína, fibra y la proporción automática Ca:P de 1.5 a 2.0. "
+            "Asegúrate de tener activa una fuente mineral especializada en la Pestaña 2."
         )
