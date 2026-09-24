@@ -171,7 +171,12 @@ with st.sidebar.expander("🐄 1. Lote, Pesos y Población", expanded=True):
     cantidad_animales = st.number_input("Número de Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
     peso_actual = st.slider("Peso Actual / Compra (kg)", min_value=200.0, max_value=650.0, value=250.0, step=10.0)
     peso_objetivo = st.slider("Peso de Venta / Meta (kg)", min_value=400.0, max_value=750.0, value=520.0, step=10.0)
-    gde = st.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=0.8, max_value=2.2, value=1.4, step=0.1)
+    
+    modo_gde = st.selectbox("Modo de Optimización GDE", ["Manual (Fijo)", "Automático Elite (Máxima GDE al Mínimo Costo x kg)"])
+    if modo_gde == "Manual (Fijo)":
+        gde = st.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=0.8, max_value=2.2, value=1.4, step=0.1)
+    else:
+        gde = 1.6 # Valor inicial referencial antes del algoritmo de optimización dual
 
 with st.sidebar.expander("💰 2. Parámetros Económicos y de Mercado", expanded=False):
     precio_compra_kg = st.number_input("Compra Becerro Base (MXN/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
@@ -199,7 +204,39 @@ with st.sidebar.expander("🌡️ 5. Variables Avanzadas y JDS", expanded=False)
     promotor_crecimiento = st.selectbox("Promotores Crecimiento", ["Ninguno", "Implante Hormonal", "Agonista β-adrenérgico (Finalización)"])
     condicion_lodo = st.selectbox("Condición de Corral / Lodo", ["Seco y Confortable", "Lodo Moderado (10-15 cm)", "Lodo Severo (>20 cm)"])
 
-# --- MODELADO PREDICTIVO BIOLÓGICO AVANZADO ---
+# --- EXTRACCIÓN DE DATOS Y BOUNDS ---
+try:
+    nombres = df_base["Nombre del Ingrediente"].astype(str).values
+    c = df_base["Precio Estimado (MXN/ton)"].astype(float).values
+    pc = df_base["Proteina Cruda (PC % MS)"].astype(float).values / 100.0  
+    neg = df_base["NEg (Mcal/kg)"].astype(float).values
+    fnd = df_base["FND (% MS)"].astype(float).values / 100.0
+    pendf = df_base["peNDF (% MS)"].astype(float).values / 100.0
+    pdr = df_base["PDR (% MS)"].astype(float).values / 100.0
+    pnd = df_base["PND (% MS)"].astype(float).values / 100.0
+    ca = df_base["Calcio (Ca %)"].astype(float).values / 100.0
+    p_min_ing = df_base["Fosforo (P %)"].astype(float).values / 100.0
+    na = df_base["Sodio (Na %)"].astype(float).values / 100.0
+    mg = df_base["Magnesio (Mg %)"].astype(float).values / 100.0
+    lipidos = df_base["Lípidos / Extracto Etéreo (%)"].astype(float).values / 100.0
+    disponibles = df_base["Disponible"].astype(bool).values
+except KeyError as err:
+    st.error(f"Falta una columna clave en la tabla: {err}.")
+    st.stop()
+
+bounds = []
+for idx, row in df_base.iterrows():
+    if not row["Disponible"]:
+        bounds.append((0.0, 0.0))
+    else:
+        min_lim = max(0.0, float(row["Min Inclusión (%)"]) / 100.0)
+        max_lim = min(1.0, float(row["Max Inclusión (%)"]) / 100.0)
+        bounds.append((min_lim, max_lim))
+
+A_eq = np.ones((1, len(c)))
+b_eq = np.array([1.0])
+
+# --- MODELADO PREDICTIVO Y OPTIMIZACIÓN DUAL GDE ---
 factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
 factor_thi = 0.93 if "Moderado" in nivel_thi else (0.83 if "Severo" in nivel_thi else 1.00)
 factor_cc = 1.06 if condicion_corporal < 3.0 else 1.00 
@@ -210,7 +247,7 @@ factor_sistema_energ = 1.10 if "Pastoreo" in sistema_produccion else (1.05 if "S
 
 if "Árido" in condiciones_pastoreo:
     factor_pastoreo_energia = 1.10
-elif "Temporal" in condiciones_pastoreo:
+elif "Temporal" in conditions_pastoreo if 'conditions_pastoreo' in locals() else "Temporal" in condiciones_pastoreo:
     factor_pastoreo_energia = 1.05
 elif "Silvopastoril" in condiciones_pastoreo:
     factor_pastoreo_energia = 1.03
@@ -229,6 +266,45 @@ else:
 
 factor_lodo = 1.00 if condicion_lodo == "Seco y Confortable" else (1.12 if "Moderado" in condicion_lodo else 1.25)
 cms_estimado = peso_actual * 0.024 * factor_clima * factor_thi * factor_cc * factor_sistema_cms / (factor_lodo if "Severo" in condicion_lodo else 1.0)
+
+# Algoritmo de Búsqueda del GDE Óptimo (Maximizar GDE al Mínimo Costo por kg de Ganancia)
+if modo_gde == "Automático Elite (Máxima GDE al Mínimo Costo x kg)":
+    mejor_gde = 1.2
+    menor_costo_kg_ganado = float('inf')
+    gde_candidatos = np.arange(1.0, 2.2, 0.05)
+    
+    for g_test in gde_candidatos:
+        # Calcular metas temporales para g_test
+        if peso_actual < 280:
+            mpc = (0.135 + (g_test * 0.015)) * factor_fenologia_pc
+            mneg = (0.70 + (g_test * 0.09)) * factor_sistema_energ * factor_pastoreo_energia * factor_fenologia_energ
+        elif peso_actual < 380:
+            mpc = (0.125 + (g_test * 0.015)) * factor_fenologia_pc
+            mneg = (0.80 + (g_test * 0.09)) * factor_sistema_energ * factor_pastoreo_energia * factor_fenologia_energ
+        elif peso_actual < 460:
+            mpc = (0.115 + (g_test * 0.015)) * factor_fenologia_pc
+            mneg = (0.90 + (g_test * 0.09)) * factor_sistema_energ * factor_pastoreo_energia * factor_fenologia_energ
+        else:
+            mpc = (0.105 + (g_test * 0.015)) * factor_fenologia_pc
+            mneg = (1.00 + (g_test * 0.10)) * factor_sistema_energ * factor_pastoreo_energia * factor_fenologia_energ
+            
+        row_cp_min = -ca + 1.5 * p_min_ing
+        row_cp_max = ca - 2.0 * p_min_ing
+        A_ub_t = np.array([-pc * 1.0, -neg * 1.0, -fnd * 1.0, -pendf * 1.0, -ca, -p_min_ing, row_cp_min, row_cp_max])
+        b_ub_t = np.array([-mpc, -mneg, -0.27, -0.19, -0.0045, -0.0028, 0.0, 0.0])
+        
+        res_t = linprog(c, A_ub=A_ub_t, b_ub=b_ub_t, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
+        if res_t.success:
+            costo_ton_t = res_t.fun
+            costo_alim_dia = (cms_estimado / 1000.0) * costo_ton_t
+            costo_por_kg = costo_alim_dia / g_test
+            # Buscamos maximizar GDE pero manteniendo el costo por kg de ganancia en niveles altamente eficientes
+            # Función de eficiencia económica dual (Penaliza costos excesivos y premia alta GDE)
+            indice_eficiencia = costo_por_kg - (g_test * 150.0) 
+            if indice_eficiencia < menor_costo_kg_ganado:
+                menor_costo_kg_ganado = indice_eficiencia
+                mejor_gde = g_test
+    gde = round(float(mejor_gde), 2)
 
 kg_por_ganar = max(0.0, peso_objetivo - peso_actual)
 dias_a_meta = kg_por_ganar / gde if gde > 0 else 0
@@ -313,38 +389,7 @@ factor_compensatorio = 0.93 if "Compensatorio" in historial_nutricional else 1.0
 meta_pc_min = meta_pc_base * factor_pc * factor_sexo_pc * factor_promotor
 meta_neg_min = meta_neg_base * factor_neg * factor_sexo_neg * factor_marco * factor_lodo * factor_compensatorio
 
-# --- EXTRACCIÓN Y MOTOR DE PROGRAMACIÓN LINEAL ---
-try:
-    nombres = df_base["Nombre del Ingrediente"].astype(str).values
-    c = df_base["Precio Estimado (MXN/ton)"].astype(float).values
-    pc = df_base["Proteina Cruda (PC % MS)"].astype(float).values / 100.0  
-    neg = df_base["NEg (Mcal/kg)"].astype(float).values
-    fnd = df_base["FND (% MS)"].astype(float).values / 100.0
-    pendf = df_base["peNDF (% MS)"].astype(float).values / 100.0
-    pdr = df_base["PDR (% MS)"].astype(float).values / 100.0
-    pnd = df_base["PND (% MS)"].astype(float).values / 100.0
-    ca = df_base["Calcio (Ca %)"].astype(float).values / 100.0
-    p_min_ing = df_base["Fosforo (P %)"].astype(float).values / 100.0
-    na = df_base["Sodio (Na %)"].astype(float).values / 100.0
-    mg = df_base["Magnesio (Mg %)"].astype(float).values / 100.0
-    lipidos = df_base["Lípidos / Extracto Etéreo (%)"].astype(float).values / 100.0
-    disponibles = df_base["Disponible"].astype(bool).values
-except KeyError as err:
-    st.error(f"Falta una columna clave en la tabla: {err}.")
-    st.stop()
-
-bounds = []
-for idx, row in df_base.iterrows():
-    if not row["Disponible"]:
-        bounds.append((0.0, 0.0))
-    else:
-        min_lim = max(0.0, float(row["Min Inclusión (%)"]) / 100.0)
-        max_lim = min(1.0, float(row["Max Inclusión (%)"]) / 100.0)
-        bounds.append((min_lim, max_lim))
-
-A_eq = np.ones((1, len(c)))
-b_eq = np.array([1.0])
-
+# --- EJECUCIÓN DEL MOTOR LINEAL FINAL ---
 resultado = None
 modo_tolerancia_activo = False
 
@@ -525,7 +570,7 @@ with tab2:
     st.subheader("🧪 Laboratorio de Nutrición y Base de Datos de Ingredientes")
     st.markdown(
         "**Personaliza por completo los perfiles nutricionales y de minerales de tus materias primas.** "
-        "Sin restricciones mínimas forzadas para garantizar el **costo mínimo absoluto** en la optimización lineal."
+        "El sistema optimiza automáticamente para maximizar la GDE al menor costo posible."
     )
     
     df_ingredientes = st.data_editor(
@@ -539,43 +584,6 @@ with tab2:
         },
         key="editor_ingredientes"
     )
-    
-    st.markdown("---")
-    st.subheader("⚖️ Estrategia Comparativa: ¿1 Dieta Única vs. Sistema Multietapa (3 Fases)?")
-    st.markdown(
-        "Fisiológica y económicamente, utilizar **3 o más dietas** a lo largo de la engorda optimiza drásticamente los costos "
-        "al reducir ingredientes caros (como la proteína) cuando el animal ya no los requiere, evitando desperdicios metabólicos. "
-        "A continuación se comparan los requerimientos y costos teóricos de las 3 fases clave:"
-    )
-    
-    # Función auxiliar para calcular costo de una fase específica
-    def resolver_fase_multietapa(pc_req, neg_req, fnd_req, pendf_req):
-        m_pc = pc_req * factor_pc
-        m_neg = neg_req * factor_neg
-        m_fnd = fnd_req
-        m_pendf = pendf_req
-        
-        row_cp_min = -ca + 1.5 * p_min_ing
-        row_cp_max = ca - 2.0 * p_min_ing
-        A_f = np.array([-pc, -neg, -fnd, -pendf, -ca, -p_min_ing, row_cp_min, row_cp_max])
-        b_f = np.array([-m_pc, -m_neg, -m_fnd, -m_pendf, -0.0045, -0.0028, 0.0, 0.0])
-        res_f = linprog(c, A_ub=A_f, b_ub=b_f, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
-        return res_f.fun if res_f.success else 0.0, res_f.success
-
-    costo_f1, ok_f1 = resolver_fase_multietapa(0.140, 0.75, 0.32, 0.24)
-    costo_f2, ok_f2 = resolver_fase_multietapa(0.120, 0.88, 0.29, 0.21)
-    costo_f3, ok_f3 = resolver_fase_multietapa(0.105, 1.05, 0.25, 0.18)
-    
-    col_mULT1, col_mULT2, col_mULT3 = st.columns(3)
-    with col_mULT1:
-        st.metric("Fase 1: Recepción (200-300kg)", f"${costo_f1:,.2f} /ton" if ok_f1 else "N/A")
-        st.caption("Alta proteína (14%), fibra efectiva alta y protección ruminal.")
-    with col_mULT2:
-        st.metric("Fase 2: Crecimiento (300-400kg)", f"${costo_f2:,.2f} /ton" if ok_f2 else "N/A")
-        st.caption("Proteína intermedia (12%), mayor energía neta de ganancia.")
-    with col_mULT3:
-        st.metric("Fase 3: Finalización (>400kg)", f"${costo_f3:,.2f} /ton" if ok_f3 else "N/A")
-        st.caption("Proteína optimizada (10.5%), máxima densidad energética ($NE_g$).")
 
 with tab3:
     st.subheader("📊 Evaluación Económica Financiera y Rentabilidad del Negocio")
@@ -615,8 +623,6 @@ with tab3:
         st.markdown("#### 📋 Desglose Analítico de Costos de Producción por Tonelada de Alimento:")
         
         tabla_mezcla = []
-        categorias_pie = {}
-        
         for i, ingrediente in enumerate(nombres):
             fraccion = resultado.x[i]
             porcentaje = fraccion * 100
@@ -729,7 +735,7 @@ with tab5:
         **Encuentra el punto exacto de rentabilidad máxima.**
     """)
     
-    st.info(f"**Variables base en uso:** Costo de Alimento: **${costo_ton_optimizado:,.2f}/ton** | GDE Fijo: **{gde} kg/día** | Gastos Fijos (Sanidad + M.O.): **${costo_sanidad_fijo + costo_mano_obra_fijo:,.0f}/cab**")
+    st.info(f"**Variables base en uso:** Costo de Alimento: **${costo_ton_optimizado:,.2f}/ton** | GDE Optimizado: **{gde} kg/día** | Gastos Fijos (Sanidad + M.O.): **${costo_sanidad_fijo + costo_mano_obra_fijo:,.0f}/cab**")
     
     def calcular_peso_optimo_financiero(precio_compra_base, precio_venta_base, costo_ton_alim, gde_fijo, costo_fijos):
         pesos_compra = range(200, 360, 10)
@@ -781,7 +787,7 @@ with tab5:
         return optimo, pd.DataFrame(matriz_resultados)
     
     resultado_optimo, df_simulacion = calcular_peso_optimo_financiero(
-        precio_compra_base=precio_compra_kg, 
+        precio_compra_base=precio_comp_kg, 
         precio_venta_base=precio_venta_kg,
         costo_ton_alim=costo_ton_optimizado, 
         gde_fijo=gde, 
