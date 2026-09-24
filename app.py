@@ -66,7 +66,7 @@ st.markdown("""
         </div>
         <div style="flex-grow: 1; min-width: 250px;">
             <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">ELITE 360</span></h1>
-            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización Máxima de Costos, Auto-Recuperación y Sostenibilidad</p>
+            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización Máxima de Costos, THI, Condición Corporal y Sostenibilidad</p>
             <p style="margin: 6px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
         </div>
     </div>
@@ -108,9 +108,9 @@ df_base = pd.DataFrame(data_respaldo)
 # --- 4. CONTROLES GENERALES Y VARIABLES AVANZADAS EN LA BARRA LATERAL ---
 st.sidebar.header("⚙️ Parámetros del Lote y Población")
 cantidad_animales = st.sidebar.number_input("Número de Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
-peso_actual = st.sidebar.slider("Peso Vivo Actual (kg)", min_value=200.0, max_value=450.0, value=250.0, step=10.0)
-peso_objetivo = st.sidebar.slider("Peso de Venta / Meta (kg)", min_value=450.0, max_value=600.0, value=520.0, step=10.0)
-gde = st.sidebar.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=1.0, max_value=2.0, value=1.4, step=0.1)
+peso_actual = st.sidebar.slider("Peso Vivo Actual (kg)", min_value=200.0, max_value=650.0, value=250.0, step=10.0)
+peso_objetivo = st.sidebar.slider("Peso de Venta / Meta (kg)", min_value=400.0, max_value=750.0, value=520.0, step=10.0)
+gde = st.sidebar.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=0.8, max_value=2.2, value=1.4, step=0.1)
 estacion = st.sidebar.selectbox("Temporada / Clima", ["Templado", "Invierno", "Verano"])
 
 st.sidebar.markdown("---")
@@ -125,23 +125,31 @@ raza_seleccionada = st.sidebar.selectbox(
         "Ganado Criollo / Local"
     ]
 )
-sexo_lote = st.sidebar.selectbox("Tipo Sexual", ["Novillos (Castrados)", "Toros Enteros", "Vaquillas"])
+sexo_lote = st.sidebar.selectbox("Tipo / Categoría Zootécnica", ["Novillos (Castrados)", "Toros Enteros", "Vaquillas de Repasto/Engorda", "Vacas de Desecho / Finalización"])
 marco_lote = st.sidebar.selectbox("Tamaño de Marco", ["Mediano (Standard)", "Pequeño (Precoz / Engrase rápido)", "Grande (Continental / Retrasado)"])
+
+st.sidebar.markdown("---")
+st.sidebar.header("🌡️ Variables Avanzadas (CC, THI & Aditivos)")
+condicion_corporal = st.sidebar.slider("Condición Corporal Inicial (CC 1.0 - 5.0)", min_value=1.0, max_value=5.0, value=2.5, step=0.5)
+nivel_thi = st.sidebar.selectbox("Estrés Térmico Ambiental (THI)", ["Confort Térmico (< 74)", "Estrés Moderado (74-78)", "Estrés Severo (> 78)"])
+aditivo_ruminal = st.sidebar.selectbox("Modificadores / Aditivos Zootécnicos", ["Ninguno", "Ionóforos (Monensina / Lasalocid)", "Buffer (Bicarbonato / Óxido Mg)", "Ambos (Ionóforo + Buffer)"])
 historial_nutricional = st.sidebar.selectbox("Historial Nutricional", ["Desarrollo Continuo (Normal)", "Crecimiento Compensatorio (Post-restricción)"])
 promotor_crecimiento = st.sidebar.selectbox("Promotores de Crecimiento", ["Ninguno", "Implante Hormonal", "Agonista β-adrenérgico (Finalización)"])
 condicion_lodo = st.sidebar.selectbox("Condición de Corral / Lodo", ["Seco y Confortable", "Lodo Moderado (10-15 cm)", "Lodo Severo (>20 cm)"])
 
 # --- MODELADO PREDICTIVO BIOLÓGICO AVANZADO ---
 factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
+factor_thi = 0.93 if "Moderado" in nivel_thi else (0.83 if "Severo" in nivel_thi else 1.00)
+factor_cc = 1.06 if condicion_corporal < 3.0 else 1.00 # Bono de eficiencia por crecimiento compensatorio en animales magros
 
 factor_lodo = 1.00 if condicion_lodo == "Seco y Confortable" else (1.12 if "Moderado" in condicion_lodo else 1.25)
-cms_estimado = peso_actual * 0.024 * factor_clima / (factor_lodo if "Severo" in condicion_lodo else 1.0)
+cms_estimado = peso_actual * 0.024 * factor_clima * factor_thi * factor_cc / (factor_lodo if "Severo" in condicion_lodo else 1.0)
 
 kg_por_ganar = max(0.0, peso_objetivo - peso_actual)
 dias_a_meta = kg_por_ganar / gde if gde > 0 else 0
 
 if peso_actual < 300:
-    fase = "Crecimiento (Becerro Ligero)"
+    fase = "Crecimiento (Becerro / Repasto)"
     meta_pc_base = 0.130 + (gde * 0.015)
     meta_neg_base = 0.75 + (gde * 0.09)
     meta_fnd_min = 0.30
@@ -150,7 +158,7 @@ if peso_actual < 300:
     meta_pnd_min = 0.045
     meta_ca_min = 0.0055
     meta_p_min = 0.0035
-elif peso_actual < 380:
+elif peso_actual < 400:
     fase = "Desarrollo / Transición"
     meta_pc_base = 0.120 + (gde * 0.015)
     meta_neg_base = 0.85 + (gde * 0.09)
@@ -161,7 +169,7 @@ elif peso_actual < 380:
     meta_ca_min = 0.0050
     meta_p_min = 0.0030
 else:
-    fase = "Finalización (Engorda Pesada)"
+    fase = "Finalización (Engorda Pesada / Vacas)"
     meta_pc_base = 0.105 + (gde * 0.015)
     meta_neg_base = 1.00 + (gde * 0.10)
     meta_fnd_min = 0.25
@@ -184,12 +192,15 @@ else:
     factor_pc = 1.00
     factor_neg = 1.00
 
-if sexo_lote == "Toros Enteros":
+if "Toros" in sexo_lote:
     factor_sexo_pc = 1.08
     factor_sexo_neg = 1.04
-elif sexo_lote == "Vaquillas":
+elif "Vaquillas" in sexo_lote:
     factor_sexo_pc = 0.96
     factor_sexo_neg = 1.06
+elif "Vacas" in sexo_lote:
+    factor_sexo_pc = 0.94
+    factor_sexo_neg = 1.02
 else:
     factor_sexo_pc = 1.00
     factor_sexo_neg = 1.00
@@ -253,7 +264,7 @@ with tab1:
     for i in range(semanas + 1):
         dias_transcurridos = i * 7
         peso_proy = min(peso_objetivo, peso_actual + (dias_transcurridos * gde))
-        cms_proy = peso_proy * 0.024 * factor_clima
+        cms_proy = peso_proy * 0.024 * factor_clima * factor_thi
         lista_semanas.append(f"Semana {i}")
         lista_pesos.append(peso_proy)
         lista_cms.append(round(cms_proy, 2))
@@ -261,7 +272,7 @@ with tab1:
     fig_comportamiento = make_subplots(specs=[[{"secondary_y": True}]])
     fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_pesos, name="Peso Proyectado (kg)", mode="lines+markers", line=dict(color="#2d5a27", width=3.5)), secondary_y=False)
     fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_cms, name="Consumo Materia Seca (kg/día)", mode="lines+markers", line=dict(color="#bc6c25", width=3, dash="dash")), secondary_y=True)
-    fig_comportamiento.update_layout(title=dict(text=f"Dinámica de Engorda (GDE: {gde} kg/d | Clima: {estacion})", font=dict(family="Inter", size=13), x=0.5), plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Inter", color="#2b2d42"), legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5), margin=dict(l=20, r=20, t=60, b=70))
+    fig_comportamiento.update_layout(title=dict(text=f"Dinámica de Engorda (GDE: {gde} kg/d | THI: {nivel_thi[:15]})", font=dict(family="Inter", size=13), x=0.5), plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Inter", color="#2b2d42"), legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5), margin=dict(l=20, r=20, t=60, b=70))
     fig_comportamiento.update_yaxes(title_text="<b>Peso Vivo del Animal (kg)</b>", secondary_y=False, color="#2d5a27")
     fig_comportamiento.update_yaxes(title_text="<b>Consumo de Materia Seca (kg/día)</b>", secondary_y=True, color="#bc6c25")
     st.plotly_chart(fig_comportamiento, use_container_width=True)
@@ -406,7 +417,7 @@ with tab3:
         df_mezcla_final = pd.DataFrame(tabla_mezcla_con_totales)
         st.dataframe(df_mezcla_final, use_container_width=True, hide_index=True)
         
-        # --- CÁLCULOS AVANZADOS Y BONOS DE CARBONO ---
+        # --- CÁLCULOS AVANZADOS Y BONOS DE CARBONO (Con factor de aditivos ionóforos) ---
         aporte_pc = np.sum(resultado.x * pc) * 100
         aporte_neg = np.sum(resultado.x * neg)
         aporte_fnd = np.sum(resultado.x * fnd) * 100
@@ -424,8 +435,10 @@ with tab3:
         
         ge_diaria = cms_estimado * 18.4 
         reduccion_lipidica = max(0.0, (aporte_lipidos - 3.0) * 0.003)
+        reduccion_ionoforo = 0.06 if "Ionóforos" in aditivo_ruminal or "Ambos" in aditivo_ruminal else 0.0
+        
         factor_fnd_ym = 0.035 + (aporte_fnd / 100.0) * 0.035
-        ym_ajustado = max(0.030, factor_fnd_ym - reduccion_lipidica)
+        ym_ajustado = max(0.025, factor_fnd_ym - reduccion_lipidica - reduccion_ionoforo)
         
         ch4_g_dia = (ge_diaria * ym_ajustado / 55.65) * 1000
         ch4_g_kg_ganancia = ch4_g_dia / gde if gde > 0 else 0
@@ -446,7 +459,7 @@ with tab3:
             st.metric("Fósforo (P)", f"{aporte_p:.2f}%", "Mineral Mayor")
             st.metric("Fibra peNDF", f"{aporte_pendf:.1f}%", "Anti-acidosis")
         with col_m3:
-            st.metric("Emisión $CH_4$", f"{ch4_g_dia:.1f} g/día", "IPCC Tier 2")
+            st.metric("Emisión $CH_4$", f"{ch4_g_dia:.1f} g/día", f"IPCC Tier 2 ({aditivo_ruminal[:10]})")
             st.metric("Equivalente $CO_2e$", f"{co2e_anual:,.1f} kg/año")
         with col_m4:
             st.metric("Valor Bonos Carbono", f"${valor_bono_mxn:,.2f} MXN", "Potencial Anual/Cab")
@@ -483,12 +496,13 @@ with tab4:
             "2. **Paso 2 (Ingredientes Húmedos / Ensilados):** Agregar ensilados o subproductos húmedos calculando la corrección por materia seca.\n"
             "3. **Paso 3 (Granos Energéticos y Proteicos):** Incorporar maíz molido, pasta de soya y canola.\n"
             "4. **Paso 4 (Núcleos, Minerales y Urea):** Agregar las sales minerales especializadas de Tlaltenango y la urea (previa dilución o mezclado homogéneo).\n"
-            "5. **Paso 5 (Líquidos):** Verter la melaza líquida con un chorro de agua al final para garantizar adherencia, evitar polvaderas y elevar la palatabilidad.\n"
-            "6. **Tiempo de Mezclado:** Operar el carro mezclador de 8 a 10 minutos continuos antes de la distribución en comederos."
+            "5. **Paso 5 (Aditivos / Buffers):** Incorporar buffers (bicarbonato) y aditivos si están seleccionados.\n"
+            "6. **Paso 6 (Líquidos):** Verter la melaza líquida con un chorro de agua al final para garantizar adherencia, evitar polvaderas y elevar la palatabilidad.\n"
+            "7. **Tiempo de Mezclado:** Operar el carro mezclador de 8 a 10 minutos continuos antes de la distribución en comederos."
         )
 
         # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ELITE ---
-        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, sexo_L, marco_L, p_act, p_obj, gain, dias, cabezas, a_ca, a_p, r_cap, a_fnd, a_pendf, ch4_d, co2e, bonos, cost_lote, tons_lote):
+        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, raza_L, sexo_L, marco_L, cc_val, thi_val, adit_val, p_act, p_obj, gain, dias, cabezas, a_ca, a_p, r_cap, a_fnd, a_pendf, ch4_d, co2e, bonos, cost_lote, tons_lote):
             pdf = FPDF()
             pdf.add_page()
             
@@ -501,7 +515,8 @@ with tab4:
             pdf.set_font("Arial", "B", 10)
             pdf.cell(0, 6, "1. Parametros Biologicos y Poblacionales del Lote", 0, 1)
             pdf.set_font("Arial", "", 9)
-            pdf.cell(0, 5, f"Fisiologia: {etapa} | Cabezas: {cabezas} | Genetica: {raza_L} | Sexo: {sexo_L}", 0, 1)
+            pdf.cell(0, 5, f"Fisiologia: {etapa} | Cabezas: {cabezas} | Genetica: {raza_L} | Categoria: {sexo_L}", 0, 1)
+            pdf.cell(0, 5, f"Condicion Corporal (CC): {cc_val} | THI: {thi_val} | Aditivos: {adit_val}", 0, 1)
             pdf.cell(0, 5, f"Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE: {gain} kg/dia | Dias: {dias:.0f}", 0, 1)
             pdf.ln(3)
             
@@ -563,7 +578,7 @@ with tab4:
 
         df_mezcla_pdf = pd.DataFrame(tabla_mezcla_con_totales)
         pdf_data = generar_pdf_ejecutivo(
-            df_mezcla_pdf, resultado.fun, fase, raza_seleccionada, sexo_lote, marco_lote, peso_actual, peso_objetivo, gde, dias_a_meta,
+            df_mezcla_pdf, resultado.fun, fase, raza_seleccionada, sexo_lote, marco_lote, condicion_corporal, nivel_thi, aditivo_ruminal, peso_actual, peso_objetivo, gde, dias_a_meta,
             cantidad_animales, aporte_ca, aporte_p, relacion_ca_p, aporte_fnd, aporte_pendf,
             ch4_g_dia, co2e_anual, valor_bono_mxn, costo_total_lote, alimento_total_ciclo / 1000.0
         )
