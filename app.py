@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from fpdf import FPDF
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO VANGUARDISTA SAAS ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO CLARO VANGUARDISTA ---
 st.set_page_config(
     page_title="Ganader-IA Elite 360 | Nutrición y Alta Rentabilidad",
     page_icon="🐄",
@@ -21,48 +21,43 @@ st.markdown("""
 
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', sans-serif !important;
-        color: #0f172a;
+        color: #1e293b;
     }
     
     .main {
         background-color: #f8fafc;
     }
     
-    /* Tarjetas de Métricas Estilo Neo-AgTech SaaS (Fuentes Reducidas) */
+    /* Tarjetas de Métricas Estilo Claro y Alta Legibilidad */
     .stMetric {
         background: #ffffff;
-        padding: 10px 12px !important;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
-        border: 1px solid #e2e8f0;
-        border-left: 4px solid #059669;
-        margin-bottom: 6px !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        overflow: hidden;
+        padding: 12px 14px !important;
+        border-radius: 14px;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+        border: 1px solid #cbd5e1;
+        border-left: 5px solid #059669;
+        margin-bottom: 8px !important;
+        transition: all 0.3s ease;
     }
     
     .stMetric:hover {
         transform: translateY(-2px);
-        box-shadow: 0 15px 25px -10px rgba(5, 150, 105, 0.12);
+        box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.15);
         border-color: #059669;
     }
     
     .stMetric label {
-        font-size: 0.6rem !important;
-        color: #64748b !important;
+        font-size: 0.7rem !important;
+        color: #475569 !important;
         font-weight: 700 !important;
         text-transform: uppercase;
-        letter-spacing: 0.6px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        letter-spacing: 0.8px;
     }
     
     .stMetric [data-testid="stMetricValue"] {
-        font-size: 0.9rem !important;
+        font-size: 1rem !important;
         color: #0f172a !important;
         font-weight: 800 !important;
-        word-break: break-word;
     }
     
     h1, h2, h3, h4 {
@@ -74,14 +69,14 @@ st.markdown("""
 
     p, span, label {
         font-family: 'Plus Jakarta Sans', sans-serif !important;
-        color: #334155;
+        color: #1e293b;
         line-height: 1.6;
     }
     
-    /* Estilización de pestañas */
+    /* Estilización de pestañas claras */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
-        background-color: #f1f5f9;
+        background-color: #e2e8f0;
         padding: 6px;
         border-radius: 12px;
         flex-wrap: wrap;
@@ -90,47 +85,42 @@ st.markdown("""
     .stTabs [data-baseweb="tab"] {
         border-radius: 8px;
         font-weight: 600;
-        color: #475569;
+        color: #334155;
         font-size: 0.85rem;
     }
     
     .stTabs [aria-selected="true"] {
         background-color: #ffffff !important;
         color: #059669 !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. LOGOTIPO Y ENCABEZADO COMERCIAL VANGUARDISTA ---
+# --- 2. LOGOTIPO REDISEÑADO Y ENCABEZADO CLARO DE ALTA VISIBILIDAD ---
 st.markdown("""
-    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #0f172a 0%, #064e3b 55%, #059669 100%); padding: 28px 32px; border-radius: 22px; box-shadow: 0 25px 40px -12px rgba(6,78,59,0.35); margin-bottom: 24px; color: white; flex-wrap: wrap; gap: 20px; border: 1px solid rgba(16, 185, 129, 0.2);">
-        <div style="flex-shrink: 0; background: rgba(255, 255, 255, 0.08); padding: 10px; border-radius: 18px; backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;">
-            <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="eliteGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#10B981" />
-                  <stop offset="100%" stop-color="#059669" />
-                </linearGradient>
-                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="#FBBF24" />
-                  <stop offset="100%" stop-color="#D97706" />
-                </linearGradient>
-              </defs>
-              <path d="M32 4L56 16V48L32 60L8 48V16L32 4Z" fill="url(#eliteGrad)" fill-opacity="0.18" stroke="url(#eliteGrad)" stroke-width="2"/>
-              <path d="M16 26C20 20 26 18 32 22C38 18 44 20 48 26" stroke="url(#goldGrad)" stroke-width="3.5" stroke-linecap="round"/>
-              <circle cx="32" cy="22" r="3.5" fill="#FBBF24"/>
-              <circle cx="32" cy="38" r="7" fill="url(#eliteGrad)" stroke="#FFFFFF" stroke-width="2"/>
-              <path d="M32 25V31" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
-              <path d="M25 38H20M39 38H44" stroke="url(#eliteGrad)" stroke-width="2" stroke-linecap="round"/>
+    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); padding: 26px 30px; border-radius: 20px; box-shadow: 0 15px 35px -10px rgba(5, 150, 105, 0.12); margin-bottom: 24px; border: 2px solid #a7f3d0; flex-wrap: wrap; gap: 20px;">
+        <div style="flex-shrink: 0; background: #059669; padding: 12px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px rgba(5, 150, 105, 0.25);">
+            <svg width="50" height="50" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 48H52V52H12V48Z" fill="#ffffff" rx="2"/>
+              <path d="M18 36H46V44H18V36Z" fill="#34d399"/>
+              <path d="M22 20C22 14.4772 26.4772 10 32 10C37.5228 10 42 14.4772 42 20V32H22V20Z" fill="#ffffff" stroke="#065f46" stroke-width="3"/>
+              <circle cx="27" cy="22" r="2.5" fill="#065f46"/>
+              <circle cx="37" cy="22" r="2.5" fill="#065f46"/>
+              <path d="M30 28H34" stroke="#065f46" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M26 12L22 6" stroke="#065f46" stroke-width="3" stroke-linecap="round"/>
+              <path d="M38 12L42 6" stroke="#065f46" stroke-width="3" stroke-linecap="round"/>
             </svg>
         </div>
         <div style="flex-grow: 1; min-width: 240px;">
-            <h1 style="margin: 0; font-size: 2.05em; color: #ffffff; letter-spacing: -0.8px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;">
-                Ganader-IA <span style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #0f172a; padding: 2px 10px; border-radius: 8px; font-size: 0.52em; vertical-align: middle; font-weight: 800; letter-spacing: 0.8px; box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);">ELITE 360</span>
+            <h1 style="margin: 0; font-size: 1.9em; color: #064e3b; letter-spacing: -0.8px; font-weight: 800;">
+                Ganader-IA <span style="background: #059669; color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px;">ELITE 360</span>
             </h1>
-            <p style="margin: 6px 0 0 0; font-size: 0.94em; color: #cbd5e1; font-weight: 400; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.2px;">
+            <p style="margin: 4px 0 2px 0; font-size: 0.92em; color: #1e293b; font-weight: 600;">
                 Plataforma SaaS de Precisión Nutricional, Economía y Sostenibilidad Pecuaria
+            </p>
+            <p style="margin: 0; font-size: 0.82em; color: #047857; font-weight: 700;">
+                ✨ Creado y Diseñado por: Dr. Alejandro Castañeda Correa
             </p>
         </div>
     </div>
@@ -392,14 +382,14 @@ class PDFReport(FPDF):
     def header(self):
         self.set_font('Arial', 'B', 12)
         self.set_text_color(5, 150, 105)
-        self.cell(0, 10, 'Ganader-IA Elite 360 - Reporte Ejecutivo y Formula Optimizada', 0, 1, 'C')
+        self.cell(0, 10, 'Ganader-IA Elite 360 - Creado por Dr. Alejandro Castaneda Correa', 0, 1, 'C')
         self.ln(3)
 
     def footer(self):
         self.set_y(-15)
         self.set_font('Arial', 'I', 8)
         self.set_text_color(100, 100, 100)
-        self.cell(0, 10, f'Pagina {self.page_no()} | Creado por Dr. Alejandro Castaneda Correa', 0, 0, 'C')
+        self.cell(0, 10, f'Pagina {self.page_no()} | Disenado y Desarrollado por Dr. Alejandro Castaneda Correa', 0, 0, 'C')
 
 def generar_pdf_reporte():
     pdf = PDFReport()
@@ -467,7 +457,6 @@ def generar_pdf_reporte():
         pdf.cell(100, 6, safe_str("COSTO TOTAL POR TONELADA"), 1, 0, 'L')
         pdf.cell(90, 6, safe_str(f"${costo_ton_optimizado:,.2f} MXN"), 1, 1, 'C')
 
-    # Salida compatible con fpdf y fpdf2
     output = pdf.output()
     if isinstance(output, bytes):
         return output
@@ -536,7 +525,7 @@ with tab1:
     fig_comportamiento = make_subplots(specs=[[{"secondary_y": True}]])
     fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_pesos, name="Peso Proyectado (kg)", mode="lines+markers", line=dict(color="#059669", width=3.5)), secondary_y=False)
     fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_cms, name="Consumo Materia Seca (kg/día)", mode="lines+markers", line=dict(color="#d97706", width=3, dash="dash")), secondary_y=True)
-    fig_comportamiento.update_layout(title=dict(text=f"Dinámica de Engorda ({perfil_aa[:18]} | GDE: {gde} kg/d)", font=dict(family="Plus Jakarta Sans", size=13), x=0.5), plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Plus Jakarta Sans", color="#0f172a"), legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5), margin=dict(l=20, r=20, t=60, b=70))
+    fig_comportamiento.update_layout(title=dict(text=f"Dinámica de Engorda ({perfil_aa[:18]} | GDE: {gde} kg/d)", font=dict(family="Plus Jakarta Sans", size=13), x=0.5), plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Plus Jakarta Sans", color="#1e293b"), legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5), margin=dict(l=20, r=20, t=60, b=70))
     fig_comportamiento.update_yaxes(title_text="<b>Peso Vivo del Animal (kg)</b>", secondary_y=False, color="#059669")
     fig_comportamiento.update_yaxes(title_text="<b>Consumo de Materia Seca (kg/día)</b>", secondary_y=True, color="#d97706")
     st.plotly_chart(fig_comportamiento, use_container_width=True)
@@ -578,7 +567,6 @@ with tab3:
         roi_cab = (utilidad_neta_cab / costo_total_cab) * 100 if costo_total_cab > 0 else 0
         
         costo_por_kg_ganado = costo_alimentacion_cab / kg_por_ganar if kg_por_ganar > 0 else 0
-        
         status_rentabilidad = "🟢 Rentable" if utilidad_neta_cab > 0 else "🔴 Negativo"
         
         col_ec1, col_ec2, col_ec3, col_ec4 = st.columns(4)
@@ -614,8 +602,6 @@ with tab3:
                     "Costo Unitario ($/ton)": f"${c[i]:,.2f}",
                     "Aporte al Costo Total ($)": f"${costo_parcial:,.2f}"
                 })
-                cat_ing = str(df_base.iloc[i].get("Categoria", "Otros"))
-                categorias_pie[cat_ing] = categorias_pie.get(cat_ing, 0) + porcentaje
         
         total_porcentaje = sum([row["Inclusion (%)"] for row in tabla_mezcla])
         total_kilos = sum([row["Kg por Tonelada (1,000 kg)"] for row in tabla_mezcla])
@@ -637,12 +623,8 @@ with tab3:
         aporte_neg = np.sum(resultado.x * neg)
         aporte_fnd = np.sum(resultado.x * fnd) * 100
         aporte_pendf = np.sum(resultado.x * pendf) * 100
-        aporte_pdr = np.sum(resultado.x * pdr) * 100
-        aporte_pnd = np.sum(resultado.x * pnd) * 100
         aporte_ca = np.sum(resultado.x * ca) * 100
         aporte_p = np.sum(resultado.x * p_min_ing) * 100
-        aporte_na = np.sum(resultado.x * na) * 100
-        aporte_mg = np.sum(resultado.x * mg) * 100
         aporte_lipidos = np.sum(resultado.x * lipidos) * 100
         
         relacion_ca_p = (aporte_ca / aporte_p) if aporte_p > 0 else 0
@@ -796,7 +778,7 @@ with tab5:
         
     st.markdown("---")
     st.markdown("### 🗺️ Mapa de Calor de Rentabilidad (Zonas de Utilidad)")
-    st.markdown("Visualiza cómo cambia la ganancia dependiendo del peso al que compras (Eje Y) y al peso que vendes (Eje X). **Las zonas amarillas son de alta rentabilidad; las moradas/oscuras generan pérdidas.**")
+    st.markdown("Visualiza cómo cambia la ganancia dependiendo del peso al que compras (Eje Y) y al peso que vendes (Eje X). **Las zonas brillantes son de alta rentabilidad.**")
     
     df_pivot = df_simulacion.pivot(index="Peso Compra (kg)", columns="Peso Venta (kg)", values="Utilidad Neta (MXN)")
     
@@ -805,12 +787,12 @@ with tab5:
         labels=dict(x="Peso Venta al Mercado (kg)", y="Peso Compra del Becerro (kg)", color="Utilidad ($)"),
         x=df_pivot.columns, 
         y=df_pivot.index,
-        color_continuous_scale="Viridis",
+        color_continuous_scale="Mint",
         aspect="auto"
     )
     
     fig_heat.update_layout(
-        font=dict(family="Plus Jakarta Sans", color="#0f172a"),
+        font=dict(family="Plus Jakarta Sans", color="#1e293b"),
         plot_bgcolor="#ffffff", 
         paper_bgcolor="#ffffff"
     )
