@@ -83,7 +83,7 @@ if not st.session_state.authenticated:
         st.markdown("<div style='text-align: center; margin-top: 15px;'><small>🔑 <i>Usa la clave <b>demo</b> para pruebas académicas y profesionales.</i></small></div>", unsafe_allow_html=True)
     st.stop()
 
-# --- 3. LOGOTIPO VECTORIAL DE VANGUARDIA (PALETA CAMPO Y GANADERÍA) ---
+# --- 3. LOGOTIPO VECTORIAL CON SLOGAN DE VANGUARDIA ---
 st.markdown("""
     <div style="display: flex; align-items: center; background: linear-gradient(135deg, #2d5a27 0%, #bc6c25 100%); padding: 25px; border-radius: 16px; box-shadow: 0 6px 20px rgba(45,90,39,0.15); margin-bottom: 25px; color: white;">
         <div style="flex-shrink: 0; margin-right: 20px;">
@@ -95,6 +95,7 @@ st.markdown("""
         <div>
             <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">PRO</span></h1>
             <p style="margin: 5px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Plataforma de Precisión Zootécnica y Optimización de Raciones</p>
+            <p style="margin: 4px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
         </div>
     </div>
 """, unsafe_allow_html=True)
