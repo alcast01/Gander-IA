@@ -100,24 +100,34 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. LOGOTIPO Y ENCABEZADO ---
+# --- 2. LOGOTIPO REDISEÑADO (VETERINARIA, NUTRICIÓN Y CAMPO) ---
 st.markdown("""
-    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); padding: 26px 30px; border-radius: 20px; box-shadow: 0 15px 35px -10px rgba(5, 150, 105, 0.12); margin-bottom: 24px; border: 2px solid #a7f3d0; flex-wrap: wrap; gap: 20px;">
-        <div style="flex-shrink: 0; background: #059669; padding: 12px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px rgba(5, 150, 105, 0.25);">
-            <svg width="50" height="50" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 48H52V52H12V48Z" fill="#ffffff" rx="2"/>
-              <path d="M18 36H46V44H18V36Z" fill="#34d399"/>
-              <path d="M22 20C22 14.4772 26.4772 10 32 10C37.5228 10 42 14.4772 42 20V32H22V20Z" fill="#ffffff" stroke="#065f46" stroke-width="3"/>
-              <circle cx="27" cy="22" r="2.5" fill="#065f46"/>
-              <circle cx="37" cy="22" r="2.5" fill="#065f46"/>
-              <path d="M30 28H34" stroke="#065f46" stroke-width="2.5" stroke-linecap="round"/>
-              <path d="M26 12L22 6" stroke="#065f46" stroke-width="3" stroke-linecap="round"/>
-              <path d="M38 12L42 6" stroke="#065f46" stroke-width="3" stroke-linecap="round"/>
+    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 50%, #fef3c7 100%); padding: 26px 30px; border-radius: 20px; box-shadow: 0 15px 35px -10px rgba(5, 150, 105, 0.15); margin-bottom: 24px; border: 2px solid #34d399; flex-wrap: wrap; gap: 20px;">
+        <div style="flex-shrink: 0; background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 12px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);">
+            <svg width="52" height="52" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="30" fill="url(#paint0_linear)" />
+              <!-- Cabeza y Cuernos de Ganado Minimalista con Cosecha -->
+              <path d="M16 26C16 26 22 18 32 18C42 18 48 26 48 26C48 26 44 38 32 44C20 38 16 26 16 26Z" fill="#ffffff" fill-opacity="0.18" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 26C12 22 10 15 15 13C20 11 24 17 26 21" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M48 26C52 22 54 15 49 13C44 11 40 17 38 21" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+              <!-- Tallo de Trigo / Nutrición -->
+              <path d="M32 48V27" stroke="#34d399" stroke-width="3.5" stroke-linecap="round"/>
+              <path d="M32 33L38 29" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M32 37L26 33" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M32 41L38 37" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
+              <!-- Nodo Veterinario / Precisión -->
+              <circle cx="32" cy="23" r="3.5" fill="#f59e0b"/>
+              <defs>
+                <linearGradient id="paint0_linear" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#047857"/>
+                  <stop offset="1" stop-color="#059669"/>
+                </linearGradient>
+              </defs>
             </svg>
         </div>
         <div style="flex-grow: 1; min-width: 240px;">
             <h1 style="margin: 0; font-size: 1.9em; color: #064e3b; letter-spacing: -0.8px; font-weight: 800;">
-                Ganader-IA <span style="background: #059669; color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px;">ELITE 360</span>
+                Ganader-IA <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">ELITE 360</span>
             </h1>
             <p style="margin: 4px 0 2px 0; font-size: 0.92em; color: #1e293b; font-weight: 600;">
                 Plataforma SaaS de Precisión Nutricional, Economía y Sostenibilidad Pecuaria
@@ -169,11 +179,20 @@ with st.sidebar.expander("🐄 1. Lote, Pesos y Población", expanded=True):
     else:
         gde = 1.6
 
-with st.sidebar.expander("💰 2. Parámetros Económicos y de Mercado", expanded=False):
+with st.sidebar.expander("💰 2. Parámetros Económicos y Sanidad", expanded=False):
     precio_compra_kg = st.number_input("Compra Becerro Base (MXN/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
     precio_venta_kg = st.number_input("Venta Ganado Gordo Base (MXN/kg)", min_value=30.0, max_value=100.0, value=50.0, step=1.0)
-    costo_sanidad_fijo = st.number_input("Sanidad y Manejo (MXN/cab)", min_value=0.0, max_value=2000.0, value=350.0, step=50.0)
-    costo_mano_obra_fijo = st.number_input("Mano de Obra (MXN/cab)", min_value=0.0, max_value=3000.0, value=450.0, step=50.0)
+    
+    st.markdown("---")
+    st.markdown("##### 🩺 Costos Variables de Recepción y Sanidad (MXN/cab)")
+    costo_aretaje = st.number_input("Aretaje (SINIIGA / ID)", min_value=0.0, max_value=500.0, value=45.0, step=5.0)
+    costo_barrido = st.number_input("Barrido Sanitario (TB / Brucela)", min_value=0.0, max_value=1000.0, value=150.0, step=10.0)
+    costo_vacunacion = st.number_input("Vacunación (Clostridios / Resp.)", min_value=0.0, max_value=500.0, value=90.0, step=5.0)
+    costo_desparasitacion = st.number_input("Desparasitación (Int./Ext.)", min_value=0.0, max_value=500.0, value=60.0, step=5.0)
+    costo_vitaminacion = st.number_input("Vitaminación / Tónicos", min_value=0.0, max_value=500.0, value=40.0, step=5.0)
+    
+    st.markdown("---")
+    costo_mano_obra_fijo = st.number_input("Mano de Obra y Operación (MXN/cab)", min_value=0.0, max_value=3000.0, value=450.0, step=50.0)
 
 with st.sidebar.expander("🌾 3. Sistema de Producción y Pastoreo", expanded=False):
     sistema_produccion = st.selectbox("Sistema", ["Corral / Engorda Intensiva (Feedlot)", "Semi-estabulado (Mixto / Suplementación en Pastoreo)", "Pastoreo Extensivo (Praderas / Agostadero)"])
@@ -407,11 +426,15 @@ if not resultado.success:
 
 costo_ton_optimizado = resultado.fun if resultado.success else 4500.0 
 
-# Cálculos económicos
+# Cálculos económicos integrando sanidad y variables de recepción
 consumo_total_ciclo_cab = cms_estimado * dias_a_meta
 costo_alimentacion_cab = (consumo_total_ciclo_cab / 1000.0) * costo_ton_optimizado
 costo_compra_cab = peso_actual * precio_compra_kg
-costo_total_cab = costo_compra_cab + costo_alimentacion_cab + costo_sanidad_fijo + costo_mano_obra_fijo
+
+costo_sanidad_inicial = costo_aretaje + costo_barrido + costo_vacunacion + costo_desparasitacion + costo_vitaminacion
+costo_total_sanidad_y_manejo = costo_sanidad_inicial + costo_mano_obra_fijo
+
+costo_total_cab = costo_compra_cab + costo_alimentacion_cab + costo_total_sanidad_y_manejo
 ingreso_venta_cab = peso_objetivo * precio_venta_kg
 utilidad_neta_cab = ingreso_venta_cab - costo_total_cab
 roi_cab = (utilidad_neta_cab / costo_total_cab) * 100 if costo_total_cab > 0 else 0
@@ -463,7 +486,8 @@ def generar_pdf_reporte():
     econ_dict = {
         "Costo de Compra Becerro": f"${costo_compra_cab:,.2f} MXN",
         "Costo Total de Alimentacion": f"${costo_alimentacion_cab:,.2f} MXN",
-        "Sanidad y Mano de Obra": f"${costo_sanidad_fijo + costo_mano_obra_fijo:,.2f} MXN",
+        "Sanidad Inicial (Aretaje, Barrido, Vac., Desp., Vit.)": f"${costo_sanidad_inicial:,.2f} MXN",
+        "Mano de Obra y Operacion": f"${costo_mano_obra_fijo:,.2f} MXN",
         "Costo Total de Produccion": f"${costo_total_cab:,.2f} MXN",
         "Ingreso por Venta Ganado": f"${ingreso_venta_cab:,.2f} MXN",
         "Utilidad Neta Esperada": f"${utilidad_neta_cab:,.2f} MXN",
@@ -561,7 +585,6 @@ with tab2:
         "Los cambios realizados aquí se guardan de forma persistente durante tu sesión."
     )
     
-    # Editor conectado a st.session_state para evitar reinicios al cambiar sliders laterales
     st.session_state.df_ingredientes_state = st.data_editor(
         st.session_state.df_ingredientes_state, 
         num_rows="dynamic", 
@@ -585,7 +608,7 @@ with tab3:
         costo_alimentacion_cab = (consumo_total_ciclo_cab / 1000.0) * costo_ton_optimizado
         
         costo_compra_cab = peso_actual * precio_compra_kg
-        costo_total_cab = costo_compra_cab + costo_alimentacion_cab + costo_sanidad_fijo + costo_mano_obra_fijo
+        costo_total_cab = costo_compra_cab + costo_alimentacion_cab + costo_total_sanidad_y_manejo
         
         ingreso_venta_cab = peso_objetivo * precio_venta_kg
         utilidad_neta_cab = ingreso_venta_cab - costo_total_cab
@@ -600,7 +623,7 @@ with tab3:
             st.metric("Alimento/Cab", f"${costo_alimentacion_cab:,.0f}")
         with col_ec2:
             st.metric("Costo Total", f"${costo_total_cab:,.0f}")
-            st.metric("Costo x kg", f"${costo_por_kg_ganado:,.1f}")
+            st.metric("Sanidad Inicial", f"${costo_sanidad_inicial:,.0f}")
         with col_ec3:
             st.metric("Ingreso Venta", f"${ingreso_venta_cab:,.0f}")
             st.metric("Utilidad Neta", f"${utilidad_neta_cab:,.0f}")
@@ -709,7 +732,7 @@ with tab4:
             f"**Lote Activo:** {cantidad_animales} animales | **Fase Zootécnica:** {fase} | **Sistema:** {sistema_produccion} | **Perfil AA:** {perfil_aa}\n\n"
             "1. **Paso 1 (Forrajes Secos / Fibra Larga):** Cargar rastrojos o harinas fibrosas al inicio para asegurar el peNDF y evitar acidosis metabólica.\n"
             "2. **Paso 2 (Ingredientes Húmedos / Ensilados):** Agregar ensilados o subproductos húmedos calculando la corrección por materia seca.\n"
-            "3. **Paso 3 (Granos Energéticos y Proteicos):** Incorporar maíz molido, pasta de soya y canola.\n"
+            "3. **Paso 3 (Granos Energeticos y Proteicos):** Incorporar maíz molido, pasta de soya y canola.\n"
             "4. **Paso 4 (Núcleos, Minerales y Urea):** Agregar las sales minerales especializadas de Tlaltenango y la urea.\n"
             "5. **Paso 5 (Aditivos / Buffers):** Incorporar buffers (bicarbonato) y aditivos si están seleccionados.\n"
             "6. **Paso 6 (Líquidos):** Verter la melaza líquida con un chorro de agua al final para garantizar adherencia, evitar polvaderas y elevar la palatabilidad.\n"
@@ -724,7 +747,7 @@ with tab5:
         **Encuentra el punto exacto de rentabilidad máxima.**
     """)
     
-    st.info(f"**Variables base en uso:** Costo de Alimento: **${costo_ton_optimizado:,.2f}/ton** | GDE Optimizado: **{gde} kg/día** | Gastos Fijos (Sanidad + M.O.): **${costo_sanidad_fijo + costo_mano_obra_fijo:,.0f}/cab**")
+    st.info(f"**Variables base en uso:** Costo de Alimento: **${costo_ton_optimizado:,.2f}/ton** | GDE Optimizado: **{gde} kg/día** | Sanidad y Manejo Fijo/Var.: **${costo_total_sanidad_y_manejo:,.0f}/cab**")
     
     def calcular_peso_optimo_financiero(precio_compra_base, precio_venta_base, costo_ton_alim, gde_fijo, costo_fijos):
         pesos_compra = range(200, 360, 10)
@@ -780,7 +803,7 @@ with tab5:
         precio_venta_base=precio_venta_kg,
         costo_ton_alim=costo_ton_optimizado, 
         gde_fijo=gde, 
-        costo_fijos=(costo_sanidad_fijo + costo_mano_obra_fijo)
+        costo_fijos=costo_total_sanidad_y_manejo
     )
     
     st.markdown("### 🏆 Escenario Ideal para Maximizar tu Dinero")
