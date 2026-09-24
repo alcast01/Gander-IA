@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from fpdf import FPDF
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO CLARO VANGUARDISTA ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO CALIBRI ---
 st.set_page_config(
     page_title="Ganader-IA Elite 360 | Nutrición y Alta Rentabilidad",
     page_icon="🐄",
@@ -17,10 +17,8 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-
     html, body, [class*="css"] {
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-family: 'Calibri', sans-serif !important;
         color: #1e293b;
     }
     
@@ -47,7 +45,7 @@ st.markdown("""
     }
     
     .stMetric label {
-        font-size: 0.6rem !important;
+        font-size: 0.65rem !important;
         color: #475569 !important;
         font-weight: 700 !important;
         text-transform: uppercase;
@@ -58,7 +56,7 @@ st.markdown("""
     }
     
     .stMetric [data-testid="stMetricValue"] {
-        font-size: 0.85rem !important;
+        font-size: 0.9rem !important;
         color: #0f172a !important;
         font-weight: 800 !important;
         word-break: break-word;
@@ -66,13 +64,13 @@ st.markdown("""
     
     h1, h2, h3, h4 {
         color: #0f172a;
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-family: 'Calibri', sans-serif !important;
         font-weight: 700;
         letter-spacing: -0.5px;
     }
 
     p, span, label {
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-family: 'Calibri', sans-serif !important;
         color: #1e293b;
         line-height: 1.6;
     }
@@ -89,7 +87,8 @@ st.markdown("""
         border-radius: 8px;
         font-weight: 600;
         color: #334155;
-        font-size: 0.82rem;
+        font-size: 0.85rem;
+        font-family: 'Calibri', sans-serif !important;
     }
     
     .stTabs [aria-selected="true"] {
@@ -100,22 +99,19 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. LOGOTIPO REDISEÑADO (VETERINARIA, NUTRICIÓN Y CAMPO) ---
+# --- 2. LOGOTIPO VETERINARIO Y DE CAMPO ---
 st.markdown("""
     <div style="display: flex; align-items: center; background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 50%, #fef3c7 100%); padding: 26px 30px; border-radius: 20px; box-shadow: 0 15px 35px -10px rgba(5, 150, 105, 0.15); margin-bottom: 24px; border: 2px solid #34d399; flex-wrap: wrap; gap: 20px;">
         <div style="flex-shrink: 0; background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 12px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);">
             <svg width="52" height="52" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="32" cy="32" r="30" fill="url(#paint0_linear)" />
-              <!-- Cabeza y Cuernos de Ganado Minimalista con Cosecha -->
               <path d="M16 26C16 26 22 18 32 18C42 18 48 26 48 26C48 26 44 38 32 44C20 38 16 26 16 26Z" fill="#ffffff" fill-opacity="0.18" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M16 26C12 22 10 15 15 13C20 11 24 17 26 21" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
               <path d="M48 26C52 22 54 15 49 13C44 11 40 17 38 21" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
-              <!-- Tallo de Trigo / Nutrición -->
               <path d="M32 48V27" stroke="#34d399" stroke-width="3.5" stroke-linecap="round"/>
               <path d="M32 33L38 29" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
               <path d="M32 37L26 33" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
               <path d="M32 41L38 37" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
-              <!-- Nodo Veterinario / Precisión -->
               <circle cx="32" cy="23" r="3.5" fill="#f59e0b"/>
               <defs>
                 <linearGradient id="paint0_linear" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
@@ -126,13 +122,13 @@ st.markdown("""
             </svg>
         </div>
         <div style="flex-grow: 1; min-width: 240px;">
-            <h1 style="margin: 0; font-size: 1.9em; color: #064e3b; letter-spacing: -0.8px; font-weight: 800;">
+            <h1 style="margin: 0; font-size: 1.9em; color: #064e3b; letter-spacing: -0.8px; font-weight: 800; font-family: 'Calibri', sans-serif;">
                 Ganader-IA <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">ELITE 360</span>
             </h1>
-            <p style="margin: 4px 0 2px 0; font-size: 0.92em; color: #1e293b; font-weight: 600;">
+            <p style="margin: 4px 0 2px 0; font-size: 0.95em; color: #1e293b; font-weight: 600; font-family: 'Calibri', sans-serif;">
                 Plataforma SaaS de Precisión Nutricional, Economía y Sostenibilidad Pecuaria
             </p>
-            <p style="margin: 0; font-size: 0.82em; color: #047857; font-weight: 700;">
+            <p style="margin: 0; font-size: 0.85em; color: #047857; font-weight: 700; font-family: 'Calibri', sans-serif;">
                 ✨ Creado y Diseñado por: Dr. Alejandro Castañeda Correa
             </p>
         </div>
@@ -573,7 +569,7 @@ with tab1:
     fig_comportamiento = make_subplots(specs=[[{"secondary_y": True}]])
     fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_pesos, name="Peso Proyectado (kg)", mode="lines+markers", line=dict(color="#059669", width=3.5)), secondary_y=False)
     fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_cms, name="Consumo Materia Seca (kg/día)", mode="lines+markers", line=dict(color="#d97706", width=3, dash="dash")), secondary_y=True)
-    fig_comportamiento.update_layout(title=dict(text=f"Dinámica de Engorda ({perfil_aa[:18]} | GDE: {gde} kg/d)", font=dict(family="Plus Jakarta Sans", size=13), x=0.5), plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Plus Jakarta Sans", color="#1e293b"), legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5), margin=dict(l=20, r=20, t=60, b=70))
+    fig_comportamiento.update_layout(title=dict(text=f"Dinámica de Engorda ({perfil_aa[:18]} | GDE: {gde} kg/d)", font=dict(family="Calibri", size=13), x=0.5), plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Calibri", color="#1e293b"), legend=dict(orientation="h", yanchor="top", y=-0.25, xanchor="center", x=0.5), margin=dict(l=20, r=20, t=60, b=70))
     fig_comportamiento.update_yaxes(title_text="<b>Peso Vivo del Animal (kg)</b>", secondary_y=False, color="#059669")
     fig_comportamiento.update_yaxes(title_text="<b>Consumo de Materia Seca (kg/día)</b>", secondary_y=True, color="#d97706")
     st.plotly_chart(fig_comportamiento, use_container_width=True)
@@ -732,7 +728,7 @@ with tab4:
             f"**Lote Activo:** {cantidad_animales} animales | **Fase Zootécnica:** {fase} | **Sistema:** {sistema_produccion} | **Perfil AA:** {perfil_aa}\n\n"
             "1. **Paso 1 (Forrajes Secos / Fibra Larga):** Cargar rastrojos o harinas fibrosas al inicio para asegurar el peNDF y evitar acidosis metabólica.\n"
             "2. **Paso 2 (Ingredientes Húmedos / Ensilados):** Agregar ensilados o subproductos húmedos calculando la corrección por materia seca.\n"
-            "3. **Paso 3 (Granos Energeticos y Proteicos):** Incorporar maíz molido, pasta de soya y canola.\n"
+            "3. **Paso 3 (Granos Energéticos y Proteicos):** Incorporar maíz molido, pasta de soya y canola.\n"
             "4. **Paso 4 (Núcleos, Minerales y Urea):** Agregar las sales minerales especializadas de Tlaltenango y la urea.\n"
             "5. **Paso 5 (Aditivos / Buffers):** Incorporar buffers (bicarbonato) y aditivos si están seleccionados.\n"
             "6. **Paso 6 (Líquidos):** Verter la melaza líquida con un chorro de agua al final para garantizar adherencia, evitar polvaderas y elevar la palatabilidad.\n"
@@ -838,7 +834,7 @@ with tab5:
     )
     
     fig_heat.update_layout(
-        font=dict(family="Plus Jakarta Sans", color="#1e293b"),
+        font=dict(family="Calibri", color="#1e293b"),
         plot_bgcolor="#ffffff", 
         paper_bgcolor="#ffffff"
     )
