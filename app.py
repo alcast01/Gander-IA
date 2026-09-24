@@ -6,6 +6,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from fpdf import FPDF
+import json
+import os
+import hashlib
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO CALIBRI ---
 st.set_page_config(
@@ -99,9 +102,30 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. GESTIÓN DE AUTENTICACIÓN (SESSION STATE) ---
-if "registered_users" not in st.session_state:
-    st.session_state.registered_users = {"admin": "1234", "alejandro": "elite360"}
+# --- 2. GESTIÓN DE USUARIOS CON PERSISTENCIA EN ARCHIVO JSON ---
+USERS_FILE = "usuarios_ganaderia_elite.json"
+
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def cargar_usuarios_persistentes():
+    if os.path.exists(USERS_FILE):
+        try:
+            with open(USERS_FILE, "r") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    # Usuarios por defecto si el archivo no existe
+    default_users = {
+        "admin": hash_password("1234"),
+        "alejandro": hash_password("elite360")
+    }
+    guardar_usuarios_persistentes(default_users)
+    return default_users
+
+def guardar_usuarios_persistentes(usuarios_dict):
+    with open(USERS_FILE, "w") as f:
+        json.dump(usuarios_dict, f, indent=4)
 
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
@@ -146,7 +170,10 @@ if not st.session_state.authenticated:
         pass_input = st.text_input("Contraseña", type="password", key="login_pass")
         
         if st.button("Entrar a la Plataforma", use_container_width=True):
-            if user_input in st.session_state.registered_users and st.session_state.registered_users[user_input] == pass_input:
+            db_usuarios = cargar_usuarios_persistentes()
+            hashed_pass = hash_password(pass_input)
+            
+            if user_input in db_usuarios and db_usuarios[user_input] == hashed_pass:
                 st.session_state.authenticated = True
                 st.session_state.current_user = user_input
                 st.success(f"¡Bienvenido de nuevo, {user_input}!")
@@ -161,20 +188,22 @@ if not st.session_state.authenticated:
         confirm_pass = st.text_input("Confirma tu Contraseña", type="password", key="reg_conf")
         
         if st.button("Registrarse y Acceder", use_container_width=True):
+            db_usuarios = cargar_usuarios_persistentes()
             if not new_user or not new_pass:
                 st.warning("Por favor, completa todos los campos.")
-            elif new_user in st.session_state.registered_users:
+            elif new_user in db_usuarios:
                 st.error("El nombre de usuario ya existe. Elige otro o inicia sesión.")
             elif new_pass != confirm_pass:
                 st.error("Las contraseñas no coinciden.")
             else:
-                st.session_state.registered_users[new_user] = new_pass
+                db_usuarios[new_user] = hash_password(new_pass)
+                guardar_usuarios_persistentes(db_usuarios)
                 st.session_state.authenticated = True
                 st.session_state.current_user = new_user
-                st.success(f"¡Cuenta creada con éxito! Bienvenido, {new_user}.")
+                st.success(f"¡Cuenta guardada y creada con éxito! Bienvenido, {new_user}.")
                 st.rerun()
 
-    st.stop() # Detiene la ejecución del resto de la app hasta que el usuario inicie sesión
+    st.stop() # Detiene la ejecución hasta que se autentique
 
 # --- 3. LOGOTIPO VETERINARIO Y DE CAMPO (USUARIO AUTENTICADO) ---
 st.markdown(f"""
