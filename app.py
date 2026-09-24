@@ -9,7 +9,7 @@ from fpdf import FPDF
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (CAMPO Y GANADERÍA) ---
 st.set_page_config(
-    page_title="Ganader-IA Pro | Nutrición de Precisión, Bonos de Carbono y Bunk Management",
+    page_title="Ganader-IA Elite | Nutrición de Precisión y Bonos de Carbono",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -66,13 +66,13 @@ st.markdown("""
         </div>
         <div style="flex-grow: 1; min-width: 250px;">
             <h1 style="margin: 0; font-size: 2.2em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 8px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">ELITE 360</span></h1>
-            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Nutrición de Precisión, Bonos de Carbono y Gestión Inteligente de Corrales</p>
+            <p style="margin: 6px 0 0 0; font-size: 1.05em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Nutrición de Precisión, Bonos de Carbono y Ca:P Automático</p>
             <p style="margin: 6px 0 0 0; font-size: 0.85em; color: #ffe8d6; font-style: italic; font-weight: 400; font-family: 'Inter', sans-serif;">✨ Tecnología e Innovación en tus manos</p>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
-# --- 3. BASE DE DATOS INICIAL CON MINERALES Y NUTRIENTES EDITABLES ---
+# --- 3. BASE DE DATOS INICIAL CON MINERALES DE TLALTENANGO ---
 data_respaldo = {
     "Nombre del Ingrediente": [
         "Rastrojo de maiz molido", 
@@ -82,25 +82,26 @@ data_respaldo = {
         "Ensilado de maiz", 
         "Canola (pasta)", 
         "Melaza liquida",
-        "Sales Minerales (Especializadas)", 
+        "Purina Mineral Tech (Tlaltenango)", 
+        "Malta Cleyton Ganafos", 
         "Grasa de paso Lactomil"
     ],
-    "Categoria": ["Forraje", "Suplemento Proteico", "Grano Energetico", "Suplemento NPN", "Forraje Humedo", "Suplemento Proteico", "Subproducto / Energetico", "Suplemento Mineral", "Suplemento Energetico"],
-    "Disponible": [True, True, True, True, False, True, True, True, True],
-    "Precio Estimado (MXN/ton)": [2500.0, 12500.0, 5800.0, 16000.0, 1200.0, 8500.0, 4800.0, 18000.0, 32000.0],
-    "Proteina Cruda (PC % MS)": [5.5, 48.0, 8.5, 281.0, 8.0, 38.0, 4.8, 0.0, 1.0],
-    "NEg (Mcal/kg)": [0.35, 1.48, 1.55, 0.0, 0.85, 1.15, 1.22, 0.0, 1.65],
-    "FND (% MS)": [75.0, 12.0, 9.0, 0.0, 45.0, 28.0, 0.0, 0.0, 0.0],
-    "peNDF (% MS)": [65.0, 2.0, 3.0, 0.0, 30.0, 10.0, 0.0, 0.0, 0.0],
-    "PDR (% MS)": [3.5, 33.6, 5.5, 281.0, 5.0, 24.0, 4.5, 0.0, 0.0],
-    "PND (% MS)": [2.0, 14.4, 3.0, 0.0, 3.0, 14.0, 0.3, 0.0, 1.0],
-    "Calcio (Ca %)": [0.35, 0.30, 0.02, 0.0, 0.25, 0.70, 0.80, 18.0, 1.0],
-    "Fosforo (P %)": [0.10, 0.65, 0.30, 0.0, 0.22, 1.10, 0.08, 10.0, 0.1],
-    "Sodio (Na %)": [0.02, 0.03, 0.02, 0.0, 0.02, 0.05, 0.10, 10.0, 0.0],
-    "Magnesio (Mg %)": [0.15, 0.28, 0.12, 0.0, 0.18, 0.50, 0.40, 2.0, 0.0],
-    "Lípidos / Extracto Etéreo (%)": [1.5, 1.8, 3.8, 0.0, 3.0, 3.5, 0.5, 0.0, 99.0],
-    "Min Inclusión (%)": [20.0, 5.0, 10.0, 0.0, 0.0, 0.0, 2.0, 1.0, 0.0],
-    "Max Inclusión (%)": [60.0, 35.0, 50.0, 1.5, 0.0, 30.0, 6.0, 3.0, 3.0]
+    "Categoria": ["Forraje", "Suplemento Proteico", "Grano Energetico", "Suplemento NPN", "Forraje Humedo", "Suplemento Proteico", "Subproducto / Energetico", "Suplemento Mineral", "Suplemento Mineral", "Suplemento Energetico"],
+    "Disponible": [True, True, True, True, False, True, True, True, True, True],
+    "Precio Estimado (MXN/ton)": [2500.0, 12500.0, 5800.0, 16000.0, 1200.0, 8500.0, 4800.0, 19000.0, 18500.0, 32000.0],
+    "Proteina Cruda (PC % MS)": [5.5, 48.0, 8.5, 281.0, 8.0, 38.0, 4.8, 0.0, 0.0, 1.0],
+    "NEg (Mcal/kg)": [0.35, 1.48, 1.55, 0.0, 0.85, 1.15, 1.22, 0.0, 0.0, 1.65],
+    "FND (% MS)": [75.0, 12.0, 9.0, 0.0, 45.0, 28.0, 0.0, 0.0, 0.0, 0.0],
+    "peNDF (% MS)": [65.0, 2.0, 3.0, 0.0, 30.0, 10.0, 0.0, 0.0, 0.0, 0.0],
+    "PDR (% MS)": [3.5, 33.6, 5.5, 281.0, 5.0, 24.0, 4.5, 0.0, 0.0, 0.0],
+    "PND (% MS)": [2.0, 14.4, 3.0, 0.0, 3.0, 14.0, 0.3, 0.0, 0.0, 1.0],
+    "Calcio (Ca %)": [0.35, 0.30, 0.02, 0.0, 0.25, 0.70, 0.80, 14.0, 16.0, 1.0],
+    "Fosforo (P %)": [0.10, 0.65, 0.30, 0.0, 0.22, 1.10, 0.08, 7.0, 8.0, 0.1],
+    "Sodio (Na %)": [0.02, 0.03, 0.02, 0.0, 0.02, 0.05, 0.10, 10.0, 9.0, 0.0],
+    "Magnesio (Mg %)": [0.15, 0.28, 0.12, 0.0, 0.18, 0.50, 0.40, 2.0, 2.5, 0.0],
+    "Lípidos / Extracto Etéreo (%)": [1.5, 1.8, 3.8, 0.0, 3.0, 3.5, 0.5, 0.0, 0.0, 99.0],
+    "Min Inclusión (%)": [20.0, 5.0, 10.0, 0.0, 0.0, 0.0, 2.0, 1.0, 1.0, 0.0],
+    "Max Inclusión (%)": [60.0, 35.0, 50.0, 1.5, 0.0, 30.0, 6.0, 3.0, 3.0, 3.0]
 }
 df_base = pd.DataFrame(data_respaldo)
 
@@ -219,7 +220,7 @@ st.sidebar.markdown(
 # --- 5. INTERFAZ MODULAR POR PESTAÑAS (4 TABS ELITE) ---
 tab1, tab2, tab3, tab4 = st.tabs([
     "📋 1. Resumen y Sensibilidad", 
-    "🧪 2. Laboratorio y Perfiles", 
+    "🧪 2. Laboratorio y Google Sheets", 
     "📊 3. Balance Mineral y Bonos de Carbono", 
     "🚜 4. Bunk Management y Operarios"
 ])
@@ -266,12 +267,18 @@ with tab1:
     st.plotly_chart(fig_comportamiento, use_container_width=True)
 
 with tab2:
-    st.subheader("🧪 Laboratorio de Nutrición Editable y Control Regional")
+    st.subheader("🧪 Laboratorio de Nutrición y Base de Datos en Google Sheets")
     st.markdown(
         "**Personaliza por completo los perfiles nutricionales y de minerales de tus materias primas.** "
-        "Selecciona cuáles insumos están disponibles en tu rancho (`✓`), ajusta sus límites de inclusión, "
-        "y edita directamente en la tabla los valores según los análisis de tu laboratorio local:"
+        "Incluye sales minerales especializadas de la región de **Tlaltenango (Purina Mineral Tech y Malta Cleyton Ganafos)**. "
+        "Puedes acceder, editar o respaldar esta tabla directamente en tu nube de Google Drive:"
     )
+    
+    st.markdown(
+        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V5)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
+        unsafe_allow_html=True
+    )
+    st.markdown("<br>", unsafe_allow_html=True)
     
     df_ingredientes = st.data_editor(
         df_base, 
@@ -318,7 +325,7 @@ for idx, row in df_ingredientes.iterrows():
 A_eq = np.ones((1, len(c)))
 b_eq = np.array([1.0])
 
-# Restricciones Ca:P automáticas (1.5:1 a 2.0:1)
+# Restricciones Ca:P automáticas estrictas (1.5:1 a 2.0:1)
 row_ca_p_min = -ca + 1.5 * p_min_ing
 row_ca_p_max = ca - 2.0 * p_min_ing
 
@@ -425,7 +432,7 @@ with tab3:
         st.error(
             "⚠️ **Aviso del Optimizador Elite 360:** Con los ingredientes seleccionados o restricciones muy cerradas, no se encontró una solución matemática factible "
             "que cumpla simultáneamente con energía, proteína, fibra y la proporción automática Ca:P de 1.5 a 2.0. "
-            "Asegúrate de tener activa una fuente mineral especializada en la Pestaña 2."
+            "Asegúrate de tener activa una sal mineral especializada (como Purina Mineral Tech o Malta Cleyton Ganafos) en la Pestaña 2."
         )
 
 with tab4:
@@ -452,7 +459,7 @@ with tab4:
             "1. **Paso 1 (Forrajes Secos / Fibra Larga):** Cargar rastrojos o harinas fibrosas al inicio para asegurar el peNDF y evitar acidosis metabólica.\n"
             "2. **Paso 2 (Ingredientes Húmedos / Ensilados):** Agregar ensilados o subproductos húmedos calculando la corrección por materia seca.\n"
             "3. **Paso 3 (Granos Energéticos y Proteicos):** Incorporar maíz molido, pasta de soya y canola.\n"
-            "4. **Paso 4 (Núcleos, Minerales y Urea):** Agregar las sales minerales especializadas y la urea (previa dilución o mezclado homogéneo para evitar toxicidad).\n"
+            "4. **Paso 4 (Núcleos, Minerales y Urea):** Agregar las sales minerales especializadas de Tlaltenango y la urea (previa dilución o mezclado homogéneo).\n"
             "5. **Paso 5 (Líquidos):** Verter la melaza líquida con un chorro de agua al final para garantizar adherencia, evitar polvaderas y elevar la palatabilidad.\n"
             "6. **Tiempo de Mezclado:** Operar el carro mezclador de 8 a 10 minutos continuos antes de la distribución en comederos."
         )
@@ -526,7 +533,7 @@ with tab4:
                 "1. Orden en batea: Forrajes secos (rastrojo) para asegurar peNDF y evitar acidosis.\n"
                 "2. Incorporar ensilados y subproductos humedos.\n"
                 "3. Anadir granos energeticos y fuentes de proteina (soya/canola).\n"
-                "4. Agregar aditivos y minerales especializados (Sales y Urea con cuidado).\n"
+                "4. Agregar aditivos y minerales especializados de Tlaltenango.\n"
                 "5. Anadir melaza liquida al final con agua y mezclar de 8 a 10 minutos."
             )
             return bytes(pdf.output())
