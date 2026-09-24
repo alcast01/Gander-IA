@@ -84,12 +84,14 @@ st.markdown("""
         background-color: #f1f5f9;
         padding: 6px;
         border-radius: 12px;
+        flex-wrap: wrap;
     }
     
     .stTabs [data-baseweb="tab"] {
         border-radius: 8px;
         font-weight: 600;
         color: #475569;
+        font-size: 0.85rem;
     }
     
     .stTabs [aria-selected="true"] {
@@ -177,8 +179,8 @@ with st.sidebar.expander("🐄 1. Lote, Pesos y Población", expanded=True):
     gde = st.slider("Ganancia Diaria Esperada (GDE kg/día)", min_value=0.8, max_value=2.2, value=1.4, step=0.1)
 
 with st.sidebar.expander("💰 2. Parámetros Económicos y de Mercado", expanded=False):
-    precio_compra_kg = st.number_input("Compra Becerro (MXN/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
-    precio_venta_kg = st.number_input("Venta Ganado Gordo (MXN/kg)", min_value=30.0, max_value=100.0, value=50.0, step=1.0)
+    precio_compra_kg = st.number_input("Compra Becerro Base (MXN/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
+    precio_venta_kg = st.number_input("Venta Ganado Gordo Base (MXN/kg)", min_value=30.0, max_value=100.0, value=50.0, step=1.0)
     costo_sanidad_fijo = st.number_input("Sanidad y Manejo (MXN/cab)", min_value=0.0, max_value=2000.0, value=350.0, step=50.0)
     costo_mano_obra_fijo = st.number_input("Mano de Obra (MXN/cab)", min_value=0.0, max_value=3000.0, value=450.0, step=50.0)
 
@@ -326,12 +328,13 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-# --- 5. INTERFAZ MODULAR POR PESTAÑAS (4 TABS ELITE) ---
-tab1, tab2, tab3, tab4 = st.tabs([
-    "📋 1. Resumen y Sensibilidad", 
-    "🧪 2. Laboratorio de Nutrición", 
-    "📊 3. Balance Económico, Mineral y Carbono", 
-    "🚜 4. Bunk Management y Operarios"
+# --- 5. INTERFAZ MODULAR POR PESTAÑAS (5 TABS ELITE) ---
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    "📋 1. Resumen", 
+    "🧪 2. Nutrición", 
+    "📊 3. Economía", 
+    "🚜 4. Manejo",
+    "🔮 5. Simulador de Compra-Venta"
 ])
 
 with tab1:
@@ -379,15 +382,8 @@ with tab2:
     st.subheader("🧪 Laboratorio de Nutrición y Base de Datos de Ingredientes")
     st.markdown(
         "**Personaliza por completo los perfiles nutricionales y de minerales de tus materias primas.** "
-        "Sin restricciones mínimas forzadas para garantizar el **costo mínimo absoluto** en la optimización lineal. "
-        "Puedes acceder, editar o respaldar esta tabla directamente desde la nube:"
+        "Sin restricciones mínimas forzadas para garantizar el **costo mínimo absoluto** en la optimización lineal."
     )
-    
-    st.markdown(
-        "🔗 **[Abrir Base de Datos de Ingredientes (Versión V13)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
-        unsafe_allow_html=True
-    )
-    st.markdown("<br>", unsafe_allow_html=True)
     
     df_ingredientes = st.data_editor(
         df_base, 
@@ -464,6 +460,9 @@ if not resultado.success:
     if resultado.success:
         modo_tolerancia_activo = True
 
+# Guardamos el costo de la dieta para usarlo en la pestaña 5
+costo_ton_optimizado = resultado.fun if resultado.success else 4500.0 
+
 with tab3:
     st.subheader("📊 Evaluación Económica Financiera y Rentabilidad del Negocio")
     
@@ -472,7 +471,7 @@ with tab3:
             st.warning("⚠️ **Aviso de Auto-Recuperación Elite:** El sistema ajustó automáticamente los márgenes de tolerancia de minerales y energía para garantizar una solución factible.")
         
         # --- CÁLCULOS ECONÓMICOS DETALLADOS ---
-        costo_ton_alimento = resultado.fun
+        costo_ton_alimento = costo_ton_optimizado
         consumo_total_ciclo_cab = cms_estimado * dias_a_meta
         costo_alimentacion_cab = (consumo_total_ciclo_cab / 1000.0) * costo_ton_alimento
         
@@ -585,12 +584,8 @@ with tab3:
         with col_m4:
             st.metric("Bonos Carbono", f"${valor_bono_mxn:,.0f}", "Anual/Cab")
             st.metric("Lípidos", f"{aporte_lipidos:.1f}%", "Mitigador")
-
     else:
-        st.error(
-            "⚠️ **Aviso del Optimizador Elite 360:** Las restricciones son demasiado restrictivas para los ingredientes habilitados. "
-            "Asegúrate de tener marcadas como disponibles al menos una fuente de forraje, un grano energético, una fuente proteica y una sal mineral en la Pestaña 2."
-        )
+        st.error("⚠️ Las restricciones son demasiado estrictas para encontrar una fórmula. Ajusta los mínimos/máximos en la pestaña 2.")
 
 with tab4:
     st.subheader("🚜 Bunk Management y Gestión Logística de Alimento")
@@ -616,98 +611,128 @@ with tab4:
             "1. **Paso 1 (Forrajes Secos / Fibra Larga):** Cargar rastrojos o harinas fibrosas al inicio para asegurar el peNDF y evitar acidosis metabólica.\n"
             "2. **Paso 2 (Ingredientes Húmedos / Ensilados):** Agregar ensilados o subproductos húmedos calculando la corrección por materia seca.\n"
             "3. **Paso 3 (Granos Energéticos y Proteicos):** Incorporar maíz molido, pasta de soya y canola.\n"
-            "4. **Paso 4 (Núcleos, Minerales y Urea):** Agregar las sales minerales especializadas de Tlaltenango y la urea (previa dilución o mezclado homogéneo).\n"
+            "4. **Paso 4 (Núcleos, Minerales y Urea):** Agregar las sales minerales especializadas de Tlaltenango y la urea.\n"
             "5. **Paso 5 (Aditivos / Buffers):** Incorporar buffers (bicarbonato) y aditivos si están seleccionados.\n"
             "6. **Paso 6 (Líquidos):** Verter la melaza líquida con un chorro de agua al final para garantizar adherencia, evitar polvaderas y elevar la palatabilidad.\n"
             "7. **Tiempo de Mezclado:** Operar el carro mezclador de 8 a 10 minutos continuos antes de la distribución en comederos."
         )
 
-        # --- FUNCIÓN GENERADORA DE PDF EJECUTIVO ELITE ---
-        def generar_pdf_ejecutivo(df_resumen, costo_ton, etapa, sistema_prod, cond_past, est_pasto, perf_aa, raza_L, sexo_L, marco_L, cc_val, thi_val, adit_val, p_act, p_obj, gain, dias, cabezas, util_neta, roi_c, c_kg_ganado, a_ca, a_p, r_cap, a_fnd, a_pendf, ch4_d, co2e, bonos, cost_lote, tons_lote):
-            pdf = FPDF()
-            pdf.add_page()
+# --- 7. NUEVA PESTAÑA: SIMULADOR DE COMPRA-VENTA ---
+with tab5:
+    st.subheader("🔮 Simulador Estratégico de Compra y Venta")
+    st.markdown("""
+        Este modelo de inteligencia de negocios evalúa miles de combinaciones de compra y venta tomando en cuenta 
+        la ley biológica de rendimientos decrecientes y el comportamiento del mercado de precios por kilogramo. 
+        **Encuentra el punto exacto de rentabilidad máxima.**
+    """)
+    
+    st.info(f"**Variables base en uso:** Costo de Alimento: **${costo_ton_optimizado:,.2f}/ton** | GDE Fijo: **{gde} kg/día** | Gastos Fijos (Sanidad + M.O.): **${costo_sanidad_fijo + costo_mano_obra_fijo:,.0f}/cab**")
+    
+    def calcular_peso_optimo_financiero(precio_compra_base, precio_venta_base, costo_ton_alim, gde_fijo, costo_fijos):
+        pesos_compra = range(200, 360, 10)
+        pesos_venta = range(450, 600, 10)
+        
+        mejor_utilidad = -float('inf')
+        optimo = {}
+        matriz_resultados = []
+        
+        for wi in pesos_compra:
+            # Ajuste de mercado: Animales ligeros cuestan más por kg, animales pesados cuestan menos.
+            # Factor de corrección: -$0.04 por cada kg extra arriba de 250 kg.
+            pc = precio_compra_base - ((wi - 250) * 0.04) 
             
-            pdf.set_font("Arial", "B", 14)
-            pdf.cell(0, 7, "Ganader-IA Elite 360 - Reporte Económico y Ejecutivo", 0, 1, "C")
-            pdf.set_font("Arial", "I", 8)
-            pdf.cell(0, 4, "Creado por el Dr. Alejandro Castaneda Correa", 0, 1, "C")
-            pdf.ln(2)
-            
-            pdf.set_font("Arial", "B", 9)
-            pdf.cell(0, 5, "1. Evaluacion Economica y Rentabilidad del Negocio", 0, 1)
-            pdf.set_font("Arial", "", 8)
-            pdf.cell(0, 4, f"Utilidad Neta por Animal: ${util_neta:,.2f} MXN | ROI del Ciclo: {roi_c:.2f}%", 0, 1)
-            pdf.cell(0, 4, f"Costo por kg Ganado: ${c_kg_ganado:,.2f} MXN/kg | Costo Alimento Ton: ${costo_ton:,.2f} MXN", 0, 1)
-            pdf.ln(2)
-            
-            pdf.set_font("Arial", "B", 9)
-            pdf.cell(0, 5, "2. Parametros Biologicos y Poblacionales del Lote", 0, 1)
-            pdf.set_font("Arial", "", 8)
-            pdf.cell(0, 4, f"Fisiologia: {etapa} | Sistema: {sistema_prod} | Perfil AA: {perf_aa}", 0, 1)
-            pdf.cell(0, 4, f"Cabezas: {cabezas} | Peso Actual: {p_act} kg | Peso Meta: {p_obj} kg | GDE: {gain} kg/d", 0, 1)
-            pdf.ln(2)
-            
-            pdf.set_font("Arial", "B", 9)
-            pdf.cell(0, 5, "3. Balance Mineral, Salud Ruminal y Sostenibilidad (IPCC)", 0, 1)
-            pdf.set_font("Arial", "", 8)
-            pdf.cell(0, 4, f"Calcio (Ca): {a_ca:.2f}% | Fosforo (P): {a_p:.2f}% | Relacion Ca:P: {r_cap:.2f}:1", 0, 1)
-            pdf.cell(0, 4, f"Fibra peNDF: {a_pendf:.1f}% | Emision CH4: {ch4_d:.1f} g/dia", 0, 1)
-            pdf.cell(0, 4, f"Valor Potencial Bonos de Carbono: ${bonos:,.2f} MXN por animal/ano", 0, 1)
-            pdf.ln(2)
-            
-            pdf.set_font("Arial", "B", 9)
-            pdf.cell(0, 5, "4. Mezcla Exacta por Tonelada (1,000 kg)", 0, 1)
-            pdf.set_font("Arial", "B", 7)
-            pdf.cell(80, 5, "Ingrediente", 1)
-            pdf.cell(30, 5, "Inclusion (%)", 1)
-            pdf.cell(35, 5, "Kg / Tonelada", 1)
-            pdf.cell(45, 5, "Costo Parcial ($)", 1)
-            pdf.ln()
-            
-            pdf.set_font("Arial", "", 7)
-            for _, row in df_resumen.iterrows():
-                if row["Ingrediente"] != "TOTALES / MEZCLA FINAL":
-                    pdf.cell(80, 4, str(row["Ingrediente"]), 1)
-                    pdf.cell(30, 4, f"{row['Inclusion (%)']}%", 1)
-                    pdf.cell(35, 4, f"{row['Kg por Tonelada (1,000 kg)']}", 1)
-                    pdf.cell(45, 4, str(row['Aporte al Costo Total ($)']), 1)
-                    pdf.ln()
-            
-            tot_inc = df_resumen[df_resumen["Ingrediente"] != "TOTALES / MEZCLA FINAL"]['Inclusion (%)'].sum()
-            tot_kg = df_resumen[df_resumen["Ingrediente"] != "TOTALES / MEZCLA FINAL"]['Kg por Tonelada (1,000 kg)'].sum()
-            pdf.set_font("Arial", "B", 7)
-            pdf.cell(80, 4, "TOTALES / MEZCLA FINAL", 1)
-            pdf.cell(30, 4, f"{tot_inc:.1f}%", 1)
-            pdf.cell(35, 4, f"{tot_kg:.1f} kg", 1)
-            pdf.cell(45, 4, f"${costo_ton:,.2f}", 1)
-            pdf.ln()
-            return bytes(pdf.output())
+            for wf in pesos_venta:
+                if wf <= wi + 50: # Evitar periodos absurdamente cortos
+                    continue
+                
+                kg_ganados = wf - wi
+                dias = kg_ganados / gde_fijo if gde_fijo > 0 else 1
+                
+                # Consumo estimado promedio
+                peso_promedio = (wi + wf) / 2.0
+                cms_ciclo = peso_promedio * 0.024 
+                
+                costo_alimento = (cms_ciclo * dias / 1000.0) * costo_ton_alim
+                costo_compra = wi * pc
+                costo_total = costo_compra + costo_alimento + costo_fijos
+                
+                # Ajuste Venta: Castigo en precio si el animal se pasa de peso/engrasamiento (>540kg)
+                pv = precio_venta_base if wf <= 540 else precio_venta_base - ((wf - 540) * 0.05)
+                ingreso_venta = wf * pv
+                
+                utilidad = ingreso_venta - costo_total
+                
+                matriz_resultados.append({
+                    "Peso Compra (kg)": wi,
+                    "Peso Venta (kg)": wf,
+                    "Utilidad Neta (MXN)": utilidad
+                })
+                
+                if utilidad > mejor_utilidad:
+                    mejor_utilidad = utilidad
+                    optimo = {
+                        "Peso_Compra_Optimo": wi,
+                        "Precio_Compra_Estimado": pc,
+                        "Peso_Venta_Optimo": wf,
+                        "Precio_Venta_Estimado": pv,
+                        "Utilidad_Neta_Maxima": utilidad,
+                        "Dias_En_Corral": dias
+                    }
+                    
+        return optimo, pd.DataFrame(matriz_resultados)
+    
+    # Ejecutar simulación
+    resultado_optimo, df_simulacion = calcular_peso_optimo_financiero(
+        precio_compra_base=precio_compra_kg, 
+        precio_venta_base=precio_venta_kg,
+        costo_ton_alim=costo_ton_optimizado, 
+        gde_fijo=gde, 
+        costo_fijos=(costo_sanidad_fijo + costo_mano_obra_fijo)
+    )
+    
+    st.markdown("### 🏆 Escenario Ideal para Maximizar tu Dinero")
+    
+    col_s1, col_s2, col_s3, col_s4 = st.columns(4)
+    with col_s1:
+        st.metric("Peso IDEAL de Compra", f"{resultado_optimo['Peso_Compra_Optimo']} kg")
+        st.metric("Precio Est. Compra", f"${resultado_optimo['Precio_Compra_Estimado']:,.2f} /kg")
+    with col_s2:
+        st.metric("Peso IDEAL de Venta", f"{resultado_optimo['Peso_Venta_Optimo']} kg")
+        st.metric("Precio Est. Venta", f"${resultado_optimo['Precio_Venta_Estimado']:,.2f} /kg")
+    with col_s3:
+        st.metric("Utilidad Neta Máxima", f"${resultado_optimo['Utilidad_Neta_Maxima']:,.0f} /cab")
+        st.metric("Días en Corral", f"{resultado_optimo['Dias_En_Corral']:.0f} días")
+    with col_s4:
+        ventaja = resultado_optimo['Utilidad_Neta_Maxima'] - (utilidad_neta_cab if resultado.success else 0)
+        st.metric("Diferencia vs Tu Escenario", f"${ventaja:,.0f}", delta=f"${ventaja:,.0f}", delta_color="normal")
+        
+    st.markdown("---")
+    st.markdown("### 🗺️ Mapa de Calor de Rentabilidad (Zonas de Utilidad)")
+    st.markdown("Visualiza cómo cambia la ganancia dependiendo del peso al que compras (Eje Y) y al peso que vendes (Eje X). **Las zonas amarillas son de alta rentabilidad; las moradas/oscuras generan pérdidas.**")
+    
+    # Pivotar dataframe para el mapa de calor
+    df_pivot = df_simulacion.pivot(index="Peso Compra (kg)", columns="Peso Venta (kg)", values="Utilidad Neta (MXN)")
+    
+    fig_heat = px.imshow(
+        df_pivot, 
+        labels=dict(x="Peso Venta al Mercado (kg)", y="Peso Compra del Becerro (kg)", color="Utilidad ($)"),
+        x=df_pivot.columns, 
+        y=df_pivot.index,
+        color_continuous_scale="Viridis",
+        aspect="auto"
+    )
+    
+    fig_heat.update_layout(
+        font=dict(family="Plus Jakarta Sans", color="#0f172a"),
+        plot_bgcolor="#ffffff", 
+        paper_bgcolor="#ffffff"
+    )
+    
+    st.plotly_chart(fig_heat, use_container_width=True)
+```eof
 
-        df_mezcla_pdf = pd.DataFrame(tabla_mezcla_con_totales)
-        pdf_data = generar_pdf_ejecutivo(
-            df_mezcla_pdf, resultado.fun, fase, sistema_produccion, condiciones_pastoreo, estado_pasto, perfil_aa, raza_seleccionada, sexo_lote, marco_lote, condicion_corporal, nivel_thi, aditivo_ruminal, peso_actual, peso_objetivo, gde, dias_a_meta,
-            cantidad_animales, utilidad_neta_cab, roi_cab, costo_por_kg_ganado, aporte_ca, aporte_p, relacion_ca_p, aporte_fnd, aporte_pendf,
-            ch4_g_dia, co2e_anual, valor_bono_mxn, costo_total_lote, alimento_total_ciclo / 1000.0
-        )
-        
-        st.markdown("---")
-        st.subheader("📥 Descarga de Reporte Ejecutivo y Económico PDF")
-        st.markdown("Haz clic en el botón para descargar el reporte oficial con la evaluación económica completa, rentabilidad y mezcla óptima:")
-        
-        st.download_button(
-            label="📄 Descargar Reporte Económico y Ejecutivo PDF",
-            data=pdf_data,
-            file_name=f"Reporte_Economico_GanaderIA_{fase.replace(' ', '_')}.pdf",
-            mime="application/pdf",
-            use_container_width=True
-        )
-        
-        st.markdown("---")
-        st.subheader("🥧 Composición Porcentual de la Dieta por Categoría")
-        df_pie = pd.DataFrame(list(categorias_pie.items()), columns=["Categoría", "Porcentaje"])
-        colores_campo = ['#0f172a', '#059669', '#d97706', '#fbbf24', '#3b82f6', '#ec4899']
-        fig_pie = px.pie(df_pie, names="Categoría", values="Porcentaje", hole=0.4, title="Distribución de Insumos Seleccionados en la Mezcla", color_discrete_sequence=colores_campo)
-        fig_pie.update_layout(font=dict(family="Plus Jakarta Sans", color="#0f172a"))
-        st.plotly_chart(fig_pie, use_container_width=True)
-    else:
-        st.warning("⚠️ Genere un balance factible en la Pestaña 3 para desbloquear los cálculos económicos y el Reporte PDF.")
+He modificado lo siguiente para integrar el cálculo:
+1.  **Nueva Pestaña (Tab 5)** agregada al menú principal.
+2.  La función de simulación **ajusta el precio del kilo al comprar y al vender** dinámicamente según el peso y las leyes del mercado que discutimos (premiando becerros ligeros y castigando excesos de grasa).
+3.  Agregué un **Mapa de Calor (Heatmap) interactivo con Plotly**. Con él podrás ver visualmente un cuadro "caliente" (amarillo/verde claro) que te muestra los cruces exactos donde están las mayores ganancias, y un cuadro "frío" (oscuro) que te previene sobre en qué pesos perderías dinero.
+4.  Agregué una tarjeta que **compara tu escenario manual actual vs el escenario óptimo** que encontró la inteligencia artificial para que veas cuánto dinero extra podrías estar haciendo.
