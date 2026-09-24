@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import linprog
 import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from fpdf import FPDF
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL (CAMPO Y GANADERÍA) ---
@@ -125,14 +127,12 @@ raza_seleccionada = st.sidebar.selectbox(
 )
 
 # --- MODELADO PREDICTIVO BIOLÓGICO Y DINÁMICO DE ALTA FIDELIDAD ---
-# Ajuste de consumo de materia seca por efecto térmico ambiental (Invierno aumenta requerimiento de mantenimiento, Verano deprime ligeramente el consumo)
 factor_clima = 0.93 if estacion == "Invierno" else (1.05 if estacion == "Verano" else 1.00)
 cms_estimado = peso_actual * 0.024 * factor_clima
 
 kg_por_ganar = max(0.0, peso_objetivo - peso_actual)
 dias_a_meta = kg_por_ganar / gde if gde > 0 else 0
 
-# Requerimientos nutricionales basados en la etapa fisiológica y exigencia de GDE
 if peso_actual < 300:
     fase = "Crecimiento (Becerro Ligero)"
     meta_pc_base = 0.130 + (gde * 0.015)
@@ -146,7 +146,6 @@ else:
     meta_pc_base = 0.105 + (gde * 0.015)
     meta_neg_base = 1.00 + (gde * 0.10)
 
-# Factores de corrección por potencial genético y eficiencia energética
 if "Británicas" in raza_seleccionada:
     factor_pc = 1.02
     factor_neg = 1.05
@@ -190,37 +189,71 @@ with tab1:
         st.metric("Etapa Fisiológica", fase)
         st.metric("Ganancia Esperada (GDE)", f"{gde} kg/día")
     with col2:
-        st.metric("Consumo MS Estimado", f"{cms_estimado:.2f} kg/día")
+        st.metric("Consumo MS Inicial", f"{cms_estimado:.2f} kg/día")
         st.metric("Días Proyectados a Meta", f"{dias_a_meta:.0f} días")
     with col3:
         st.metric("Ganancia Total Esperada", f"{kg_por_ganar:.1f} kg")
         st.metric("Genética", raza_seleccionada.split("(")[0].strip())
     
     st.markdown("---")
-    st.subheader("📈 Curva de Comportamiento y Proyección de Peso en el Tiempo")
+    st.subheader("📈 Gráfica de Comportamiento: Peso y Consumo de Materia Seca en el Tiempo")
+    st.markdown(f"Evolución semanal del lote desde el **Peso Inicial ({peso_actual} kg)** hasta el **Peso Final ({peso_objetivo} kg)** considerando una GDE constante de **{gde} kg/día**:")
     
     semanas = int(np.ceil(dias_a_meta / 7)) if dias_a_meta > 0 else 1
     semanas = max(semanas, 4)
     
-    df_proyeccion = pd.DataFrame({
-        "Semana": [f"Semana {i}" for i in range(semanas + 1)],
-        "Peso Proyectado (kg)": [min(peso_objetivo, peso_actual + (i * 7 * gde)) for i in range(semanas + 1)]
-    })
+    lista_semanas = []
+    lista_pesos = []
+    lista_cms = []
     
-    fig_line = px.line(
-        df_proyeccion, 
-        x="Semana", 
-        y="Peso Proyectado (kg)", 
-        markers=True,
-        title="Trayectoria de Engorda del Lote hacia el Peso Objetivo"
+    for i in range(semanas + 1):
+        dias_transcurridos = i * 7
+        peso_proy = min(peso_objetivo, peso_actual + (dias_transcurridos * gde))
+        cms_proy = peso_proy * 0.024 * factor_clima
+        lista_semanas.append(f"Semana {i}")
+        lista_pesos.append(peso_proy)
+        lista_cms.append(round(cms_proy, 2))
+    
+    # Construcción de gráfica de doble eje con Plotly (Peso vs Consumo de Materia Seca)
+    fig_comportamiento = make_subplots(specs=[[{"secondary_y": True}]])
+
+    fig_comportamiento.add_trace(
+        go.Scatter(
+            x=lista_semanas,
+            y=lista_pesos,
+            name="Peso Proyectado (kg)",
+            mode="lines+markers",
+            line=dict(color="#2d5a27", width=3.5),
+            marker=dict(size=8, color="#2d5a27")
+        ),
+        secondary_y=False,
     )
-    fig_line.update_traces(line_color="#2d5a27", marker=dict(size=8, color="#bc6c25"))
-    fig_line.update_layout(
-        plot_bgcolor="#ffffff", 
-        paper_bgcolor="#ffffff", 
-        font=dict(family="Inter", color="#2b2d42")
+
+    fig_comportamiento.add_trace(
+        go.Scatter(
+            x=lista_semanas,
+            y=lista_cms,
+            name="Consumo Materia Seca (kg/día)",
+            mode="lines+markers",
+            line=dict(color="#bc6c25", width=3, dash="dash"),
+            marker=dict(size=8, color="#bc6c25")
+        ),
+        secondary_y=True,
     )
-    st.plotly_chart(fig_line, use_container_width=True)
+
+    fig_comportamiento.update_layout(
+        title=dict(text=f"Dinámica de Engorda (GDE: {gde} kg/d | Clima: {estacion})", font=dict(family="Inter", size=15)),
+        plot_bgcolor="#ffffff",
+        paper_bgcolor="#ffffff",
+        font=dict(family="Inter", color="#2b2d42"),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        margin=dict(l=20, r=20, t=50, b=20)
+    )
+
+    fig_comportamiento.update_yaxes(title_text="<b>Peso Vivo del Animal (kg)</b>", secondary_y=False, color="#2d5a27")
+    fig_comportamiento.update_yaxes(title_text="<b>Consumo de Materia Seca (kg/día)</b>", secondary_y=True, color="#bc6c25")
+
+    st.plotly_chart(fig_comportamiento, use_container_width=True)
 
 with tab2:
     st.subheader("Gestión de Inventario y Análisis de Laboratorio")
@@ -242,20 +275,19 @@ except KeyError as err:
     st.error(f"Falta una columna clave en la tabla: {err}.")
     st.stop()
 
-# Restricciones operativas y toxicológicas por ingrediente
 bounds = []
 for idx, row in df_ingredientes.iterrows():
     nombre = str(row["Nombre del Ingrediente"]).lower()
     if "urea" in nombre:
-        bounds.append((0.0, 0.015))    # Urea: Máximo 1.5% en la dieta total
+        bounds.append((0.0, 0.015))    # Urea: Máximo 1.5%
     elif "mineral" in nombre or "sal" in nombre:
         bounds.append((0.01, 0.03))   # Minerales: 1% a 3%
     elif "grasa" in nombre or "lactomil" in nombre:
         bounds.append((0.01, 0.03))   # Grasa de sobrepaso: 1% a 3%
     elif "melaza" in nombre:
-        bounds.append((0.02, 0.06))   # Melaza: 2% a 6% para palatabilidad y aglutinación
+        bounds.append((0.02, 0.06))   # Melaza: 2% a 6%
     else:
-        bounds.append((0.0, 1.0))      # Forrajes y concentrados energéticos/proteicos
+        bounds.append((0.0, 1.0))      # Forrajes y concentrados
 
 A_eq = np.ones((1, len(c)))
 b_eq = np.array([1.0])
@@ -347,7 +379,6 @@ with tab3:
                 pdf.ln()
                 
             pdf.ln(5)
-            # Instrucciones para operarios
             pdf.set_font("Arial", "B", 11)
             pdf.cell(0, 7, "4. Instrucciones de Mezclado para los Operarios del Corral", 0, 1)
             pdf.set_font("Arial", "", 9)
@@ -374,7 +405,6 @@ with tab3:
             use_container_width=True
         )
         
-        # --- GRÁFICAS DE PASTEL Y BARRAS (PALETA CAMPO) ---
         st.markdown("---")
         st.subheader("🥧 Composición Porcentual de la Dieta por Categoría")
         df_pie = pd.DataFrame(list(categorias_pie.items()), columns=["Categoría", "Porcentaje"])
