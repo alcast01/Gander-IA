@@ -99,11 +99,88 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. LOGOTIPO VETERINARIO Y DE CAMPO ---
-st.markdown("""
-    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 50%, #fef3c7 100%); padding: 26px 30px; border-radius: 20px; box-shadow: 0 15px 35px -10px rgba(5, 150, 105, 0.15); margin-bottom: 24px; border: 2px solid #34d399; flex-wrap: wrap; gap: 20px;">
+# --- 2. GESTIÓN DE AUTENTICACIÓN (SESSION STATE) ---
+if "registered_users" not in st.session_state:
+    st.session_state.registered_users = {"admin": "1234", "alejandro": "elite360"}
+
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if "current_user" not in st.session_state:
+    st.session_state.current_user = ""
+
+# --- PANTALLA DE ACCESO / LOGIN SI NO ESTÁ AUTENTICADO ---
+if not st.session_state.authenticated:
+    st.markdown("""
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px; margin-top: 30px;">
+            <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 16px; border-radius: 20px; box-shadow: 0 10px 25px rgba(5, 150, 105, 0.3);">
+                <svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="32" cy="32" r="30" fill="url(#paint0_linear)" />
+                  <path d="M16 26C16 26 22 18 32 18C42 18 48 26 48 26C48 26 44 38 32 44C20 38 16 26 16 26Z" fill="#ffffff" fill-opacity="0.18" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M16 26C12 22 10 15 15 13C20 11 24 17 26 21" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+                  <path d="M48 26C52 22 54 15 49 13C44 11 40 17 38 21" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+                  <path d="M32 48V27" stroke="#34d399" stroke-width="3.5" stroke-linecap="round"/>
+                  <circle cx="32" cy="23" r="3.5" fill="#f59e0b"/>
+                  <defs>
+                    <linearGradient id="paint0_linear" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#047857"/>
+                      <stop offset="1" stop-color="#059669"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+            </div>
+        </div>
+        <h2 style="text-align: center; color: #064e3b; font-family: 'Calibri', sans-serif; font-weight: 800; margin-bottom: 5px;">
+            Ganader-IA <span style="color: #059669;">ELITE 360</span>
+        </h2>
+        <p style="text-align: center; color: #475569; font-family: 'Calibri', sans-serif; margin-bottom: 25px;">
+            Plataforma SaaS de Precisión Nutricional y Alta Rentabilidad Pecuaria
+        </p>
+    """, unsafe_allow_html=True)
+
+    tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "📝 Registrar Cuenta Nueva"])
+
+    with tab_login:
+        st.markdown("### Acceso al Sistema")
+        user_input = st.text_input("Nombre de Usuario", key="login_user")
+        pass_input = st.text_input("Contraseña", type="password", key="login_pass")
+        
+        if st.button("Entrar a la Plataforma", use_container_width=True):
+            if user_input in st.session_state.registered_users and st.session_state.registered_users[user_input] == pass_input:
+                st.session_state.authenticated = True
+                st.session_state.current_user = user_input
+                st.success(f"¡Bienvenido de nuevo, {user_input}!")
+                st.rerun()
+            else:
+                st.error("Usuario o contraseña incorrectos. Verifica tus datos.")
+
+    with tab_register:
+        st.markdown("### Creación de Nueva Cuenta")
+        new_user = st.text_input("Elige un Nombre de Usuario", key="reg_user")
+        new_pass = st.text_input("Elige una Contraseña", type="password", key="reg_pass")
+        confirm_pass = st.text_input("Confirma tu Contraseña", type="password", key="reg_conf")
+        
+        if st.button("Registrarse y Acceder", use_container_width=True):
+            if not new_user or not new_pass:
+                st.warning("Por favor, completa todos los campos.")
+            elif new_user in st.session_state.registered_users:
+                st.error("El nombre de usuario ya existe. Elige otro o inicia sesión.")
+            elif new_pass != confirm_pass:
+                st.error("Las contraseñas no coinciden.")
+            else:
+                st.session_state.registered_users[new_user] = new_pass
+                st.session_state.authenticated = True
+                st.session_state.current_user = new_user
+                st.success(f"¡Cuenta creada con éxito! Bienvenido, {new_user}.")
+                st.rerun()
+
+    st.stop() # Detiene la ejecución del resto de la app hasta que el usuario inicie sesión
+
+# --- 3. LOGOTIPO VETERINARIO Y DE CAMPO (USUARIO AUTENTICADO) ---
+st.markdown(f"""
+    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 50%, #fef3c7 100%); padding: 22px 26px; border-radius: 20px; box-shadow: 0 15px 35px -10px rgba(5, 150, 105, 0.15); margin-bottom: 24px; border: 2px solid #34d399; flex-wrap: wrap; gap: 20px;">
         <div style="flex-shrink: 0; background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 12px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);">
-            <svg width="52" height="52" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="32" cy="32" r="30" fill="url(#paint0_linear)" />
               <path d="M16 26C16 26 22 18 32 18C42 18 48 26 48 26C48 26 44 38 32 44C20 38 16 26 16 26Z" fill="#ffffff" fill-opacity="0.18" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M16 26C12 22 10 15 15 13C20 11 24 17 26 21" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
@@ -122,20 +199,17 @@ st.markdown("""
             </svg>
         </div>
         <div style="flex-grow: 1; min-width: 240px;">
-            <h1 style="margin: 0; font-size: 1.9em; color: #064e3b; letter-spacing: -0.8px; font-weight: 800; font-family: 'Calibri', sans-serif;">
+            <h1 style="margin: 0; font-size: 1.8em; color: #064e3b; letter-spacing: -0.8px; font-weight: 800; font-family: 'Calibri', sans-serif;">
                 Ganader-IA <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">ELITE 360</span>
             </h1>
-            <p style="margin: 4px 0 2px 0; font-size: 0.95em; color: #1e293b; font-weight: 600; font-family: 'Calibri', sans-serif;">
-                Plataforma SaaS de Precisión Nutricional, Economía y Sostenibilidad Pecuaria
-            </p>
-            <p style="margin: 0; font-size: 0.85em; color: #047857; font-weight: 700; font-family: 'Calibri', sans-serif;">
-                ✨ Creado y Diseñado por: Dr. Alejandro Castañeda Correa
+            <p style="margin: 3px 0 2px 0; font-size: 0.9em; color: #1e293b; font-weight: 600; font-family: 'Calibri', sans-serif;">
+                Sesión Activa: <span style="color: #059669; font-weight: 700;">{st.session_state.current_user.capitalize()}</span> | Creado por: Dr. Alejandro Castañeda Correa
             </p>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
-# --- 3. BASE DE DATOS INICIAL CON PERSISTENCIA (SESSION STATE) ---
+# --- 4. BASE DE DATOS INICIAL CON PERSISTENCIA (SESSION STATE) ---
 if "df_ingredientes_state" not in st.session_state:
     st.session_state.df_ingredientes_state = pd.DataFrame({
         "Nombre del Ingrediente": [
@@ -161,8 +235,15 @@ if "df_ingredientes_state" not in st.session_state:
         "Max Inclusión (%)": [100.0, 100.0, 100.0, 1.5, 100.0, 100.0, 100.0, 5.0, 5.0, 5.0]
     })
 
-# --- 4. BARRA LATERAL ---
-st.sidebar.markdown("### 🎛️ Panel de Control Elite")
+# --- 5. BARRA LATERAL ---
+st.sidebar.markdown(f"### 🎛️ Panel de Control Elite")
+st.sidebar.markdown(f"👤 **Usuario:** {st.session_state.current_user.capitalize()}")
+if st.sidebar.button("🚪 Cerrar Sesión", use_container_width=True):
+    st.session_state.authenticated = False
+    st.session_state.current_user = ""
+    st.rerun()
+
+st.sidebar.markdown("---")
 
 with st.sidebar.expander("🐄 1. Lote, Pesos y Población", expanded=True):
     cantidad_animales = st.number_input("Número de Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
