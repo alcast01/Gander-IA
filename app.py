@@ -75,7 +75,7 @@ st.markdown("""
     
     /* Estilización de pestañas claras */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
+        gap: 6px;
         background-color: #e2e8f0;
         padding: 6px;
         border-radius: 12px;
@@ -86,7 +86,7 @@ st.markdown("""
         border-radius: 8px;
         font-weight: 600;
         color: #334155;
-        font-size: 0.85rem;
+        font-size: 0.82rem;
     }
     
     .stTabs [aria-selected="true"] {
@@ -465,28 +465,14 @@ def generar_pdf_reporte():
     else:
         return output.encode('latin1')
 
-# --- EXPORTACIÓN EN BARRA LATERAL ---
-st.sidebar.markdown("---")
-with st.sidebar.expander("📥 6. Reportes y Exportación", expanded=True):
-    if resultado.success:
-        pdf_bytes = generar_pdf_reporte()
-        st.download_button(
-            label="📄 Descargar Reporte PDF",
-            data=pdf_bytes,
-            file_name="GanaderIA_Elite_360_Reporte.pdf",
-            mime="application/pdf",
-            use_container_width=True
-        )
-    else:
-        st.warning("Resuelve las restricciones nutricionales para habilitar el reporte PDF.")
-
-# --- 5. INTERFAZ MODULAR POR PESTAÑAS (5 TABS ELITE) ---
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+# --- 5. INTERFAZ MODULAR POR PESTAÑAS (6 TABS ELITE CON REPORTE PDF AL LADO DEL SIMULADOR) ---
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "📋 1. Resumen", 
     "🧪 2. Nutrición", 
     "📊 3. Economía", 
     "🚜 4. Manejo",
-    "🔮 5. Simulador de Compra-Venta"
+    "🔮 5. Simulador Compra-Venta",
+    "📄 6. Reporte PDF"
 ])
 
 with tab1:
@@ -798,3 +784,23 @@ with tab5:
     )
     
     st.plotly_chart(fig_heat, use_container_width=True)
+
+with tab6:
+    st.subheader("📄 Generación y Descarga de Reporte Ejecutivo PDF")
+    st.markdown(
+        "Descarga un reporte profesional con todo el resumen zootécnico, financiero y la fórmula de costo mínimo optimizada "
+        "listo para compartir con socios o impresión."
+    )
+    
+    if resultado.success:
+        pdf_bytes = generar_pdf_reporte()
+        st.download_button(
+            label="📥 Descargar Reporte Ejecutivo en PDF",
+            data=pdf_bytes,
+            file_name="GanaderIA_Elite_360_Reporte.pdf",
+            mime="application/pdf",
+            use_container_width=True
+        )
+        st.success("¡El reporte PDF se ha generado correctamente con los datos actuales del lote y formulación lineal!")
+    else:
+        st.warning("⚠️ Resuelve las restricciones nutricionales en la pestaña **Nutrición** para habilitar la descarga del reporte PDF.")
