@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from fpdf import FPDF
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL COMPACTO ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y ESTILO VISUAL ULTRA-COMPACTO ---
 st.set_page_config(
     page_title="Ganader-IA Elite 360 | Nutrición y Economía",
     page_icon="🐄",
@@ -28,26 +28,29 @@ st.markdown("""
         background-color: #fcfbf9;
     }
     
-    /* Cuadros de métricas compactos y legibles */
+    /* Métricas ultra compactas para evitar cortes */
     .stMetric {
         background-color: #ffffff;
-        padding: 10px 12px !important;
-        border-radius: 10px;
-        box-shadow: 0 3px 8px rgba(45, 90, 39, 0.06);
-        border-left: 4px solid #2d5a27;
+        padding: 6px 8px !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(45, 90, 39, 0.05);
+        border-left: 3px solid #2d5a27;
         border-top: 1px solid #e6e2dd;
         border-right: 1px solid #e6e2dd;
         border-bottom: 1px solid #e6e2dd;
-        margin-bottom: 8px !important;
+        margin-bottom: 6px !important;
     }
     
     .stMetric label {
-        font-size: 0.75rem !important;
-        color: #555555 !important;
+        font-size: 0.68rem !important;
+        color: #666666 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
     
     .stMetric [data-testid="stMetricValue"] {
-        font-size: 1.15rem !important;
+        font-size: 0.95rem !important;
         color: #1f2421 !important;
         font-weight: 700 !important;
     }
@@ -69,16 +72,16 @@ st.markdown("""
 
 # --- 2. LOGOTIPO VECTORIAL INSTITUCIONAL ---
 st.markdown("""
-    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #2d5a27 0%, #bc6c25 100%); padding: 18px; border-radius: 14px; box-shadow: 0 4px 15px rgba(45,90,39,0.15); margin-bottom: 20px; color: white; flex-wrap: wrap; gap: 12px;">
+    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #2d5a27 0%, #bc6c25 100%); padding: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(45,90,39,0.15); margin-bottom: 15px; color: white; flex-wrap: wrap; gap: 10px;">
         <div style="flex-shrink: 0;">
-            <svg width="55" height="55" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="#ffffff"/>
                 <circle cx="12" cy="12" r="3" fill="#dda15e"/>
             </svg>
         </div>
-        <div style="flex-grow: 1; min-width: 220px;">
-            <h1 style="margin: 0; font-size: 1.8em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 6px; border-radius: 6px; font-size: 0.6em; vertical-align: middle;">ELITE 360</span></h1>
-            <p style="margin: 4px 0 0 0; font-size: 0.95em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización Compacta, Evaluación Financiera y Sostenibilidad</p>
+        <div style="flex-grow: 1; min-width: 200px;">
+            <h1 style="margin: 0; font-size: 1.5em; color: #ffffff; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">Ganader-IA <span style="background-color: #dda15e; color: #1f2421; padding: 2px 6px; border-radius: 4px; font-size: 0.55em; vertical-align: middle;">ELITE 360</span></h1>
+            <p style="margin: 2px 0 0 0; font-size: 0.85em; color: #f4f1de; font-weight: 300; font-family: 'Inter', sans-serif;">Optimización Compacta, Financiera y Sostenibilidad</p>
         </div>
     </div>
 """, unsafe_allow_html=True)
@@ -353,7 +356,7 @@ with tab2:
     )
     
     st.markdown(
-        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V8)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
+        "🔗 **[Abrir Base de Datos de Ingredientes en Google Sheets (Versión V9)](https://docs.google.com/spreadsheets/d/10LccHsdSqXYf_WisztCiIUEYAE8WUnJfDcY4WbB59DY/edit?usp=drivesdk&ouid=111418825164788732728)**",
         unsafe_allow_html=True
     )
     st.markdown("<br>", unsafe_allow_html=True)
@@ -454,20 +457,20 @@ with tab3:
         
         costo_por_kg_ganado = costo_alimentacion_cab / kg_por_ganar if kg_por_ganar > 0 else 0
         
-        status_rentabilidad = "🟢 Negocio Rentable" if utilidad_neta_cab > 0 else "🔴 Margen Negativo"
+        status_rentabilidad = "🟢 Rentable" if utilidad_neta_cab > 0 else "🔴 Negativo"
         
         col_ec1, col_ec2, col_ec3, col_ec4 = st.columns(4)
         with col_ec1:
-            st.metric("Costo Compra Becerro", f"${costo_compra_cab:,.0f} MXN")
-            st.metric("Costo Alimento/Cab", f"${costo_alimentacion_cab:,.0f} MXN")
+            st.metric("Compra Becerro", f"${costo_compra_cab:,.0f}")
+            st.metric("Alimento/Cab", f"${costo_alimentacion_cab:,.0f}")
         with col_ec2:
-            st.metric("Costo Total Animal", f"${costo_total_cab:,.0f} MXN")
-            st.metric("Costo x kg Ganado", f"${costo_por_kg_ganado:,.1f} MXN")
+            st.metric("Costo Total", f"${costo_total_cab:,.0f}")
+            st.metric("Costo x kg", f"${costo_por_kg_ganado:,.1f}")
         with col_ec3:
-            st.metric("Ingreso Venta/Cab", f"${ingreso_venta_cab:,.0f} MXN")
-            st.metric("Utilidad Neta / Cab", f"${utilidad_neta_cab:,.0f} MXN")
+            st.metric("Ingreso Venta", f"${ingreso_venta_cab:,.0f}")
+            st.metric("Utilidad Neta", f"${utilidad_neta_cab:,.0f}")
         with col_ec4:
-            st.metric("ROI del Ciclo", f"{roi_cab:.1f}%")
+            st.metric("ROI Ciclo", f"{roi_cab:.1f}%")
             st.metric("Estatus", status_rentabilidad)
             
         st.markdown("---")
@@ -543,16 +546,16 @@ with tab3:
         
         col_m1, col_m2, col_m3, col_m4 = st.columns(4)
         with col_m1:
-            st.metric("Calcio (Ca)", f"{aporte_ca:.2f}%", "Mineral")
+            st.metric("Calcio (Ca)", f"{aporte_pc:.1f}%", "Mineral")
             st.metric("Relación Ca:P", f"{relacion_ca_p:.1f}:1", status_ca_p)
         with col_m2:
             st.metric("Fibra peNDF", f"{aporte_pendf:.1f}%", "Anti-acidosis")
             st.metric("Riesgo SARA", riesgo_sara, "Ruminal")
         with col_m3:
-            st.metric("Emisión $CH_4$", f"{ch4_g_dia:.1f} g/d", f"IPCC Tier 2")
+            st.metric("Emisión $CH_4$", f"{ch4_g_dia:.1f} g/d", "IPCC Tier 2")
             st.metric("Eq. $CO_2e$", f"{co2e_anual:,.0f} kg/año")
         with col_m4:
-            st.metric("Bonos Carbono", f"${valor_bono_mxn:,.0f} MXN", "Anual/Cab")
+            st.metric("Bonos Carbono", f"${valor_bono_mxn:,.0f}", "Anual/Cab")
             st.metric("Lípidos", f"{aporte_lipidos:.1f}%", "Mitigador")
 
     else:
