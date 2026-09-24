@@ -28,38 +28,38 @@ st.markdown("""
         background-color: #f8fafc;
     }
     
-    /* Tarjetas de Métricas Estilo Neo-AgTech SaaS */
+    /* Tarjetas de Métricas Estilo Neo-AgTech SaaS (Fuentes Reducidas) */
     .stMetric {
         background: #ffffff;
-        padding: 12px 14px !important;
-        border-radius: 14px;
+        padding: 10px 12px !important;
+        border-radius: 12px;
         box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
         border: 1px solid #e2e8f0;
-        border-left: 5px solid #059669;
-        margin-bottom: 8px !important;
+        border-left: 4px solid #059669;
+        margin-bottom: 6px !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden;
     }
     
     .stMetric:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 20px 30px -10px rgba(5, 150, 105, 0.12);
+        transform: translateY(-2px);
+        box-shadow: 0 15px 25px -10px rgba(5, 150, 105, 0.12);
         border-color: #059669;
     }
     
     .stMetric label {
-        font-size: 0.7rem !important;
+        font-size: 0.6rem !important;
         color: #64748b !important;
         font-weight: 700 !important;
         text-transform: uppercase;
-        letter-spacing: 0.8px;
+        letter-spacing: 0.6px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
     
     .stMetric [data-testid="stMetricValue"] {
-        font-size: 1.05rem !important;
+        font-size: 0.9rem !important;
         color: #0f172a !important;
         font-weight: 800 !important;
         word-break: break-word;
