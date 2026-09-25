@@ -150,6 +150,12 @@ if "authenticated" not in st.session_state:
 if "current_user" not in st.session_state:
     st.session_state.current_user = ""
 
+# Inicializar historial de chat con NutriON
+if "nutrion_messages" not in st.session_state:
+    st.session_state.nutrion_messages = [
+        {"role": "assistant", "content": "¡Hola! Soy **NutriON**, tu asistente virtual automatizado para **Ganader-IA Elite 360**. Estoy aquí para ayudarte con cualquier duda sobre nutrición animal, funcionamiento de la plataforma, reportar problemas técnicos o recibir tus comentarios. ¿En qué te puedo ayudar hoy?"}
+    ]
+
 # --- PANTALLA DE ACCESO / SUSCRIPCIÓN SI NO ESTÁ AUTENTICADO ---
 if not st.session_state.authenticated:
     st.markdown("""
@@ -719,14 +725,15 @@ def generar_pdf_reporte():
     else:
         return output.encode('latin1')
 
-# --- 6. INTERFAZ MODULAR POR PESTAÑAS (6 TABS ELITE) ---
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+# --- 6. INTERFAZ MODULAR POR PESTAÑAS (7 TABS ELITE CON NUTRA-ON) ---
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "📋 1. Resumen", 
     "🧪 2. Nutrición & Multietapa", 
     "📊 3. Economía", 
     "🚜 4. Manejo",
     "🔮 5. Simulador Compra-Venta",
-    "📄 6. Reporte PDF"
+    "📄 6. Reporte PDF",
+    "💬 7. NutriON (Soporte & Ayuda)"
 ])
 
 with tab1:
@@ -1063,3 +1070,42 @@ with tab6:
         st.success("¡El reporte PDF se ha generado correctamente con los datos actuales del lote y formulación lineal!")
     else:
         st.warning("⚠️ Resuelve las restricciones nutricionales en la pestaña **Nutrición & Multietapa** para habilitar la descarga del reporte PDF.")
+
+with tab7:
+    st.subheader("💬 Asistente Virtual NutriON (Soporte & Ayuda al Cliente)")
+    st.markdown("""
+        Bienvenido al canal de atención automatizada con **NutriON**. Puedes escribir tus preguntas sobre formulación, 
+        dudas del software, reportar algún problema técnico o dejar tus comentarios y sugerencias.
+    """)
+    
+    # Contenedor para mostrar mensajes de chat
+    chat_container = st.container()
+    with chat_container:
+        for message in st.session_state.nutrion_messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
+    # Entrada de texto para el usuario
+    if user_query := st.chat_input("Escribe tu pregunta, reporte o comentario aquí..."):
+        # Añadir mensaje del usuario al historial
+        st.session_state.nutrion_messages.append({"role": "user", "content": user_query})
+        with st.chat_message("user"):
+            st.markdown(user_query)
+
+        # Generar respuesta automática inteligente de NutriON basada en el contenido
+        query_lower = user_query.lower()
+        if any(w in query_lower for w in ["precio", "costo", "suscripcion", "plan", "trimestral", "semestral", "anual", "pagar"]):
+            bot_response = "💳 **Planes de Suscripción Elite Disponibles:**\n- **Trimestral (3 Meses):** $2,700 MXN ($900/mes)\n- **Semestral (6 Meses):** $4,800 MXN ($800/mes - Ahorras $100/mes)\n- **Anual (12 Meses):** $8,400 MXN ($700/mes - Ahorras $200/mes)\nPuedes renovar o adquirir tu licencia directamente desde la pantalla de inicio al cerrar sesión."
+        elif any(w in query_lower for w in ["formula", "ingrediente", "nutricion", "proteina", "energia", "minimos", "maximos"]):
+            bot_response = "🧪 Para ajustar fórmulas y perfiles nutricionales, dirígete a la pestaña **2. Nutrición & Multietapa**. Ahí puedes modificar los precios, disponibilidad y límites de inclusión de cada ingrediente. El motor lineal calculará automáticamente la mezcla de costo mínimo."
+        elif any(w in query_lower for w in ["error", "fallo", "problema", "bug", "tecnico", "ayuda", "soporte"]):
+            bot_response = "🛠️ Lamento que experimentes inconvenientes técnicos. Nuestro equipo de soporte (liderado por el Dr. Alejandro Castañeda) revisa los reportes continuamente. Por favor, asegúrate de actualizar la página o verificar los parámetros ingresados. Si persiste, puedes comunicarte directamente al correo de administración."
+        elif any(w in query_lower for w in ["gde", "ganancia", "peso", "meta", "dias"]):
+            bot_response = "📈 La **Ganancia Diaria Esperada (GDE)** y los pesos proyectados se pueden configurar en la barra lateral izquierda (apartado *Lote, Pesos y Población*). Puedes elegir entre modo manual o el optimizador automático Elite."
+        else:
+            bot_response = f"🤖 He registrado tu mensaje: *\"{user_query}\"*. Como asistente virtual **NutriON**, he enviado este comentario al registro de atención para que el equipo técnico y el Dr. Alejandro Castañeda lo tengan en cuenta. ¿Tienes alguna otra duda sobre nutrición o la plataforma?"
+
+        # Añadir respuesta de NutriON al historial
+        st.session_state.nutrion_messages.append({"role": "assistant", "content": bot_response})
+        with st.chat_message("assistant"):
+            st.markdown(bot_response)
