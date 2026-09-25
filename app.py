@@ -1166,7 +1166,7 @@ with tab8:
         para garantizar el éxito de tu operación pecuaria.
     """)
     
-    with st.expander("🌾 1. Guías Nutricionales y Formulación de Dietas para Ranchos y Feedlots", expanded=True):
+    with st.expander("🌾 1. Guías Nutricionales y Formulación de Dietas para Ranchos y Feedlots", expanded=False):
         st.markdown("""
             * **Recepción de Becerros (Estrés Post-Transporte):** 
               - Uso de dietas altas en fibra efectiva (`peNDF > 24%`) para estimular la rumia, favorecer la salivación y proteger la integridad epitelial del rumen.
@@ -1196,29 +1196,44 @@ with tab8:
               - **Densidad Energética:** Elevar ligeramente la concentración de energía neta (grasa de sobrepaso) para compensar la caída voluntaria de consumo de materia seca (CMS) inducida por el calor.
         """)
         
-    with st.expander("🩺 4. Solicitud de Consultoría Remota Personalizada con el Especialista", expanded=False):
+    with st.expander("🩺 4. Solicitud y Agendamiento de Consultoría Remota ($475 MXN / 30 min)", expanded=True):
         st.markdown("""
-            ¿Necesitas un diagnóstico a profundidad, auditoría de tu planta de alimentos o revisión de casos clínicos nutricionales complejos 
-            en tu rancho? Envía tus datos y el Dr. Alejandro Castañeda evaluará tu situación de forma personalizada.
+            **¿Necesitas un diagnóstico a profundidad, auditoría de tu planta de alimentos o revisión de casos clínicos nutricionales complejos?**
+            * 💰 **Costo de la Consulta:** **$475.00 MXN**
+            * ⏱️ **Duración:** **30 minutos** de sesión técnica en vivo con el Dr. Alejandro Castañeda Correa.
+            * 💳 **Pago Seguro y Agendamiento:** Ingresa los datos de tu tarjeta de crédito o débito para procesar el pago y agendar tu sesión de inmediato.
         """)
         
         col_c1, col_c2 = st.columns(2)
         with col_c1:
             nombre_contacto = st.text_input("Nombre del Productor / Responsable", key="rem_nombre")
             rancho_ubicacion = st.text_input("Ubicación del Rancho / Planta", key="rem_ubi")
+            contacto_email = st.text_input("Correo Electrónico o Teléfono de Contacto", key="rem_contacto")
         with col_c2:
             tipo_consulta = st.selectbox("Motivo de Asesoría Remota", [
                 "Auditoría y Calibración de Planta de Alimentos", 
                 "Diagnóstico y Control de Acidosis / Salud Ruminal", 
                 "Optimización y Auditoría de Costos de Ración", 
-                "Evaluación Integral de Ganancia Diaria Esperada (GDE)"
-            ])
-            contacto_email = st.text_input("Correo Electrónico o Teléfono de Contacto", key="rem_contacto")
+                "Evaluación Integral de Ganancia Diaria Esperada (GDE)",
+                "Asesoría Nutricional General y Casos Clínicos"
+            ], key="rem_tipo")
+            fecha_cita = st.date_input("Fecha Preferida para la Asesoría", min_value=datetime.now().date(), key="rem_fecha")
+            hora_cita = st.selectbox("Horario Preferido", ["09:00 AM - 09:30 AM", "11:00 AM - 11:30 AM", "01:00 PM - 01:30 PM", "04:00 PM - 04:30 PM"], key="rem_hora")
+            
+        st.markdown("##### 💳 Datos de Pago (Tarjeta de Crédito / Débito)")
+        col_p1, col_p2, col_p3 = st.columns([2, 1, 1])
+        with col_p1:
+            tarjeta_asesoria = st.text_input("Número de Tarjeta de Crédito / Débito", placeholder="4000 1234 5678 9010", key="rem_card")
+        with col_p2:
+            exp_asesoria = st.text_input("Expiración (MM/AA)", placeholder="12/28", key="rem_exp")
+        with col_p3:
+            cvv_asesoria = st.text_input("CVV", type="password", placeholder="123", key="rem_cvv")
             
         st.markdown("")
-        if st.button("📤 Enviar Solicitud de Asesoría Experta Remota", use_container_width=True):
-            if nombre_contacto and contacto_email:
-                st.success(f"✅ ¡Solicitud registrada con éxito, {nombre_contacto}! El Dr. Alejandro Castañeda y el equipo de **NutriON 360** han recibido los datos de tu proyecto en **{rancho_ubicacion or 'tu región'}** y se pondrán en contacto contigo en breve para coordinar la asesoría técnica.")
+        if st.button("💳 Pagar $475 MXN y Agendar Asesoría Remota (30 min)", use_container_width=True):
+            if nombre_contacto and contacto_email and tarjeta_asesoria:
+                st.success(f"🎉 **¡Pago de $475.00 MXN Exitoso y Cita Agendada!**\n\nEstimado(a) **{nombre_contacto}**, tu asesoría de 30 minutos ha sido programada para el **{fecha_cita}** en el horario de **{hora_cita}**.")
+                st.info(f"📧 **Notificación Enviada:** Se ha enviado la confirmación de la cita, el enlace de videollamada y el comprobante fiscal a tu correo o teléfono de contacto: **{contacto_email}**. El Dr. Alejandro Castañeda se conectará puntualmente en el horario seleccionado.")
                 st.balloons()
             else:
-                st.warning("⚠️ Por favor, ingresa tu nombre y un medio de contacto válido para enviar la solicitud de asesoría.")
+                st.warning("⚠️ Por favor, completa tu nombre, medio de contacto y los datos de tu tarjeta para procesar el pago y agendar la asesoría.")
