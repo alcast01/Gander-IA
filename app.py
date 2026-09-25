@@ -77,9 +77,9 @@ st.markdown("""
 
     /* PESTAÑAS (TABS) MODERNAS */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
+        gap: 6px;
         background-color: #e2e8f0;
-        padding: 8px;
+        padding: 6px;
         border-radius: 14px;
         flex-wrap: wrap;
     }
@@ -88,9 +88,9 @@ st.markdown("""
         border-radius: 10px;
         font-weight: 600;
         color: #334155 !important;
-        font-size: 0.85rem !important;
+        font-size: 0.82rem !important;
         font-family: 'Calibri', sans-serif !important;
-        padding: 8px 14px;
+        padding: 8px 12px;
         background-color: transparent;
         transition: background-color 0.2s ease;
     }
@@ -185,7 +185,6 @@ if not st.session_state.authenticated:
             <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 18px; border-radius: 22px; box-shadow: 0 12px 30px rgba(5, 150, 105, 0.35);">
                 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="32" cy="32" r="30" fill="url(#paint0_linear)" />
-                  <!-- Silueta Ganadera y Nutrición de Rancho -->
                   <path d="M18 36C18 28 24 22 32 22C40 22 46 28 46 36C46 40 43 43 40 44H24C21 43 18 40 18 36Z" fill="#ffffff" fill-opacity="0.2"/>
                   <path d="M22 23L16 16M42 23L48 16" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
                   <circle cx="28" cy="32" r="2.5" fill="#fbbf24"/>
@@ -209,7 +208,7 @@ if not st.session_state.authenticated:
             Nutrición de precisión y rentabilidad inteligente para cada etapa de tu rancho.
         </p>
         <p style="text-align: center; color: #475569; font-family: 'Calibri', sans-serif; font-size: 0.85rem; margin-bottom: 25px;">
-            Plataforma SaaS de Optimización Nutricional Bovina y Alta Eficiencia Pecuaria
+            Plataforma SaaS de Optimización Nutricional Bovina y Asesoría Experta Remota
         </p>
     """, unsafe_allow_html=True)
 
@@ -353,7 +352,10 @@ st.markdown(f"""
             <h1 style="margin: 0; font-size: 1.8em; color: #064e3b; letter-spacing: -0.8px; font-weight: 800; font-family: 'Calibri', sans-serif;">
                 NutriON <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">360</span>
             </h1>
-            <p style="margin: 3px 0 2px 0; font-size: 0.9em; color: #1e293b; font-weight: 600; font-family: 'Calibri', sans-serif;">
+            <p style="margin: 2px 0 2px 0; font-size: 0.82em; color: #059669; font-weight: 700; font-family: 'Calibri', sans-serif;">
+                Nutrición de precisión y rentabilidad inteligente para cada etapa de tu rancho.
+            </p>
+            <p style="margin: 3px 0 2px 0; font-size: 0.88em; color: #1e293b; font-weight: 600; font-family: 'Calibri', sans-serif;">
                 Usuario: <span style="color: #059669; font-weight: 700;">{st.session_state.current_user.capitalize()}</span> | Plan: <span style="color: #d97706; font-weight: 700;">{plan_activo_usuario}</span> | Creado por: Dr. Alejandro Castañeda Correa
             </p>
         </div>
@@ -774,15 +776,16 @@ def generar_pdf_reporte():
     else:
         return output.encode('latin1')
 
-# --- 6. INTERFAZ MODULAR POR PESTAÑAS (7 TABS ELITE) ---
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+# --- 6. INTERFAZ MODULAR POR PESTAÑAS (8 TABS ELITE) ---
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "📋 1. Resumen", 
     "🧪 2. Nutrición & Multietapa", 
     "📊 3. Economía", 
     "🚜 4. Manejo",
     "🔮 5. Simulador Compra-Venta",
     "📄 6. Reporte PDF",
-    "💬 7. NutriON (Soporte & Ayuda)"
+    "💬 7. NutriON (Soporte)",
+    "🧭 8. Asesoría Virtual & Guías"
 ])
 
 with tab1:
@@ -1153,3 +1156,69 @@ with tab7:
         st.session_state.nutrion_messages.append({"role": "assistant", "content": bot_response})
         with st.chat_message("assistant"):
             st.markdown(bot_response)
+
+with tab8:
+    st.subheader("🧭 Centro de Asesoría Virtual & Guías de Campo (NutriON Remote Hub)")
+    st.markdown("""
+        **Solución experta sin fronteras:** Cuando las largas distancias, el clima adverso o los imprevistos logísticos 
+        impiden la visita presencial de un nutriólogo especialista a tu rancho o planta de alimentos, **NutriON 360** 
+        actúa como tu consultor experto 24/7. Aquí encontrarás metodologías de campo, protocolos industriales y guías técnicas 
+        para garantizar el éxito de tu operación pecuaria.
+    """)
+    
+    with st.expander("🌾 1. Guías Nutricionales y Formulación de Dietas para Ranchos y Feedlots", expanded=True):
+        st.markdown("""
+            * **Recepción de Becerros (Estrés Post-Transporte):** 
+              - Uso de dietas altas en fibra efectiva (`peNDF > 24%`) para estimular la rumia, favorecer la salivación y proteger la integridad epitelial del rumen.
+              - Incorporación de electrolitos, potasio (1.2% de la MS) y niveles elevados de vitaminas A, D y E para contrarrestar la inmunodepresión por transporte.
+            * **Fase de Crecimiento y Repasto:**
+              - Enfoque en desarrollo esquelético y muscular magro sin engrasamiento prematuro. Balance óptimo de energía metabolizable y proteína degradable en rumen (PDR).
+            * **Finalización Intensiva (Engorda Rápida):**
+              - Transición gradual de forraje a grano en 3 etapas (14 días), incrementando el almidón fermentescible de forma segura para prevenir acidosis ruminal subaguda (SARA) y maximizar la ganancia diaria de peso (GDE).
+        """)
+        
+    with st.expander("🏭 2. Protocolos de Mezclado y Operación en Plantas de Alimentos", expanded=False):
+        st.markdown("""
+            * **Secuencia de Carga en Carros Mezcladores o Tolvas Industriales:**
+              1. **Fibra Larga / Forrajes Secos:** Paja o rastrojos molidos al inicio para desmoronar, homogeneizar y unificar el tamaño de partícula.
+              2. **Ingredientes Húmedos / Ensilados:** Ensilado de maíz o subproductos húmedos, corrigiendo siempre por contenido de materia seca real.
+              3. **Granos Secos y Concentrados:** Maíz molido, pasta de soya y harina de canola.
+              4. **Núcleos Minerales, Vitaminas y Urea:** Añadir con pre-mezcla previa para evitar puntos calientes, segregación o sobredosis de minerales traza y NPN.
+              5. **Líquidos (Melaza / Grasas de Paso):** Verter al final con aspersión uniforme para fijar polvillos y elevar la palatabilidad de la ración.
+            * **Tiempo de Mezclado Recomendado:** Mínimo **8 a 10 minutos** continuos posteriores a la adición del último ingrediente. Una mezcla deficiente genera variabilidad en el consumo y mermas en la conversión alimenticia del lote.
+        """)
+        
+    with st.expander("🌡️ 3. Estrategias de Manejo ante Estrés Térmico y Clima Adverso", expanded=False):
+        st.markdown("""
+            * **Mitigación del THI Elevado (>78):**
+              - **Ajuste de Horarios:** Ofrecer entre el 60% y 70% del alimento durante las horas frescas de la noche o primeras horas de la mañana para estimular el consumo en horas de menor temperatura.
+              - **Suplementación con Buffers:** Inclusión de Bicarbonato de Sodio (0.7% - 1.0% de la MS) para compensar la pérdida de capacidad amortiguadora por jadeo y pantofleadores.
+              - **Densidad Energética:** Elevar ligeramente la concentración de energía neta (grasa de sobrepaso) para compensar la caída voluntaria de consumo de materia seca (CMS) inducida por el calor.
+        """)
+        
+    with st.expander("🩺 4. Solicitud de Consultoría Remota Personalizada con el Especialista", expanded=False):
+        st.markdown("""
+            ¿Necesitas un diagnóstico a profundidad, auditoría de tu planta de alimentos o revisión de casos clínicos nutricionales complejos 
+            en tu rancho? Envía tus datos y el Dr. Alejandro Castañeda evaluará tu situación de forma personalizada.
+        """)
+        
+        col_c1, col_c2 = st.columns(2)
+        with col_c1:
+            nombre_contacto = st.text_input("Nombre del Productor / Responsable", key="rem_nombre")
+            rancho_ubicacion = st.text_input("Ubicación del Rancho / Planta", key="rem_ubi")
+        with col_c2:
+            tipo_consulta = st.selectbox("Motivo de Asesoría Remota", [
+                "Auditoría y Calibración de Planta de Alimentos", 
+                "Diagnóstico y Control de Acidosis / Salud Ruminal", 
+                "Optimización y Auditoría de Costos de Ración", 
+                "Evaluación Integral de Ganancia Diaria Esperada (GDE)"
+            ])
+            contacto_email = st.text_input("Correo Electrónico o Teléfono de Contacto", key="rem_contacto")
+            
+        st.markdown("")
+        if st.button("📤 Enviar Solicitud de Asesoría Experta Remota", use_container_width=True):
+            if nombre_contacto and contacto_email:
+                st.success(f"✅ ¡Solicitud registrada con éxito, {nombre_contacto}! El Dr. Alejandro Castañeda y el equipo de **NutriON 360** han recibido los datos de tu proyecto en **{rancho_ubicacion or 'tu región'}** y se pondrán en contacto contigo en breve para coordinar la asesoría técnica.")
+                st.balloons()
+            else:
+                st.warning("⚠️ Por favor, ingresa tu nombre y un medio de contacto válido para enviar la solicitud de asesoría.")
