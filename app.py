@@ -11,7 +11,7 @@ import os
 import hashlib
 from datetime import datetime, timedelta
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO TIPOGRÁFICO UNIFORME (CALIBRI) ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO SaaS PROFESIONAL (CALIBRI & UI/UX) ---
 st.set_page_config(
     page_title="Ganader-IA Elite 360 | Nutrición y Alta Rentabilidad",
     page_icon="🐄",
@@ -21,7 +21,7 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-    /* UNIFICACIÓN GLOBAL DE FUENTE Y COLOR BASE */
+    /* UNIFICACIÓN GLOBAL DE FUENTE Y COLOR BASE SaaS */
     html, body, [class*="css"], .stMarkdown, .stText, .stSelectbox, .stSlider, .stNumberInput, div, span, p, label, .stRadio {
         font-family: 'Calibri', sans-serif !important;
         color: #1e293b !important;
@@ -32,42 +32,42 @@ st.markdown("""
         font-family: 'Calibri', sans-serif !important;
     }
     
-    /* TARJETAS DE MÉTRICAS UNIFORMES */
+    /* TARJETAS DE MÉTRICAS AVANZADAS (CARDS) */
     .stMetric {
         background: #ffffff;
-        padding: 10px 12px !important;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px -2px rgba(15, 23, 42, 0.06);
-        border: 1px solid #cbd5e1;
-        border-left: 4px solid #059669;
-        margin-bottom: 8px !important;
+        padding: 12px 14px !important;
+        border-radius: 14px;
+        box-shadow: 0 4px 20px -3px rgba(15, 23, 42, 0.08);
+        border: 1px solid #e2e8f0;
+        border-left: 5px solid #059669;
+        margin-bottom: 10px !important;
         overflow: hidden;
         transition: all 0.3s ease;
     }
     
     .stMetric:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 20px -5px rgba(5, 150, 105, 0.12);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.15);
         border-color: #059669;
     }
     
     .stMetric label {
-        font-size: 0.7rem !important;
-        color: #475569 !important;
+        font-size: 0.72rem !important;
+        color: #64748b !important;
         font-weight: 700 !important;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.8px;
         font-family: 'Calibri', sans-serif !important;
     }
     
     .stMetric [data-testid="stMetricValue"] {
-        font-size: 1rem !important;
+        font-size: 1.15rem !important;
         color: #0f172a !important;
         font-weight: 800 !important;
         font-family: 'Calibri', sans-serif !important;
     }
     
-    /* ENCABEZADOS Y TÍTULOS */
+    /* ENCABEZADOS Y TÍTULOS CORPORATIVOS */
     h1, h2, h3, h4, h5, h6 {
         color: #0f172a !important;
         font-family: 'Calibri', sans-serif !important;
@@ -75,35 +75,54 @@ st.markdown("""
         letter-spacing: -0.5px;
     }
 
-    /* PESTAÑAS (TABS) UNIFORMES */
+    /* PESTAÑAS (TABS) MODERNAS */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 6px;
+        gap: 8px;
         background-color: #e2e8f0;
-        padding: 6px;
-        border-radius: 12px;
+        padding: 8px;
+        border-radius: 14px;
         flex-wrap: wrap;
     }
     
     .stTabs [data-baseweb="tab"] {
-        border-radius: 8px;
+        border-radius: 10px;
         font-weight: 600;
         color: #334155 !important;
         font-size: 0.85rem !important;
         font-family: 'Calibri', sans-serif !important;
+        padding: 8px 14px;
+        background-color: transparent;
+        transition: background-color 0.2s ease;
     }
     
     .stTabs [aria-selected="true"] {
         background-color: #ffffff !important;
         color: #059669 !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
         font-family: 'Calibri', sans-serif !important;
     }
     
-    /* BOTONES */
+    /* BOTONES ESTILIZADOS */
     .stButton button {
         font-family: 'Calibri', sans-serif !important;
         font-weight: 700 !important;
-        border-radius: 8px !important;
+        border-radius: 10px !important;
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+        color: #ffffff !important;
+        border: none !important;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+        transition: all 0.2s ease;
+    }
+    
+    .stButton button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(5, 150, 105, 0.35);
+    }
+    
+    /* CONTENEDOR DE ALERTAS E INFO */
+    .stAlert {
+        border-radius: 12px !important;
+        border: 1px solid #cbd5e1 !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -163,8 +182,8 @@ if "nutrion_messages" not in st.session_state:
 if not st.session_state.authenticated:
     st.markdown("""
         <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px; margin-top: 30px;">
-            <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 16px; border-radius: 20px; box-shadow: 0 10px 25px rgba(5, 150, 105, 0.3);">
-                <svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 18px; border-radius: 22px; box-shadow: 0 12px 30px rgba(5, 150, 105, 0.35);">
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="32" cy="32" r="30" fill="url(#paint0_linear)" />
                   <path d="M16 26C16 26 22 18 32 18C42 18 48 26 48 26C48 26 44 38 32 44C20 38 16 26 16 26Z" fill="#ffffff" fill-opacity="0.18" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                   <path d="M16 26C12 22 10 15 15 13C20 11 24 17 26 21" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
@@ -191,22 +210,11 @@ if not st.session_state.authenticated:
     tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "💳 Planes Elite y Registro"])
 
     with tab_login:
-        st.markdown("""
-            <div style="background: #ecfdf5; padding: 14px 18px; border-radius: 12px; border: 1.5px solid #059669; margin-bottom: 20px;">
-                <p style="margin: 0 0 8px 0; font-size: 0.9rem; font-weight: 700; color: #064e3b;">👑 Acceso Rápido del Creador (Dr. Alejandro Castañeda)</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        if st.button("🚀 Entrar Directamente como Creador (Dr. Alejandro)", use_container_width=True):
-            st.session_state.authenticated = True
-            st.session_state.current_user = "alejandro"
-            st.rerun()
-            
-        st.markdown("---")
-        st.markdown("### Acceso a Usuarios Registrados")
+        st.markdown("### Acceso con Usuario y Contraseña")
         user_input = st.text_input("Nombre de Usuario", key="login_user")
         pass_input = st.text_input("Contraseña", type="password", key="login_pass")
         
+        st.markdown("")
         if st.button("Entrar a la Plataforma", use_container_width=True):
             db_usuarios = cargar_usuarios_persistentes()
             hashed_pass = hash_password(pass_input)
@@ -258,7 +266,6 @@ if not st.session_state.authenticated:
         
         st.markdown("")
         
-        # Opción de Renovación Automática
         auto_renew_enabled = st.checkbox(
             "🔄 **Activar Renovación Automática** (La suscripción se cobrará y renovará automáticamente al cumplirse el periodo elegido, garantizando acceso ininterrumpido).",
             value=True
@@ -283,7 +290,6 @@ if not st.session_state.authenticated:
             elif len(num_tarjeta.replace(" ", "")) < 15:
                 st.error("⚠️ Número de tarjeta inválido. Verifica los dígitos.")
             else:
-                # Calcular días del próximo cobro automático
                 dias_periodo = 90 if "Trimestral" in plan_elegido else (180 if "Semestral" in plan_elegido else 365)
                 fecha_renovacion = (datetime.now() + timedelta(days=dias_periodo)).strftime("%Y-%m-%d")
                 
@@ -380,7 +386,6 @@ st.sidebar.markdown(f"### 🎛️ Panel de Control Elite")
 st.sidebar.markdown(f"👤 **Usuario:** {st.session_state.current_user.capitalize()}")
 st.sidebar.markdown(f"🛡️ **Plan:** {plan_activo_usuario}")
 
-# Panel de Gestión de Renovación Automática en el Sidebar
 with st.sidebar.expander("🔄 Gestión de Suscripción", expanded=True):
     st.markdown(f"**Próxima Renovación:** `{next_ren_date}`")
     
