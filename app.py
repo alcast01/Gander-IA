@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO SaaS PROFESIONAL (CALIBRI & UI/UX) ---
 st.set_page_config(
-    page_title="Ganader-IA Elite 360 | Nutrición y Alta Rentabilidad",
+    page_title="NutriON 360 | Nutrición de Precisión y Alta Rentabilidad",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -128,7 +128,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y RENOVACIÓN AUTOMÁTICA ---
-USERS_FILE = "usuarios_ganaderia_elite_autorenew.json"
+USERS_FILE = "usuarios_nutrion_360_autorenew.json"
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -143,7 +143,7 @@ def cargar_usuarios_persistentes():
     default_users = {
         "admin": {
             "password": hash_password("1234"),
-            "email": "admin@ganaderiaelite.com",
+            "email": "admin@nutrion360.com",
             "subscription_active": True,
             "plan": "Anual (12 Meses) - $8,400 MXN | $700.00/mes",
             "auto_renew": True,
@@ -152,7 +152,7 @@ def cargar_usuarios_persistentes():
         },
         "alejandro": {
             "password": hash_password("elite360"),
-            "email": "alejandro.castaneda@ganaderiaelite.com",
+            "email": "alejandro.castaneda@nutrion360.com",
             "subscription_active": True,
             "plan": "Anual (12 Meses) - $8,400 MXN | $700.00/mes",
             "auto_renew": True,
@@ -175,7 +175,7 @@ if "current_user" not in st.session_state:
 
 if "nutrion_messages" not in st.session_state:
     st.session_state.nutrion_messages = [
-        {"role": "assistant", "content": "¡Hola! Soy **NutriON**, tu asistente virtual automatizado para **Ganader-IA Elite 360**. Estoy aquí para ayudarte con cualquier duda sobre nutrición animal, funcionamiento de la plataforma, renovación automática o soporte técnico. ¿En qué te puedo ayudar hoy?"}
+        {"role": "assistant", "content": "¡Hola! Soy **NutriON**, tu asistente virtual automatizado para **NutriON 360**. Estoy aquí para ayudarte con cualquier duda sobre nutrición animal, formulación de raciones, renovación automática o soporte técnico. ¿En qué te puedo ayudar hoy?"}
     ]
 
 # --- PANTALLA DE ACCESO / SUSCRIPCIÓN SI NO ESTÁ AUTENTICADO ---
@@ -185,11 +185,14 @@ if not st.session_state.authenticated:
             <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 18px; border-radius: 22px; box-shadow: 0 12px 30px rgba(5, 150, 105, 0.35);">
                 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="32" cy="32" r="30" fill="url(#paint0_linear)" />
-                  <path d="M16 26C16 26 22 18 32 18C42 18 48 26 48 26C48 26 44 38 32 44C20 38 16 26 16 26Z" fill="#ffffff" fill-opacity="0.18" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M16 26C12 22 10 15 15 13C20 11 24 17 26 21" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
-                  <path d="M48 26C52 22 54 15 49 13C44 11 40 17 38 21" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
-                  <path d="M32 48V27" stroke="#34d399" stroke-width="3.5" stroke-linecap="round"/>
-                  <circle cx="32" cy="23" r="3.5" fill="#f59e0b"/>
+                  <!-- Silueta Ganadera y Nutrición de Rancho -->
+                  <path d="M18 36C18 28 24 22 32 22C40 22 46 28 46 36C46 40 43 43 40 44H24C21 43 18 40 18 36Z" fill="#ffffff" fill-opacity="0.2"/>
+                  <path d="M22 23L16 16M42 23L48 16" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+                  <circle cx="28" cy="32" r="2.5" fill="#fbbf24"/>
+                  <circle cx="36" cy="32" r="2.5" fill="#fbbf24"/>
+                  <path d="M29 38C30.5 39.5 33.5 39.5 35 38" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+                  <path d="M32 14V22" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+                  <path d="M28 17L32 14L36 17" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                   <defs>
                     <linearGradient id="paint0_linear" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
                       <stop stop-color="#047857"/>
@@ -199,11 +202,14 @@ if not st.session_state.authenticated:
                 </svg>
             </div>
         </div>
-        <h2 style="text-align: center; color: #064e3b; font-family: 'Calibri', sans-serif; font-weight: 800; margin-bottom: 5px;">
-            Ganader-IA <span style="color: #059669;">ELITE 360</span>
+        <h2 style="text-align: center; color: #064e3b; font-family: 'Calibri', sans-serif; font-weight: 800; margin-bottom: 2px;">
+            NutriON <span style="color: #059669;">360</span>
         </h2>
-        <p style="text-align: center; color: #475569; font-family: 'Calibri', sans-serif; margin-bottom: 25px;">
-            Plataforma SaaS de Precisión Nutricional y Alta Rentabilidad Pecuaria
+        <p style="text-align: center; color: #059669; font-family: 'Calibri', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">
+            Nutrición de precisión y rentabilidad inteligente para cada etapa de tu rancho.
+        </p>
+        <p style="text-align: center; color: #475569; font-family: 'Calibri', sans-serif; font-size: 0.85rem; margin-bottom: 25px;">
+            Plataforma SaaS de Optimización Nutricional Bovina y Alta Eficiencia Pecuaria
         </p>
     """, unsafe_allow_html=True)
 
@@ -235,7 +241,7 @@ if not st.session_state.authenticated:
         st.markdown("Elige el periodo de suscripción que mejor se adapte a tus requerimientos operativos:")
         
         plan_elegido = st.radio(
-            "Planes de Suscripción Elite Disponibles:",
+            "Planes de Suscripción NutriON 360 Disponibles:",
             [
                 "Trimestral (3 Meses) - $2,700 MXN | $900.00/mes (Tarifa Estándar)",
                 "Semestral (6 Meses) - $4,800 MXN | $800.00/mes (Ahorro de $100.00/mes vs. Trimestral)",
@@ -278,7 +284,7 @@ if not st.session_state.authenticated:
         except Exception:
             costo_str = "$8,400 MXN"
         
-        if st.button(f"💳 Pagar {costo_str} y Activar Licencia Elite", use_container_width=True):
+        if st.button(f"💳 Pagar {costo_str} y Activar Licencia NutriON", use_container_width=True):
             db_usuarios = cargar_usuarios_persistentes()
             
             if not new_user or not new_email or not new_pass or not num_tarjeta:
@@ -328,14 +334,13 @@ st.markdown(f"""
         <div style="flex-shrink: 0; background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 12px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);">
             <svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="32" cy="32" r="30" fill="url(#paint0_linear)" />
-              <path d="M16 26C16 26 22 18 32 18C42 18 48 26 48 26C48 26 44 38 32 44C20 38 16 26 16 26Z" fill="#ffffff" fill-opacity="0.18" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M16 26C12 22 10 15 15 13C20 11 24 17 26 21" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
-              <path d="M48 26C52 22 54 15 49 13C44 11 40 17 38 21" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
-              <path d="M32 48V27" stroke="#34d399" stroke-width="3.5" stroke-linecap="round"/>
-              <path d="M32 33L38 29" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
-              <path d="M32 37L26 33" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
-              <path d="M32 41L38 37" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
-              <circle cx="32" cy="23" r="3.5" fill="#f59e0b"/>
+              <path d="M18 36C18 28 24 22 32 22C40 22 46 28 46 36C46 40 43 43 40 44H24C21 43 18 40 18 36Z" fill="#ffffff" fill-opacity="0.2"/>
+              <path d="M22 23L16 16M42 23L48 16" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="28" cy="32" r="2.5" fill="#fbbf24"/>
+              <circle cx="36" cy="32" r="2.5" fill="#fbbf24"/>
+              <path d="M29 38C30.5 39.5 33.5 39.5 35 38" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M32 14V22" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+              <path d="M28 17L32 14L36 17" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
               <defs>
                 <linearGradient id="paint0_linear" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
                   <stop stop-color="#047857"/>
@@ -346,7 +351,7 @@ st.markdown(f"""
         </div>
         <div style="flex-grow: 1; min-width: 240px;">
             <h1 style="margin: 0; font-size: 1.8em; color: #064e3b; letter-spacing: -0.8px; font-weight: 800; font-family: 'Calibri', sans-serif;">
-                Ganader-IA <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">ELITE 360</span>
+                NutriON <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">360</span>
             </h1>
             <p style="margin: 3px 0 2px 0; font-size: 0.9em; color: #1e293b; font-weight: 600; font-family: 'Calibri', sans-serif;">
                 Usuario: <span style="color: #059669; font-weight: 700;">{st.session_state.current_user.capitalize()}</span> | Plan: <span style="color: #d97706; font-weight: 700;">{plan_activo_usuario}</span> | Creado por: Dr. Alejandro Castañeda Correa
@@ -382,7 +387,7 @@ if "df_ingredientes_state" not in st.session_state:
     })
 
 # --- 5. BARRA LATERAL ---
-st.sidebar.markdown(f"### 🎛️ Panel de Control Elite")
+st.sidebar.markdown(f"### 🎛️ Panel de Control NutriON")
 st.sidebar.markdown(f"👤 **Usuario:** {st.session_state.current_user.capitalize()}")
 st.sidebar.markdown(f"🛡️ **Plan:** {plan_activo_usuario}")
 
@@ -686,7 +691,7 @@ class PDFReport(FPDF):
     def header(self):
         self.set_font('Arial', 'B', 12)
         self.set_text_color(5, 150, 105)
-        self.cell(0, 10, 'Ganader-IA Elite 360 - Creado por Dr. Alejandro Castaneda Correa', 0, 1, 'C')
+        self.cell(0, 10, 'NutriON 360 - Creado por Dr. Alejandro Castaneda Correa', 0, 1, 'C')
         self.ln(3)
 
     def footer(self):
@@ -852,7 +857,7 @@ with tab3:
     
     if resultado.success:
         if modo_tolerancia_activo:
-            st.warning("⚠️ **Aviso de Auto-Recuperación Elite:** El sistema ajustó automáticamente los márgenes de tolerancia de minerales y energía para garantizar una solución factible.")
+            st.warning("⚠️ **Aviso de Auto-Recuperación NutriON:** El sistema ajustó automáticamente los márgenes de tolerancia de minerales y energía para garantizar una solución factible.")
         
         consumo_total_ciclo_cab = cms_estimado * dias_a_meta
         costo_alimentacion_cab = (consumo_total_ciclo_cab / 1000.0) * costo_ton_optimizado
@@ -1107,7 +1112,7 @@ with tab6:
         st.download_button(
             label="📥 Descargar Reporte Ejecutivo en PDF",
             data=pdf_bytes,
-            file_name="GanaderIA_Elite_360_Reporte.pdf",
+            file_name="NutriON_360_Reporte.pdf",
             mime="application/pdf",
             use_container_width=True
         )
@@ -1137,7 +1142,7 @@ with tab7:
         if any(w in query_lower for w in ["renovacion", "automatica", "renovar", "recurrente", "cobro"]):
             bot_response = "🔄 **Renovación Automática:** Puedes activar o desactivar la renovación automática en cualquier momento desde el panel lateral izquierdo (*Gestión de Suscripción*). Al estar activa, el sistema programará el siguiente cargo y renovación al cumplirse tu ciclo (3, 6 o 12 meses)."
         elif any(w in query_lower for w in ["precio", "costo", "suscripcion", "plan", "trimestral", "semestral", "anual", "pagar"]):
-            bot_response = "💳 **Planes de Suscripción Elite Disponibles:**\n- **Trimestral (3 Meses):** $2,700 MXN ($900/mes)\n- **Semestral (6 Meses):** $4,800 MXN ($800/mes)\n- **Anual (12 Meses):** $8,400 MXN ($700/mes)\nPuedes elegir tu periodo y activar la renovación automática al registrarte o renovar."
+            bot_response = "💳 **Planes de Suscripción NutriON 360 Disponibles:**\n- **Trimestral (3 Meses):** $2,700 MXN ($900/mes)\n- **Semestral (6 Meses):** $4,800 MXN ($800/mes)\n- **Anual (12 Meses):** $8,400 MXN ($700/mes)\nPuedes elegir tu periodo y activar la renovación automática al registrarte o renovar."
         elif any(w in query_lower for w in ["formula", "ingrediente", "nutricion", "proteina", "energia"]):
             bot_response = "🧪 Para ajustar fórmulas y perfiles nutricionales, dirígete a la pestaña **2. Nutrición & Multietapa**. Ahí puedes modificar los precios, disponibilidad y límites de inclusión de cada ingrediente."
         elif any(w in query_lower for w in ["error", "fallo", "problema", "bug", "tecnico", "ayuda", "soporte"]):
