@@ -400,7 +400,7 @@ if "df_collares_state" not in st.session_state:
         r = np.random.rand()
         if r < 0.75:
             estados_salud.append("🟢 Sano / Activo")
-            visitas_com.append(np.randint(8, 15) if hasattr(np, 'randint') else int(np.random.randint(8, 15)))
+            visitas_com.append(int(np.random.randint(8, 15)))
             min_masticacion.append(int(np.random.randint(520, 680)))
         elif r < 0.90:
             estados_salud.append("🟡 Alerta (Bajo Consumo)")
@@ -1030,7 +1030,8 @@ with tab4:
     with col_h2:
         st.metric("Animales Sanos", f"{sanos_count} cabezas", "🟢 Normal")
     with col_h3:
-        st.metric("Enfermos / Riesgo (Descarte)", f"{enfermos_count} cabezas", "🔴 Acción Inmediata", delta=f"-{enfermos_count}", delta_color="inverse")
+        # CORRECCIÓN DE LA LNEA CON ERROR (SE ELIMINÓ EL ARGUMENTO POSICIONAL DUPLICADO)
+        st.metric("Enfermos / Riesgo (Descarte)", f"{enfermos_count} cabezas", delta=f"-{enfermos_count}", delta_color="inverse")
         
     st.markdown("---")
     st.markdown("#### 📱 Centro de Notificaciones y Alertas Automáticas al Teléfono")
