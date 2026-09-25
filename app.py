@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO SaaS PROFESIONAL (CALIBRI & UI/UX) ---
 st.set_page_config(
-    page_title="NutriON 360 | Plataforma Elite de Nutrición y Alta Rentabilidad Bovina",
+    page_title="NutriON 360 Ultra | IA, Collares IoT y Alta Rentabilidad Bovina",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -128,7 +128,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y RENOVACIÓN AUTOMÁTICA ---
-USERS_FILE = "usuarios_nutrion_360_master.json"
+USERS_FILE = "usuarios_nutrion_360_ultra.json"
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -145,7 +145,7 @@ def cargar_usuarios_persistentes():
             "password": hash_password("1234"),
             "email": "admin@nutrion360.com",
             "subscription_active": True,
-            "plan": "Anual Elite (12 Meses) - $8,400 MXN | $700.00/mes",
+            "plan": "Anual Ultra AI & IoT (12 Meses) - $9,600 MXN | $800.00/mes",
             "auto_renew": True,
             "next_renewal_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d"),
             "fecha_registro": "2026-01-01"
@@ -154,7 +154,7 @@ def cargar_usuarios_persistentes():
             "password": hash_password("elite360"),
             "email": "alejandro.castaneda@nutrion360.com",
             "subscription_active": True,
-            "plan": "Anual Elite (12 Meses) - $8,400 MXN | $700.00/mes",
+            "plan": "Anual Ultra AI & IoT (12 Meses) - $9,600 MXN | $800.00/mes",
             "auto_renew": True,
             "next_renewal_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d"),
             "fecha_registro": "2026-01-01"
@@ -175,7 +175,7 @@ if "current_user" not in st.session_state:
 
 if "nutrion_messages" not in st.session_state:
     st.session_state.nutrion_messages = [
-        {"role": "assistant", "content": "¡Hola! Soy **NutriON**, tu asistente virtual automatizado con IA para **NutriON 360**. Estoy aquí para ayudarte con telemetría IoT, mercados de futuros, formulación y soporte técnico. ¿En qué te puedo ayudar hoy?"}
+        {"role": "assistant", "content": "¡Hola! Soy **NutriON**, tu asistente virtual con Inteligencia Artificial para **NutriON 360 Ultra**. Estoy conectado en tiempo real con los collares IoT, básculas de carros mezcladores y el sistema de salud animal. ¿En qué te puedo ayudar hoy?"}
     ]
 
 # --- PANTALLA DE ACCESO / SUSCRIPCIÓN SI NO ESTÁ AUTENTICADO ---
@@ -202,17 +202,17 @@ if not st.session_state.authenticated:
             </div>
         </div>
         <h2 style="text-align: center; color: #064e3b; font-family: 'Calibri', sans-serif; font-weight: 800; margin-bottom: 2px;">
-            NutriON <span style="color: #059669;">360</span> <span style="font-size: 0.5em; background: #059669; color: white; padding: 2px 8px; border-radius: 6px; vertical-align: middle;">MASTER ELITE</span>
+            NutriON <span style="color: #059669;">360</span> <span style="font-size: 0.5em; background: #059669; color: white; padding: 2px 8px; border-radius: 6px; vertical-align: middle;">ULTRA AI & IOT</span>
         </h2>
         <p style="text-align: center; color: #059669; font-family: 'Calibri', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">
-            Nutrición de precisión, telemetría IoT y rentabilidad inteligente sin fronteras.
+            Nutrición de precisión, telemetría IoT de collares y detección temprana de salud animal.
         </p>
         <p style="text-align: center; color: #475569; font-family: 'Calibri', sans-serif; font-size: 0.85rem; margin-bottom: 25px;">
-            Plataforma SaaS Global de Optimización Nutricional y Consultoría Experta Remota
+            Plataforma Global de Optimización, Smart Collars y Consultoría Experta Remota
         </p>
     """, unsafe_allow_html=True)
 
-    tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "💳 Planes Elite Global y Registro"])
+    tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "💳 Planes Ultra AI & Registro"])
 
     with tab_login:
         st.markdown("### Acceso con Usuario y Contraseña")
@@ -220,7 +220,7 @@ if not st.session_state.authenticated:
         pass_input = st.text_input("Contraseña", type="password", key="login_pass")
         
         st.markdown("")
-        if st.button("Entrar a la Plataforma Elite", use_container_width=True):
+        if st.button("Entrar a la Plataforma Ultra AI", use_container_width=True):
             db_usuarios = cargar_usuarios_persistentes()
             hashed_pass = hash_password(pass_input)
             
@@ -236,15 +236,15 @@ if not st.session_state.authenticated:
                 st.error("Usuario o contraseña incorrectos. Verifica tus datos.")
 
     with tab_register:
-        st.markdown("### 🌟 Selección de Plan Elite y Licenciamiento")
-        st.markdown("Elige el periodo de suscripción con acceso total a telemetría IoT, mercados y consultoría:")
+        st.markdown("### 🌟 Selección de Plan Ultra AI & IoT")
+        st.markdown("Elige el periodo de suscripción con acceso total a collares inteligentes y telemetría de carros mezcladores:")
         
         plan_elegido = st.radio(
             "Planes de Suscripción NutriON 360 Disponibles:",
             [
-                "Trimestral Pro (3 Meses) - $2,700 MXN | $900.00/mes",
-                "Semestral Feedlot (6 Meses) - $4,800 MXN | $800.00/mes",
-                "Anual Elite Global (12 Meses) - $8,400 MXN | $700.00/mes (Más Popular)"
+                "Trimestral Pro AI (3 Meses) - $3,000 MXN | $1,000.00/mes",
+                "Semestral Feedlot IoT (6 Meses) - $5,400 MXN | $900.00/mes",
+                "Anual Ultra AI & IoT (12 Meses) - $9,600 MXN | $800.00/mes (Acceso Total)"
             ],
             index=2
         )
@@ -255,7 +255,7 @@ if not st.session_state.authenticated:
         col_r1, col_r2 = st.columns(2)
         with col_r1:
             new_user = st.text_input("Nombre de Usuario Deseado", key="reg_user")
-            new_email = st.text_input("Correo Electrónico (para recibo y avisos)", key="reg_email")
+            new_email = st.text_input("Correo Electrónico (para notificaciones y avisos)", key="reg_email")
         with col_r2:
             new_pass = st.text_input("Contraseña", type="password", key="reg_pass")
             confirm_pass = st.text_input("Confirma Contraseña", type="password", key="reg_conf")
@@ -272,7 +272,7 @@ if not st.session_state.authenticated:
         st.markdown("")
         
         auto_renew_enabled = st.checkbox(
-            "🔄 **Activar Renovación Automática** (La suscripción se cobrará y renovará automáticamente al cumplirse el periodo elegido, garantizando acceso ininterrumpido).",
+            "🔄 **Activar Renovación Automática** (La suscripción se cobrará y renovará automáticamente al cumplirse el periodo elegido, garantizando monitoreo ininterrumpido).",
             value=True
         )
         
@@ -281,9 +281,9 @@ if not st.session_state.authenticated:
         try:
             costo_str = plan_elegido.split("-")[1].split("|")[0].strip()
         except Exception:
-            costo_str = "$8,400 MXN"
+            costo_str = "$9,600 MXN"
         
-        if st.button(f"💳 Pagar {costo_str} y Activar Licencia Master", use_container_width=True):
+        if st.button(f"💳 Pagar {costo_str} y Activar Licencia Ultra AI", use_container_width=True):
             db_usuarios = cargar_usuarios_persistentes()
             
             if not new_user or not new_email or not new_pass or not num_tarjeta:
@@ -324,7 +324,7 @@ if not st.session_state.authenticated:
 # --- 3. LOGOTIPO VETERINARIO Y DE CAMPO (USUARIO AUTENTICADO) ---
 db_usuarios_activos = cargar_usuarios_persistentes()
 user_info = db_usuarios_activos.get(st.session_state.current_user, {})
-plan_activo_usuario = user_info.get("plan", "Plan Master Elite")
+plan_activo_usuario = user_info.get("plan", "Plan Ultra AI & IoT")
 auto_renew_status = user_info.get("auto_renew", False)
 next_ren_date = user_info.get("next_renewal_date", "N/A")
 
@@ -350,10 +350,10 @@ st.markdown(f"""
         </div>
         <div style="flex-grow: 1; min-width: 240px;">
             <h1 style="margin: 0; font-size: 1.8em; color: #064e3b; letter-spacing: -0.8px; font-weight: 800; font-family: 'Calibri', sans-serif;">
-                NutriON <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">360 MASTER</span>
+                NutriON <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">360 ULTRA</span>
             </h1>
             <p style="margin: 2px 0 2px 0; font-size: 0.82em; color: #059669; font-weight: 700; font-family: 'Calibri', sans-serif;">
-                Nutrición de precisión, telemetría IoT y rentabilidad inteligente sin fronteras.
+                Nutrición de precisión, collares IoT de masticación y detección de animales enfermos en tiempo real.
             </p>
             <p style="margin: 3px 0 2px 0; font-size: 0.88em; color: #1e293b; font-weight: 600; font-family: 'Calibri', sans-serif;">
                 Usuario: <span style="color: #059669; font-weight: 700;">{st.session_state.current_user.capitalize()}</span> | Licencia: <span style="color: #d97706; font-weight: 700;">{plan_activo_usuario}</span> | Creado por: Dr. Alejandro Castañeda Correa
@@ -388,12 +388,45 @@ if "df_ingredientes_state" not in st.session_state:
         "Max Inclusión (%)": [100.0, 100.0, 100.0, 1.5, 100.0, 100.0, 100.0, 5.0, 5.0, 5.0]
     })
 
+# --- SIMULACIÓN DE DATOS DE COLLAR IoT PARA ANIMALES ---
+if "df_collares_state" not in st.session_state:
+    np.random.seed(42)
+    ids_animales = [f"ID-{1000 + i}" for i in range(1, 26)]
+    estados_salud = []
+    visitas_com = []
+    min_masticacion = []
+    
+    for idx in ids_animales:
+        r = np.random.rand()
+        if r < 0.75:
+            estados_salud.append("🟢 Sano / Activo")
+            visitas_com.append(np.randint(8, 15) if hasattr(np, 'randint') else int(np.random.randint(8, 15)))
+            min_masticacion.append(int(np.random.randint(520, 680)))
+        elif r < 0.90:
+            estados_salud.append("🟡 Alerta (Bajo Consumo)")
+            visitas_com.append(int(np.random.randint(3, 6)))
+            min_masticacion.append(int(np.random.randint(380, 480)))
+        else:
+            estados_salud.append("🔴 Enfermo / Riesgo (Descarte)")
+            visitas_com.append(int(np.random.randint(0, 2)))
+            min_masticacion.append(int(np.random.randint(150, 320)))
+            
+    st.session_state.df_collares_state = pd.DataFrame({
+        "ID Arete / Animal": ids_animales,
+        "Estatus Collares IoT": estados_salud,
+        "Visitas Comedero (visitas/día)": visitas_com,
+        "Masticación / Rumina (min/día)": min_masticacion,
+        "Acción IA Recomendada": [
+            "Ninguna (Lote Óptimo)" if "Sano" in s else ("Aislar y revisar temperatura" if "Alerta" in s else "Descarte / Tratamiento urgente por ineficiencia") for s in estados_salud
+        ]
+    })
+
 # --- 5. BARRA LATERAL ---
-st.sidebar.markdown(f"### 🎛️ Panel Master NutriON")
+st.sidebar.markdown(f"### 🎛️ Panel Ultra AI NutriON")
 st.sidebar.markdown(f"👤 **Usuario:** {st.session_state.current_user.capitalize()}")
 st.sidebar.markdown(f"🛡️ **Licencia:** {plan_activo_usuario}")
 
-with st.sidebar.expander("🔄 Gestión de Suscripción Master", expanded=True):
+with st.sidebar.expander("🔄 Gestión de Suscripción Ultra", expanded=True):
     st.markdown(f"**Próxima Renovación:** `{next_ren_date}`")
     
     nuevo_estado_auto = st.checkbox("Renovación Automática", value=auto_renew_status, key="sidebar_auto_renew_toggle")
@@ -693,14 +726,14 @@ class PDFReport(FPDF):
     def header(self):
         self.set_font('Arial', 'B', 12)
         self.set_text_color(5, 150, 105)
-        self.cell(0, 10, 'NutriON 360 Master Elite - Creado por Dr. Alejandro Castaneda Correa', 0, 1, 'C')
+        self.cell(0, 10, 'NutriON 360 Ultra AI - Creado por Dr. Alejandro Castaneda Correa', 0, 1, 'C')
         self.ln(3)
 
     def footer(self):
         self.set_y(-15)
         self.set_font('Arial', 'I', 8)
         self.set_text_color(100, 100, 100)
-        self.cell(0, 10, f'Pagina {self.page_no()} | Telemetria IoT & Nutricion de Precision - Dr. Alejandro Castaneda Correa', 0, 0, 'C')
+        self.cell(0, 10, f'Pagina {self.page_no()} | Smart Collars IoT & Health AI - Dr. Alejandro Castaneda Correa', 0, 0, 'C')
 
 def generar_pdf_reporte():
     pdf = PDFReport()
@@ -711,7 +744,7 @@ def generar_pdf_reporte():
 
     pdf.set_font('Arial', 'B', 11)
     pdf.set_text_color(15, 23, 42)
-    pdf.cell(0, 8, safe_str("1. Resumen Zootecnico y Productivo (IoT Sync)"), 0, 1)
+    pdf.cell(0, 8, safe_str("1. Resumen Zootecnico y Salud IoT"), 0, 1)
     pdf.set_font('Arial', '', 10)
     
     resumen_dict = {
@@ -729,13 +762,13 @@ def generar_pdf_reporte():
         
     pdf.ln(4)
     pdf.set_font('Arial', 'B', 11)
-    pdf.cell(0, 8, safe_str("2. Evaluacion Financiera y Cobertura por Cabeza"), 0, 1)
+    pdf.cell(0, 8, safe_str("2. Evaluacion Financiera por Cabeza"), 0, 1)
     pdf.set_font('Arial', '', 10)
     
     econ_dict = {
         "Costo de Compra Becerro": f"${costo_compra_cab:,.2f} MXN",
         "Costo Total de Alimentacion": f"${costo_alimentacion_cab:,.2f} MXN",
-        "Sanidad Inicial (Aretaje, Barrido, Vac., Desp., Vit.)": f"${costo_sanidad_inicial:,.2f} MXN",
+        "Sanidad Inicial": f"${costo_sanidad_inicial:,.2f} MXN",
         "Mano de Obra y Operacion": f"${costo_mano_obra_fijo:,.2f} MXN",
         "Costo Total de Produccion": f"${costo_total_cab:,.2f} MXN",
         "Ingreso por Venta Ganado": f"${ingreso_venta_cab:,.2f} MXN",
@@ -749,7 +782,7 @@ def generar_pdf_reporte():
 
     pdf.ln(4)
     pdf.set_font('Arial', 'B', 11)
-    pdf.cell(0, 8, safe_str("3. Formula Optimizada (Costo Minimo IoT)"), 0, 1)
+    pdf.cell(0, 8, safe_str("3. Formula Optimizada (Costo Minimo)"), 0, 1)
     
     pdf.set_font('Arial', 'B', 9)
     pdf.cell(100, 7, safe_str("Ingrediente"), 1, 0, 'L')
@@ -776,16 +809,16 @@ def generar_pdf_reporte():
     else:
         return output.encode('latin1')
 
-# --- 6. INTERFAZ MODULAR POR PESTAÑAS (8 TABS MASTER ELITE) ---
+# --- 6. INTERFAZ MODULAR POR PESTAÑAS (8 TABS ULTRA AI) ---
 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-    "📋 1. Resumen & IoT Clima", 
+    "📋 1. Resumen & Clima IoT", 
     "🧪 2. Nutrición Patrocinada", 
     "📊 3. Economía & Futuros", 
-    "🚜 4. Manejo & Báscula IoT",
-    "🔮 5. Simulador Compra-Venta",
-    "📄 6. Reporte PDF Master",
-    "💬 7. NutriON (IA Soporte)",
-    "🧭 8. Asesoría & Marketplace"
+    "🩺 4. Collares IA & Salud Animal",
+    "🚜 5. Báscula & Carros Mezcladores",
+    "🔮 6. Simulador Compra-Venta",
+    "📄 7. Reporte PDF Ultra",
+    "💬 8. NutriON IA & Asesoría"
 ])
 
 with tab1:
@@ -825,7 +858,7 @@ with tab1:
     fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_pesos, name="Peso Proyectado (kg)", mode="lines+markers", line=dict(color="#059669", width=3.5)), secondary_y=False)
     fig_comportamiento.add_trace(go.Scatter(x=lista_semanas, y=lista_cms, name="Consumo Materia Seca (kg/día)", mode="lines+markers", line=dict(color="#d97706", width=3, dash="dash")), secondary_y=True)
     fig_comportamiento.update_layout(
-        title=dict(text=f"Dinámica de Engorda IoT ({perfil_aa[:18]} | GDE: {gde} kg/d)", font=dict(family="Calibri", size=14, color="#0f172a"), x=0.5), 
+        title=dict(text=f"Dinámica de Engorda Ultra ({perfil_aa[:18]} | GDE: {gde} kg/d)", font=dict(family="Calibri", size=14, color="#0f172a"), x=0.5), 
         plot_bgcolor="#ffffff", 
         paper_bgcolor="#ffffff", 
         font=dict(family="Calibri", size=12, color="#1e293b"), 
@@ -852,7 +885,7 @@ with tab2:
             "Min Inclusión (%)": st.column_config.NumberColumn("Min (%)", min_value=0.0, max_value=100.0, step=0.5),
             "Max Inclusión (%)": st.column_config.NumberColumn("Max (%)", min_value=0.0, max_value=100.0, step=0.5),
         },
-        key="editor_ingredientes_persisted_master"
+        key="editor_ingredientes_persisted_ultra"
     )
 
 with tab3:
@@ -893,7 +926,7 @@ with tab3:
         st.info(
             "💡 **Recomendación Hedging NutriON 360:** Basado en tu consumo proyectado de **"
             f"{(consumo_total_ciclo_cab * cantidad_animales) / 1000.0:,.1f} toneladas** de alimento, "
-            "el mercado de granos presenta estabilidad en contratos a 3 meses. Considera asegurar un 50% de tus requerimientos de maíz para blindar tu costo por tonelada."
+            "el mercado de granos presenta estabilidad en contratos a 3 meses. Considera asegurar un 50% de tus requerimientos de maíz."
         )
         
         st.markdown("---")
@@ -975,8 +1008,61 @@ with tab3:
         st.error("⚠️ Las restricciones son demasiado estrictas para encontrar una fórmula. Ajusta los mínimos/máximos en la pestaña 2.")
 
 with tab4:
+    st.subheader("🩺 4. Collares IoT de Masticación & Detección IA de Animales Enfermos")
+    st.markdown("""
+        **Inteligencia Artificial aplicada al Comportamiento Animal:** Los collares IoT integrados monitorean 
+        los movimientos de masticación (minutos de rumia diarios) y las visitas al comedero en tiempo real. 
+        Si un animal reduce drásticamente su actividad o ausentismo en comederos, **NutriON 360 Ultra** 
+        envía una notificación instantánea al teléfono celular del productor para aislarlo, tratarlo o descartarlo 
+        antes de que sufra pérdidas severas de peso o contagie al lote.
+    """)
+    
+    col_h1, col_h2, col_h3 = st.columns(3)
+    df_collares = st.session_state.df_collares_state
+    
+    total_animales_mon = len(df_collares)
+    sanos_count = len(df_collares[df_collares["Estatus Collares IoT"].str.contains("Sano")])
+    alertas_count = len(df_collares[df_collares["Estatus Collares IoT"].str.contains("Alerta")])
+    enfermos_count = len(df_collares[df_collares["Estatus Collares IoT"].str.contains("Enfermo")])
+    
+    with col_h1:
+        st.metric("Collares IoT Activos", f"{total_animales_mon} cabezas")
+    with col_h2:
+        st.metric("Animales Sanos", f"{sanos_count} cabezas", "🟢 Normal")
+    with col_h3:
+        st.metric("Enfermos / Riesgo (Descarte)", f"{enfermos_count} cabezas", "🔴 Acción Inmediata", delta=f"-{enfermos_count}", delta_color="inverse")
+        
+    st.markdown("---")
+    st.markdown("#### 📱 Centro de Notificaciones y Alertas Automáticas al Teléfono")
+    
+    col_phone_1, col_phone_2 = st.columns([2, 1])
+    with col_phone_1:
+        telefono_productor = st.text_input("Número Celular (WhatsApp / SMS para Alertas)", placeholder="+52 33 1234 5678", value="+52 ")
+        canal_alerta = st.selectbox("Canal de Notificación Preferido", ["WhatsApp Business API", "SMS Directo", "Push Notification en App", "Todos los canales"])
+    with col_phone_2:
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("📲 Enviar Prueba de Alerta SMS/Push", use_container_width=True):
+            if len(telefono_productor) > 5:
+                st.success(f"📱 **¡Alerta Enviada a {telefono_productor}!**\n\n*Mensaje:* '⚠️ Alerta NutriON Ultra: Animal #1014 muestra caída del 52% en masticación y 0 visitas al comedero hoy. Posible inicio de BRD o acidosis. Aislar inmediatamente.'")
+                st.balloons()
+            else:
+                st.warning("⚠️ Ingresa un número de celular válido para la prueba.")
+                
+    st.markdown("---")
+    st.markdown("#### 📊 Monitoreo Individual por Arete (Datos de Collar IoT en Vivo)")
+    st.markdown("Tabla analítica generada por el algoritmo de IA para identificar animales rezagados que comerán menos y ganarán menos peso:")
+    
+    st.dataframe(df_collares, use_container_width=True, hide_index=True)
+    
+    st.info(
+        "💡 **Estrategia de Descarte y Crecimiento:** Los animales marcados con 🔴 o 🟡 muestran un tiempo de masticación menor a 350 min/día "
+        "(frente al estándar de 550 min/día). Mantener estos animales en el corral incrementa el costo de conversión alimenticia ineficiente. "
+        "La recomendación de la IA es separarlos para un tratamiento veterinario especializado o venta anticipada."
+    )
+
+with tab5:
     st.subheader("🚜 Telemetría IoT y Simulación de Báscula para Carros Mezcladores")
-    st.markdown("Conexión inalámbrica simulada con indicadores de pesaje en batea para control milimétrico de la ración:")
+    st.markdown("Conexión inalámbrica con indicadores de pesaje en batea para control milimétrico de la ración:")
     
     if resultado.success:
         cms_total_lote = cms_estimado * cantidad_animales
@@ -1001,21 +1087,21 @@ with tab4:
             f"🔗 **Estado de Conexión IoT:** 🟢 Vinculado con Báscula Carro Mezclador #1 (Bluetooth / Wi-Fi)\n\n"
             f"**Carga Actual en Proceso:** {ingrediente_ejemplo} ({porcentaje_ejemplo:.1f}% de la ración)\n"
             f"* **Meta en Batea:** {kilos_meta_lote:,.1f} kg\n"
-            f"* **Lectura Actual en Báscula:** `{kilos_meta_lote * 0.98:,.1f} kg` (Margen de precisión: 98.5% - 🟢 Semáforo Verde)"
+            f"* **Lectura Actual en Báscula:** `{kilos_meta_lote * 0.99:,.1f} kg` (Margen de precisión: 99.1% - 🟢 Semáforo Verde)"
         )
         
         st.markdown("---")
         st.markdown("#### 📋 Protocolo y Orden de Carga en Batea para Operarios:")
         st.markdown(
-            "1. **Paso 1 (Forrajes Secos / Fibra Larga):** Cargar rastrojos o harinas fibrosas al inicio para asegurar el peNDF y evitar acidosis metabólica.\n"
-            "2. **Paso 2 (Ingredientes Húmedos / Ensilados):** Agregar ensilados o subproductos húmedos corrigiendo por materia seca real.\n"
+            "1. **Paso 1 (Forrajes Secos / Fibra Larga):** Cargar rastrojos o harinas fibrosas al inicio para asegurar el peNDF.\n"
+            "2. **Paso 2 (Ingredientes Húmedos / Ensilados):** Agregar ensilados corrigiendo por materia seca real.\n"
             "3. **Paso 3 (Granos Secos y Concentrados):** Incorporar maíz molido, pasta de soya y canola.\n"
-            "4. **Paso 4 (Núcleos, Minerales y Urea):** Añadir sales minerales y urea.\n"
-            "5. **Paso 5 (Líquidos):** Verter melaza líquida con aspersión al final para fijar polvillos y elevar palatabilidad.\n"
-            "6. **Tiempo de Mezclado:** Operar de 8 a 10 minutos continuos antes de distribuir en comederos."
+            "4. **Paso 4 (Núcleos Minerales, Vitaminas y Urea):** Añadir sales minerales y urea.\n"
+            "5. **Paso 5 (Líquidos):** Verter melaza líquida con aspersión al final.\n"
+            "6. **Tiempo de Mezclado:** Operar de 8 a 10 minutos continuos."
         )
 
-with tab5:
+with tab6:
     st.subheader("🔮 Simulador Estratégico de Compra y Venta")
     st.markdown("""
         Este modelo de inteligencia de negocios evalúa miles de combinaciones de compra y venta tomando en cuenta 
@@ -1121,30 +1207,30 @@ with tab5:
     
     st.plotly_chart(fig_heat, use_container_width=True)
 
-with tab6:
-    st.subheader("📄 Generación y Descarga de Reporte Ejecutivo PDF Master")
+with tab7:
+    st.subheader("📄 Generación y Descarga de Reporte Ejecutivo PDF Ultra")
     st.markdown(
-        "Descarga un reporte profesional con todo el resumen zootécnico, financiero, telemetría IoT y formulación lineal optimizada."
+        "Descarga un reporte profesional con todo el resumen zootécnico, financiero, telemetría IoT de collares y formulación lineal optimizada."
     )
     
     if resultado.success:
         pdf_bytes = generar_pdf_reporte()
         st.download_button(
-            label="📥 Descargar Reporte Ejecutivo Master en PDF",
+            label="📥 Descargar Reporte Ejecutivo Ultra en PDF",
             data=pdf_bytes,
-            file_name="NutriON_360_Master_Reporte.pdf",
+            file_name="NutriON_360_Ultra_Reporte.pdf",
             mime="application/pdf",
             use_container_width=True
         )
-        st.success("¡El reporte PDF Master se ha generado correctamente!")
+        st.success("¡El reporte PDF Ultra se ha generado correctamente!")
     else:
         st.warning("⚠️ Resuelve las restricciones nutricionales en la pestaña **Nutrición Patrocinada** para habilitar la descarga.")
 
-with tab7:
-    st.subheader("💬 Asistente Virtual Inteligente NutriON (IA Master)")
+with tab8:
+    st.subheader("💬 Asistente Virtual Inteligente NutriON (IA Ultra)")
     st.markdown("""
-        Bienvenido al canal de atención con IA de **NutriON 360**. Pregunta sobre telemetría IoT, contratos de futuros, 
-        formulación o soporte técnico.
+        Bienvenido al canal de atención con IA de **NutriON 360 Ultra**. Pregunta sobre collares IoT, detección de animales 
+        enfermos, contratos de futuros, formulación o soporte técnico.
     """)
     
     chat_container = st.container()
@@ -1159,96 +1245,54 @@ with tab7:
             st.markdown(user_query)
 
         query_lower = user_query.lower()
-        if any(w in query_lower for w in ["iot", "bascula", "carro", "mezclador", "bluetooth"]):
-            bot_response = "📶 **Telemetría IoT:** NutriON 360 se conecta mediante Bluetooth o API directa con indicadores de pesaje (como Digi-Star o Avery Weigh-Tronix) para guiar al operario en tiempo real durante la carga en batea."
-        elif any(w in query_lower for w in ["futuros", "cbot", "hedging", "granos", "soya", "maiz"]):
-            bot_response = "📈 **Módulo de Futuros (Hedging):** Monitoreamos los mercados internacionales de granos para recomendarte cuándo asegurar contratos a futuro basados en tu consumo proyectado."
+        if any(w in query_lower for w in ["collar", "masticacion", "rumia", "enfermo", "comedero", "visitas"]):
+            bot_response = "🩺 **Collares IoT y Salud Animal:** Los collares miden los minutos de rumia y visitas al comedero. Cuando un animal baja su actividad un 40% respecto al promedio, la IA activa una alerta roja para aislarlo y evitar ineficiencias en ganancia de peso."
+        elif any(w in query_lower for w in ["iot", "bascula", "carro", "mezclador", "bluetooth"]):
+            bot_response = "📶 **Telemetría IoT:** NutriON 360 se conecta mediante Bluetooth o API directa con indicadores de pesaje en carros mezcladores para garantizar precisión milimétrica en batea."
         elif any(w in query_lower for w in ["renovacion", "automatica", "renovar", "cobro"]):
-            bot_response = "🔄 **Renovación Automática:** Puedes activar o desactivar la renovación automática en cualquier momento desde el panel lateral izquierdo (*Gestión de Suscripción Master*)."
+            bot_response = "🔄 **Renovación Automática:** Puedes activar o desactivar la renovación automática en cualquier momento desde el panel lateral izquierdo (*Gestión de Suscripción Ultra*)."
         elif any(w in query_lower for w in ["precio", "costo", "suscripcion", "plan"]):
-            bot_response = "💳 **Planes Elite Disponibles:** Trimestral ($2,700), Semestral ($4,800) y Anual Elite Global ($8,400 MXN)."
+            bot_response = "💳 **Planes Ultra Disponibles:** Trimestral Pro ($3,000), Semestral Feedlot IoT ($5,400) y Anual Ultra AI & IoT ($9,600 MXN)."
         else:
-            bot_response = f"🤖 He registrado tu consulta: *\"{user_query}\"*. Como asistente **NutriON Master**, he enviado este requerimiento al equipo técnico del Dr. Alejandro Castañeda."
+            bot_response = f"🤖 He registrado tu consulta: *\"{user_query}\"*. Como asistente **NutriON Ultra AI**, he enviado este requerimiento al equipo técnico del Dr. Alejandro Castañeda."
 
         st.session_state.nutrion_messages.append({"role": "assistant", "content": bot_response})
         with st.chat_message("assistant"):
             st.markdown(bot_response)
 
-with tab8:
-    st.subheader("🧭 Centro de Asesoría Virtual, Guías de Campo & Marketplace de Expertos")
-    st.markdown("""
-        **Solución experta sin fronteras:** Cuando las largas distancias o el clima adverso impiden la visita presencial, 
-        **NutriON 360 Master** conecta tu rancho con una red global de especialistas certificados y guías de campo avanzadas.
-    """)
+    st.markdown("---")
+    st.markdown("### 🧭 Centro de Asesoría Virtual & Agendamiento de Consultoría ($475 MXN / 30 min)")
     
-    with st.expander("🌾 1. Guías Nutricionales y Formulación de Dietas para Ranchos y Feedlots", expanded=False):
-        st.markdown("""
-            * **Recepción de Becerros (Estrés Post-Transporte):** 
-              - Uso de dietas altas en fibra efectiva (`peNDF > 24%`) para estimular la rumia y proteger la integridad ruminal.
-              - Incorporación de electrolitos, potasio (1.2% MS) y vitaminas A, D y E.
-            * **Fase de Crecimiento y Repasto:**
-              - Desarrollo esquelético y muscular magro con balance óptimo de energía y proteína degradable (PDR).
-            * **Finalización Intensiva (Engorda Rápida):**
-              - Transición gradual de forraje a grano en 3 etapas (14 días) para prevenir SARA y maximizar GDE.
-        """)
+    col_c1, col_c2 = st.columns(2)
+    with col_c1:
+        nombre_contacto = st.text_input("Nombre del Productor / Responsable", key="rem_nombre")
+        rancho_ubicacion = st.text_input("Ubicación del Rancho / Planta", key="rem_ubi")
+        contacto_email = st.text_input("Correo Electrónico o Teléfono de Contacto", key="rem_contacto")
+    with col_c2:
+        tipo_consulta = st.selectbox("Motivo de Asesoría Remota", [
+            "Interpretación de Alertas de Collares IoT y Salud",
+            "Auditoría y Calibración de Planta de Alimentos", 
+            "Diagnóstico y Control de Acidosis / Salud Ruminal", 
+            "Optimización y Auditoría de Costos de Ración", 
+            "Evaluación Integral de Ganancia Diaria Esperada (GDE)"
+        ], key="rem_tipo")
+        fecha_cita = st.date_input("Fecha Preferida para la Asesoría", min_value=datetime.now().date(), key="rem_fecha")
+        hora_cita = st.selectbox("Horario Preferido", ["09:00 AM - 09:30 AM", "11:00 AM - 11:30 AM", "01:00 PM - 01:30 PM", "04:00 PM - 04:30 PM"], key="rem_hora")
         
-    with st.expander("🏭 2. Protocolos de Mezclado IoT y Operación en Plantas de Alimentos", expanded=False):
-        st.markdown("""
-            * **Secuencia de Carga en Carros Mezcladores:**
-              1. **Fibra Larga / Forrajes Secos** al inicio.
-              2. **Ingredientes Húmedos / Ensilados** corrigiendo por materia seca.
-              3. **Granos Secos y Concentrados** (Maíz, Soya, Canola).
-              4. **Núcleos Minerales, Vitaminas y Urea** (con pre-mezcla).
-              5. **Líquidos (Melaza / Grasas)** al final con aspersión uniforme.
-            * **Tiempo de Mezclado:** Mínimo **8 a 10 minutos** continuos.
-        """)
+    st.markdown("##### 💳 Datos de Pago (Tarjeta de Crédito / Débito)")
+    col_p1, col_p2, col_p3 = st.columns([2, 1, 1])
+    with col_p1:
+        tarjeta_asesoria = st.text_input("Número de Tarjeta de Crédito / Débito", placeholder="4000 1234 5678 9010", key="rem_card")
+    with col_p2:
+        exp_asesoria = st.text_input("Expiración (MM/AA)", placeholder="12/28", key="rem_exp")
+    with col_p3:
+        cvv_asesoria = st.text_input("CVV", type="password", placeholder="123", key="rem_cvv")
         
-    with st.expander("🌡️ 3. Estrategias de Manejo ante Estrés Térmico y THI Elevado", expanded=False):
-        st.markdown("""
-            * **Mitigación de Calor (>78 THI):**
-              - Ofrecer entre 60% y 70% del alimento durante las horas frescas de la noche o madrugada.
-              - Inclusión de Bicarbonato de Sodio (0.7% - 1.0% de la MS).
-              - Elevar ligeramente la densidad energética con grasa de sobrepaso para compensar la caída de CMS.
-        """)
-        
-    with st.expander("🩺 4. Solicitud y Agendamiento de Consultoría Remota Elite ($475 MXN / 30 min)", expanded=True):
-        st.markdown("""
-            **¿Necesitas un diagnóstico a profundidad, auditoría de tu planta o revisión de casos clínicos complejos?**
-            * 💰 **Costo de la Consulta:** **$475.00 MXN**
-            * ⏱️ **Duración:** **30 minutos** de sesión técnica en vivo.
-            * 💳 **Pago Seguro y Agendamiento:** Ingresa los datos de tu tarjeta para procesar el pago y agendar de inmediato.
-        """)
-        
-        col_c1, col_c2 = st.columns(2)
-        with col_c1:
-            nombre_contacto = st.text_input("Nombre del Productor / Responsable", key="rem_nombre")
-            rancho_ubicacion = st.text_input("Ubicación del Rancho / Planta", key="rem_ubi")
-            contacto_email = st.text_input("Correo Electrónico o Teléfono de Contacto", key="rem_contacto")
-        with col_c2:
-            tipo_consulta = st.selectbox("Motivo de Asesoría Remota", [
-                "Auditoría y Calibración de Planta de Alimentos", 
-                "Diagnóstico y Control de Acidosis / Salud Ruminal", 
-                "Optimización y Auditoría de Costos de Ración", 
-                "Evaluación Integral de Ganancia Diaria Esperada (GDE)",
-                "Asesoría Nutricional General y Casos Clínicos"
-            ], key="rem_tipo")
-            fecha_cita = st.date_input("Fecha Preferida para la Asesoría", min_value=datetime.now().date(), key="rem_fecha")
-            hora_cita = st.selectbox("Horario Preferido", ["09:00 AM - 09:30 AM", "11:00 AM - 11:30 AM", "01:00 PM - 01:30 PM", "04:00 PM - 04:30 PM"], key="rem_hora")
-            
-        st.markdown("##### 💳 Datos de Pago (Tarjeta de Crédito / Débito)")
-        col_p1, col_p2, col_p3 = st.columns([2, 1, 1])
-        with col_p1:
-            tarjeta_asesoria = st.text_input("Número de Tarjeta de Crédito / Débito", placeholder="4000 1234 5678 9010", key="rem_card")
-        with col_p2:
-            exp_asesoria = st.text_input("Expiración (MM/AA)", placeholder="12/28", key="rem_exp")
-        with col_p3:
-            cvv_asesoria = st.text_input("CVV", type="password", placeholder="123", key="rem_cvv")
-            
-        st.markdown("")
-        if st.button("💳 Pagar $475 MXN y Agendar Asesoría Remota (30 min)", use_container_width=True):
-            if nombre_contacto and contacto_email and tarjeta_asesoria:
-                st.success(f"🎉 **¡Pago de $475.00 MXN Exitoso y Cita Agendada!**\n\nEstimado(a) **{nombre_contacto}**, tu asesoría de 30 minutos ha sido programada para el **{fecha_cita}** a las **{hora_cita}**.")
-                st.info(f"📧 **Notificación Enviada:** Se ha enviado la confirmación de la cita, el enlace de videollamada y el comprobante fiscal a: **{contacto_email}**. El Dr. Alejandro Castañeda se conectará puntualmente.")
-                st.balloons()
-            else:
-                st.warning("⚠️ Por favor, completa tu nombre, medio de contacto y los datos de tu tarjeta para procesar el pago y agendar la asesoría.")
+    st.markdown("")
+    if st.button("💳 Pagar $475 MXN y Agendar Asesoría Remota (30 min)", use_container_width=True):
+        if nombre_contacto and contacto_email and tarjeta_asesoria:
+            st.success(f"🎉 **¡Pago de $475.00 MXN Exitoso y Cita Agendada!**\n\nEstimado(a) **{nombre_contacto}**, tu asesoría de 30 minutos ha sido programada para el **{fecha_cita}** a las **{hora_cita}**.")
+            st.info(f"📧 **Notificación Enviada:** Se ha enviado la confirmación de la cita, el enlace de videollamada y el comprobante fiscal a: **{contacto_email}**. El Dr. Alejandro Castañeda se conectará puntualmente.")
+            st.balloons()
+        else:
+            st.warning("⚠️ Por favor, completa tu nombre, medio de contacto y los datos de tu tarjeta para procesar el pago y agendar la asesoría.")
