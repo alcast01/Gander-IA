@@ -9,7 +9,7 @@ from fpdf import FPDF
 import json
 import os
 import hashlib
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO TIPOGRÁFICO UNIFORME (CALIBRI) ---
 st.set_page_config(
@@ -108,8 +108,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y PLANES DE SUSCRIPCIÓN PROPORCIONALES ---
-USERS_FILE = "usuarios_ganaderia_elite_proportional.json"
+# --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y RENOVACIÓN AUTOMÁTICA ---
+USERS_FILE = "usuarios_ganaderia_elite_autorenew.json"
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -127,6 +127,8 @@ def cargar_usuarios_persistentes():
             "email": "admin@ganaderiaelite.com",
             "subscription_active": True,
             "plan": "Anual (12 Meses) - $8,400 MXN | $700.00/mes",
+            "auto_renew": True,
+            "next_renewal_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d"),
             "fecha_registro": "2026-01-01"
         },
         "alejandro": {
@@ -134,6 +136,8 @@ def cargar_usuarios_persistentes():
             "email": "alejandro.castaneda@ganaderiaelite.com",
             "subscription_active": True,
             "plan": "Anual (12 Meses) - $8,400 MXN | $700.00/mes",
+            "auto_renew": True,
+            "next_renewal_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d"),
             "fecha_registro": "2026-01-01"
         }
     }
@@ -150,10 +154,9 @@ if "authenticated" not in st.session_state:
 if "current_user" not in st.session_state:
     st.session_state.current_user = ""
 
-# Inicializar historial de chat con NutriON
 if "nutrion_messages" not in st.session_state:
     st.session_state.nutrion_messages = [
-        {"role": "assistant", "content": "¡Hola! Soy **NutriON**, tu asistente virtual automatizado para **Ganader-IA Elite 360**. Estoy aquí para ayudarte con cualquier duda sobre nutrición animal, funcionamiento de la plataforma, reportar problemas técnicos o recibir tus comentarios. ¿En qué te puedo ayudar hoy?"}
+        {"role": "assistant", "content": "¡Hola! Soy **NutriON**, tu asistente virtual automatizado para **Ganader-IA Elite 360**. Estoy aquí para ayudarte con cualquier duda sobre nutrición animal, funcionamiento de la plataforma, renovación automática o soporte técnico. ¿En qué te puedo ayudar hoy?"}
     ]
 
 # --- PANTALLA DE ACCESO / SUSCRIPCIÓN SI NO ESTÁ AUTENTICADO ---
@@ -188,7 +191,6 @@ if not st.session_state.authenticated:
     tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "💳 Planes Elite y Registro"])
 
     with tab_login:
-        # --- BOTÓN DE ACCESO DIRECTO EXCLUSIVO PARA EL CREADOR ---
         st.markdown("""
             <div style="background: #ecfdf5; padding: 14px 18px; border-radius: 12px; border: 1.5px solid #059669; margin-bottom: 20px;">
                 <p style="margin: 0 0 8px 0; font-size: 0.9rem; font-weight: 700; color: #064e3b;">👑 Acceso Rápido del Creador (Dr. Alejandro Castañeda)</p>
@@ -235,12 +237,12 @@ if not st.session_state.authenticated:
         )
         
         st.markdown("---")
-        st.markdown("##### 📝 Datos de Cuenta y Pago Seguro")
+        st.markdown("##### 📝 Datos de Cuenta, Pago Seguro y Renovación Automática")
         
         col_r1, col_r2 = st.columns(2)
         with col_r1:
             new_user = st.text_input("Nombre de Usuario Deseado", key="reg_user")
-            new_email = st.text_input("Correo Electrónico (para notificaciones y recibo)", key="reg_email")
+            new_email = st.text_input("Correo Electrónico (para recibo y avisos)", key="reg_email")
         with col_r2:
             new_pass = st.text_input("Contraseña", type="password", key="reg_pass")
             confirm_pass = st.text_input("Confirma Contraseña", type="password", key="reg_conf")
@@ -256,7 +258,14 @@ if not st.session_state.authenticated:
         
         st.markdown("")
         
-        # Extracción dinámica exacta del costo seleccionado
+        # Opción de Renovación Automática
+        auto_renew_enabled = st.checkbox(
+            "🔄 **Activar Renovación Automática** (La suscripción se cobrará y renovará automáticamente al cumplirse el periodo elegido, garantizando acceso ininterrumpido).",
+            value=True
+        )
+        
+        st.markdown("")
+        
         try:
             costo_str = plan_elegido.split("-")[1].split("|")[0].strip()
         except Exception:
@@ -274,17 +283,25 @@ if not st.session_state.authenticated:
             elif len(num_tarjeta.replace(" ", "")) < 15:
                 st.error("⚠️ Número de tarjeta inválido. Verifica los dígitos.")
             else:
+                # Calcular días del próximo cobro automático
+                dias_periodo = 90 if "Trimestral" in plan_elegido else (180 if "Semestral" in plan_elegido else 365)
+                fecha_renovacion = (datetime.now() + timedelta(days=dias_periodo)).strftime("%Y-%m-%d")
+                
                 db_usuarios[new_user] = {
                     "password": hash_password(new_pass),
                     "email": new_email,
                     "subscription_active": True,
                     "plan": plan_elegido,
+                    "auto_renew": auto_renew_enabled,
+                    "next_renewal_date": fecha_renovacion,
                     "fecha_registro": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 }
                 guardar_usuarios_persistentes(db_usuarios)
                 
                 st.success(f"🎉 **¡Pago Exitoso de {costo_str} ({plan_elegido})!** Transacción aprobada.")
-                st.success(f"📧 **Notificación Enviada:** Se ha enviado un correo electrónico de confirmación de pago, comprobante fiscal y tus accesos a **{new_email}**.")
+                if auto_renew_enabled:
+                    st.info(f"🔄 **Renovación Automática Activada:** Tu próxima renovación está programada para el **{fecha_renovacion}**.")
+                st.success(f"📧 **Notificación Enviada:** Se ha enviado el comprobante fiscal y tus accesos a **{new_email}**.")
                 
                 st.session_state.authenticated = True
                 st.session_state.current_user = new_user
@@ -297,6 +314,8 @@ if not st.session_state.authenticated:
 db_usuarios_activos = cargar_usuarios_persistentes()
 user_info = db_usuarios_activos.get(st.session_state.current_user, {})
 plan_activo_usuario = user_info.get("plan", "Plan Elite")
+auto_renew_status = user_info.get("auto_renew", False)
+next_ren_date = user_info.get("next_renewal_date", "N/A")
 
 st.markdown(f"""
     <div style="display: flex; align-items: center; background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 50%, #fef3c7 100%); padding: 22px 26px; border-radius: 20px; box-shadow: 0 15px 35px -10px rgba(5, 150, 105, 0.15); margin-bottom: 24px; border: 2px solid #34d399; flex-wrap: wrap; gap: 20px;">
@@ -360,6 +379,26 @@ if "df_ingredientes_state" not in st.session_state:
 st.sidebar.markdown(f"### 🎛️ Panel de Control Elite")
 st.sidebar.markdown(f"👤 **Usuario:** {st.session_state.current_user.capitalize()}")
 st.sidebar.markdown(f"🛡️ **Plan:** {plan_activo_usuario}")
+
+# Panel de Gestión de Renovación Automática en el Sidebar
+with st.sidebar.expander("🔄 Gestión de Suscripción", expanded=True):
+    st.markdown(f"**Próxima Renovación:** `{next_ren_date}`")
+    
+    nuevo_estado_auto = st.checkbox("Renovación Automática", value=auto_renew_status, key="sidebar_auto_renew_toggle")
+    
+    if nuevo_estado_auto != auto_renew_status:
+        db_all = cargar_usuarios_persistentes()
+        if st.session_state.current_user in db_all:
+            db_all[st.session_state.current_user]["auto_renew"] = nuevo_estado_auto
+            guardar_usuarios_persistentes(db_all)
+            st.success("¡Estado de renovación actualizado!")
+            st.rerun()
+            
+    if nuevo_estado_auto:
+        st.info("🟢 Tu suscripción se renovará automáticamente al finalizar el periodo.")
+    else:
+        st.warning("🟡 La renovación automática está desactivada. Al vencer tu plan, deberás renovar manualmente.")
+
 if st.sidebar.button("🚪 Cerrar Sesión", use_container_width=True):
     st.session_state.authenticated = False
     st.session_state.current_user = ""
@@ -367,7 +406,7 @@ if st.sidebar.button("🚪 Cerrar Sesión", use_container_width=True):
 
 st.sidebar.markdown("---")
 
-with st.sidebar.expander("🐄 1. Lote, Pesos y Población", expanded=True):
+with st.sidebar.expander("🐄 1. Lote, Pesos y Población", expanded=False):
     cantidad_animales = st.number_input("Número de Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
     peso_actual = st.slider("Peso Actual / Compra (kg)", min_value=200.0, max_value=650.0, value=250.0, step=10.0)
     peso_objetivo = st.slider("Peso de Venta / Meta (kg)", min_value=400.0, max_value=750.0, value=520.0, step=10.0)
@@ -725,7 +764,7 @@ def generar_pdf_reporte():
     else:
         return output.encode('latin1')
 
-# --- 6. INTERFAZ MODULAR POR PESTAÑAS (7 TABS ELITE CON NUTRA-ON) ---
+# --- 6. INTERFAZ MODULAR POR PESTAÑAS (7 TABS ELITE) ---
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "📋 1. Resumen", 
     "🧪 2. Nutrición & Multietapa", 
@@ -1075,37 +1114,32 @@ with tab7:
     st.subheader("💬 Asistente Virtual NutriON (Soporte & Ayuda al Cliente)")
     st.markdown("""
         Bienvenido al canal de atención automatizada con **NutriON**. Puedes escribir tus preguntas sobre formulación, 
-        dudas del software, reportar algún problema técnico o dejar tus comentarios y sugerencias.
+        renovación automática, soporte técnico o dejar tus comentarios y sugerencias.
     """)
     
-    # Contenedor para mostrar mensajes de chat
     chat_container = st.container()
     with chat_container:
         for message in st.session_state.nutrion_messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-    # Entrada de texto para el usuario
     if user_query := st.chat_input("Escribe tu pregunta, reporte o comentario aquí..."):
-        # Añadir mensaje del usuario al historial
         st.session_state.nutrion_messages.append({"role": "user", "content": user_query})
         with st.chat_message("user"):
             st.markdown(user_query)
 
-        # Generar respuesta automática inteligente de NutriON basada en el contenido
         query_lower = user_query.lower()
-        if any(w in query_lower for w in ["precio", "costo", "suscripcion", "plan", "trimestral", "semestral", "anual", "pagar"]):
-            bot_response = "💳 **Planes de Suscripción Elite Disponibles:**\n- **Trimestral (3 Meses):** $2,700 MXN ($900/mes)\n- **Semestral (6 Meses):** $4,800 MXN ($800/mes - Ahorras $100/mes)\n- **Anual (12 Meses):** $8,400 MXN ($700/mes - Ahorras $200/mes)\nPuedes renovar o adquirir tu licencia directamente desde la pantalla de inicio al cerrar sesión."
-        elif any(w in query_lower for w in ["formula", "ingrediente", "nutricion", "proteina", "energia", "minimos", "maximos"]):
-            bot_response = "🧪 Para ajustar fórmulas y perfiles nutricionales, dirígete a la pestaña **2. Nutrición & Multietapa**. Ahí puedes modificar los precios, disponibilidad y límites de inclusión de cada ingrediente. El motor lineal calculará automáticamente la mezcla de costo mínimo."
+        if any(w in query_lower for w in ["renovacion", "automatica", "renovar", "recurrente", "cobro"]):
+            bot_response = "🔄 **Renovación Automática:** Puedes activar o desactivar la renovación automática en cualquier momento desde el panel lateral izquierdo (*Gestión de Suscripción*). Al estar activa, el sistema programará el siguiente cargo y renovación al cumplirse tu ciclo (3, 6 o 12 meses)."
+        elif any(w in query_lower for w in ["precio", "costo", "suscripcion", "plan", "trimestral", "semestral", "anual", "pagar"]):
+            bot_response = "💳 **Planes de Suscripción Elite Disponibles:**\n- **Trimestral (3 Meses):** $2,700 MXN ($900/mes)\n- **Semestral (6 Meses):** $4,800 MXN ($800/mes)\n- **Anual (12 Meses):** $8,400 MXN ($700/mes)\nPuedes elegir tu periodo y activar la renovación automática al registrarte o renovar."
+        elif any(w in query_lower for w in ["formula", "ingrediente", "nutricion", "proteina", "energia"]):
+            bot_response = "🧪 Para ajustar fórmulas y perfiles nutricionales, dirígete a la pestaña **2. Nutrición & Multietapa**. Ahí puedes modificar los precios, disponibilidad y límites de inclusión de cada ingrediente."
         elif any(w in query_lower for w in ["error", "fallo", "problema", "bug", "tecnico", "ayuda", "soporte"]):
-            bot_response = "🛠️ Lamento que experimentes inconvenientes técnicos. Nuestro equipo de soporte (liderado por el Dr. Alejandro Castañeda) revisa los reportes continuamente. Por favor, asegúrate de actualizar la página o verificar los parámetros ingresados. Si persiste, puedes comunicarte directamente al correo de administración."
-        elif any(w in query_lower for w in ["gde", "ganancia", "peso", "meta", "dias"]):
-            bot_response = "📈 La **Ganancia Diaria Esperada (GDE)** y los pesos proyectados se pueden configurar en la barra lateral izquierda (apartado *Lote, Pesos y Población*). Puedes elegir entre modo manual o el optimizador automático Elite."
+            bot_response = "🛠️ Lamento que experimentes inconvenientes técnicos. Nuestro equipo de soporte (liderado por el Dr. Alejandro Castañeda) revisa los reportes continuamente. Asegúrate de actualizar la página o verificar los parámetros ingresados."
         else:
-            bot_response = f"🤖 He registrado tu mensaje: *\"{user_query}\"*. Como asistente virtual **NutriON**, he enviado este comentario al registro de atención para que el equipo técnico y el Dr. Alejandro Castañeda lo tengan en cuenta. ¿Tienes alguna otra duda sobre nutrición o la plataforma?"
+            bot_response = f"🤖 He registrado tu mensaje: *\"{user_query}\"*. Como asistente virtual **NutriON**, he enviado este comentario al equipo técnico y al Dr. Alejandro Castañeda. ¿Tienes alguna otra duda sobre la plataforma?"
 
-        # Añadir respuesta de NutriON al historial
         st.session_state.nutrion_messages.append({"role": "assistant", "content": bot_response})
         with st.chat_message("assistant"):
             st.markdown(bot_response)
