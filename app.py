@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO SaaS PROFESIONAL (CALIBRI & UI/UX) ---
 st.set_page_config(
-    page_title="NutriON 360 Ultra | IA, Collares IoT y Alta Rentabilidad Bovina",
+    page_title="NutriON 360 Ultra | IA, Collares IoT, NIR y Alta Rentabilidad Bovina",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -88,9 +88,9 @@ st.markdown("""
         border-radius: 10px;
         font-weight: 600;
         color: #334155 !important;
-        font-size: 0.82rem !important;
+        font-size: 0.80rem !important;
         font-family: 'Calibri', sans-serif !important;
-        padding: 8px 12px;
+        padding: 8px 10px;
         background-color: transparent;
         transition: background-color 0.2s ease;
     }
@@ -175,7 +175,7 @@ if "current_user" not in st.session_state:
 
 if "nutrion_messages" not in st.session_state:
     st.session_state.nutrion_messages = [
-        {"role": "assistant", "content": "¡Hola! Soy **NutriON**, tu asistente virtual con Inteligencia Artificial para **NutriON 360 Ultra**. Estoy conectado en tiempo real con los collares IoT, básculas de carros mezcladores y el sistema de salud animal. ¿En qué te puedo ayudar hoy?"}
+        {"role": "assistant", "content": "¡Hola! Soy **NutriON**, tu asistente virtual con Inteligencia Artificial para **NutriON 360 Ultra**. Estoy conectado en tiempo real con sensores NIR, bolos ruminales de pH, collares IoT y el sistema de salud animal. ¿En qué te puedo ayudar hoy?"}
     ]
 
 # --- PANTALLA DE ACCESO / SUSCRIPCIÓN SI NO ESTÁ AUTENTICADO ---
@@ -202,10 +202,10 @@ if not st.session_state.authenticated:
             </div>
         </div>
         <h2 style="text-align: center; color: #064e3b; font-family: 'Calibri', sans-serif; font-weight: 800; margin-bottom: 2px;">
-            NutriON <span style="color: #059669;">360</span> <span style="font-size: 0.5em; background: #059669; color: white; padding: 2px 8px; border-radius: 6px; vertical-align: middle;">ULTRA AI & IOT</span>
+            NutriON <span style="color: #059669;">360</span> <span style="font-size: 0.5em; background: #059669; color: white; padding: 2px 8px; border-radius: 6px; vertical-align: middle;">ULTRA V4.0 AI & IOT</span>
         </h2>
         <p style="text-align: center; color: #059669; font-family: 'Calibri', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">
-            Nutrición de precisión, telemetría IoT de collares y detección temprana de salud animal.
+            Nutrición de precisión, telemetría NIR, bolos ruminales de pH y visión artificial.
         </p>
         <p style="text-align: center; color: #475569; font-family: 'Calibri', sans-serif; font-size: 0.85rem; margin-bottom: 25px;">
             Plataforma Global de Optimización, Smart Collars y Consultoría Experta Remota
@@ -237,7 +237,7 @@ if not st.session_state.authenticated:
 
     with tab_register:
         st.markdown("### 🌟 Selección de Plan Ultra AI & IoT")
-        st.markdown("Elige el periodo de suscripción con acceso total a collares inteligentes y telemetría de carros mezcladores:")
+        st.markdown("Elige el periodo de suscripción con acceso total a sensores NIR, bolos ruminales y telemetría:")
         
         plan_elegido = st.radio(
             "Planes de Suscripción NutriON 360 Disponibles:",
@@ -350,10 +350,10 @@ st.markdown(f"""
         </div>
         <div style="flex-grow: 1; min-width: 240px;">
             <h1 style="margin: 0; font-size: 1.8em; color: #064e3b; letter-spacing: -0.8px; font-weight: 800; font-family: 'Calibri', sans-serif;">
-                NutriON <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">360 ULTRA</span>
+                NutriON <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">360 ULTRA V4.0</span>
             </h1>
             <p style="margin: 2px 0 2px 0; font-size: 0.82em; color: #059669; font-weight: 700; font-family: 'Calibri', sans-serif;">
-                Nutrición de precisión, collares IoT de masticación y detección de animales enfermos en tiempo real.
+                Sensores NIR, bolos ruminales IoT de pH, IA acústica y gemelos digitales ganaderos.
             </p>
             <p style="margin: 3px 0 2px 0; font-size: 0.88em; color: #1e293b; font-weight: 600; font-family: 'Calibri', sans-serif;">
                 Usuario: <span style="color: #059669; font-weight: 700;">{st.session_state.current_user.capitalize()}</span> | Licencia: <span style="color: #d97706; font-weight: 700;">{plan_activo_usuario}</span> | Creado por: Dr. Alejandro Castañeda Correa
@@ -809,16 +809,20 @@ def generar_pdf_reporte():
     else:
         return output.encode('latin1')
 
-# --- 6. INTERFAZ MODULAR POR PESTAÑAS (8 TABS ULTRA AI) ---
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-    "📋 1. Resumen & Clima IoT", 
-    "🧪 2. Nutrición Patrocinada", 
-    "📊 3. Economía & Futuros", 
-    "🩺 4. Collares IA & Salud Animal",
-    "🚜 5. Báscula & Carros Mezcladores",
-    "🔮 6. Simulador Compra-Venta",
-    "📄 7. Reporte PDF Ultra",
-    "💬 8. NutriON IA & Asesoría"
+# --- 6. INTERFAZ MODULAR POR PESTAÑAS (12 TABS ULTRA AI) ---
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12 = st.tabs([
+    "📋 1. Resumen & Clima", 
+    "🧪 2. Nutrición", 
+    "📊 3. Economía", 
+    "🩺 4. Collares IoT",
+    "🚜 5. Báscula",
+    "🔮 6. Compra-Venta",
+    "📄 7. Reporte PDF",
+    "💬 8. NutriON IA",
+    "🧭 9. Citas",
+    "📡 10. NIR & pH Ruminal",
+    "🎙️ 11. IA Acústica & Visión",
+    "🌱 12. Gemelos & Blockchain"
 ])
 
 with tab1:
@@ -1008,13 +1012,12 @@ with tab3:
         st.error("⚠️ Las restricciones son demasiado estrictas para encontrar una fórmula. Ajusta los mínimos/máximos en la pestaña 2.")
 
 with tab4:
-    st.subheader("🩺 4. Collares IoT de Masticación & Detección IA de Animales Enfermos")
+    st.subheader("🩺 Collares IoT de Masticación & Detección IA de Animales Enfermos")
     st.markdown("""
         **Inteligencia Artificial aplicada al Comportamiento Animal:** Los collares IoT integrados monitorean 
         los movimientos de masticación (minutos de rumia diarios) y las visitas al comedero en tiempo real. 
         Si un animal reduce drásticamente su actividad o ausentismo en comederos, **NutriON 360 Ultra** 
-        envía una notificación instantánea al teléfono celular del productor para aislarlo, tratarlo o descartarlo 
-        antes de que sufra pérdidas severas de peso o contagie al lote.
+        envía una notificación instantánea al teléfono celular del productor para aislarlo, tratarlo o descartarlo.
     """)
     
     col_h1, col_h2, col_h3 = st.columns(3)
@@ -1030,7 +1033,6 @@ with tab4:
     with col_h2:
         st.metric("Animales Sanos", f"{sanos_count} cabezas", "🟢 Normal")
     with col_h3:
-        # CORRECCIÓN DE LA LNEA CON ERROR (SE ELIMINÓ EL ARGUMENTO POSICIONAL DUPLICADO)
         st.metric("Enfermos / Riesgo (Descarte)", f"{enfermos_count} cabezas", delta=f"-{enfermos_count}", delta_color="inverse")
         
     st.markdown("---")
@@ -1051,15 +1053,7 @@ with tab4:
                 
     st.markdown("---")
     st.markdown("#### 📊 Monitoreo Individual por Arete (Datos de Collar IoT en Vivo)")
-    st.markdown("Tabla analítica generada por el algoritmo de IA para identificar animales rezagados que comerán menos y ganarán menos peso:")
-    
     st.dataframe(df_collares, use_container_width=True, hide_index=True)
-    
-    st.info(
-        "💡 **Estrategia de Descarte y Crecimiento:** Los animales marcados con 🔴 o 🟡 muestran un tiempo de masticación menor a 350 min/día "
-        "(frente al estándar de 550 min/día). Mantener estos animales en el corral incrementa el costo de conversión alimenticia ineficiente. "
-        "La recomendación de la IA es separarlos para un tratamiento veterinario especializado o venta anticipada."
-    )
 
 with tab5:
     st.subheader("🚜 Telemetría IoT y Simulación de Báscula para Carros Mezcladores")
@@ -1090,26 +1084,10 @@ with tab5:
             f"* **Meta en Batea:** {kilos_meta_lote:,.1f} kg\n"
             f"* **Lectura Actual en Báscula:** `{kilos_meta_lote * 0.99:,.1f} kg` (Margen de precisión: 99.1% - 🟢 Semáforo Verde)"
         )
-        
-        st.markdown("---")
-        st.markdown("#### 📋 Protocolo y Orden de Carga en Batea para Operarios:")
-        st.markdown(
-            "1. **Paso 1 (Forrajes Secos / Fibra Larga):** Cargar rastrojos o harinas fibrosas al inicio para asegurar el peNDF.\n"
-            "2. **Paso 2 (Ingredientes Húmedos / Ensilados):** Agregar ensilados corrigiendo por materia seca real.\n"
-            "3. **Paso 3 (Granos Secos y Concentrados):** Incorporar maíz molido, pasta de soya y canola.\n"
-            "4. **Paso 4 (Núcleos Minerales, Vitaminas y Urea):** Añadir sales minerales y urea.\n"
-            "5. **Paso 5 (Líquidos):** Verter melaza líquida con aspersión al final.\n"
-            "6. **Tiempo de Mezclado:** Operar de 8 a 10 minutos continuos."
-        )
 
 with tab6:
     st.subheader("🔮 Simulador Estratégico de Compra y Venta")
-    st.markdown("""
-        Este modelo de inteligencia de negocios evalúa miles de combinaciones de compra y venta tomando en cuenta 
-        la ley biológica de rendimientos decrecientes y el comportamiento del mercado. **Encuentra el punto exacto de rentabilidad máxima.**
-    """)
-    
-    st.info(f"**Variables base en uso:** Costo de Alimento: **${costo_ton_optimizado:,.2f}/ton** | GDE Optimizado: **{gde} kg/día** | Sanidad y Manejo Fijo/Var.: **${costo_total_sanidad_y_manejo:,.0f}/cab**")
+    st.markdown("Este modelo de inteligencia de negocios evalúa miles de combinaciones de compra y venta para encontrar el punto exacto de rentabilidad máxima.")
     
     def calcular_peso_optimo_financiero(precio_compra_base, precio_venta_base, costo_ton_alim, gde_fijo, costo_fijos):
         pesos_compra = range(200, 360, 10)
@@ -1121,43 +1099,23 @@ with tab6:
         
         for wi in pesos_compra:
             pc = precio_compra_base - ((wi - 250) * 0.04) 
-            
             for wf in pesos_venta:
                 if wf <= wi + 50: 
                     continue
-                
                 kg_ganados = wf - wi
                 dias = kg_ganados / gde_fijo if gde_fijo > 0 else 1
-                
                 peso_promedio = (wi + wf) / 2.0
                 cms_ciclo = peso_promedio * 0.024 
-                
                 costo_alimento = (cms_ciclo * dias / 1000.0) * costo_ton_alim
                 costo_compra = wi * pc
                 costo_total = costo_compra + costo_alimento + costo_fijos
-                
                 pv = precio_venta_base if wf <= 540 else precio_venta_base - ((wf - 540) * 0.05)
                 ingreso_venta = wf * pv
-                
                 utilidad = ingreso_venta - costo_total
-                
-                matriz_resultados.append({
-                    "Peso Compra (kg)": wi,
-                    "Peso Venta (kg)": wf,
-                    "Utilidad Neta (MXN)": utilidad
-                })
-                
+                matriz_resultados.append({"Peso Compra (kg)": wi, "Peso Venta (kg)": wf, "Utilidad Neta (MXN)": utilidad})
                 if utilidad > mejor_utilidad:
                     mejor_utilidad = utilidad
-                    optimo = {
-                        "Peso_Compra_Optimo": wi,
-                        "Precio_Compra_Estimado": pc,
-                        "Peso_Venta_Optimo": wf,
-                        "Precio_Venta_Estimado": pv,
-                        "Utilidad_Neta_Maxima": utilidad,
-                        "Dias_En_Corral": dias
-                    }
-                    
+                    optimo = {"Peso_Compra_Optimo": wi, "Precio_Compra_Estimado": pc, "Peso_Venta_Optimo": wf, "Precio_Venta_Estimado": pv, "Utilidad_Neta_Maxima": utilidad, "Dias_En_Corral": dias}
         return optimo, pd.DataFrame(matriz_resultados)
     
     resultado_optimo, df_simulacion = calcular_peso_optimo_financiero(
@@ -1168,52 +1126,24 @@ with tab6:
         costo_fijos=costo_total_sanidad_y_manejo
     )
     
-    st.markdown("### 🏆 Escenario Ideal para Maximizar tu Dinero")
-    
     col_s1, col_s2, col_s3, col_s4 = st.columns(4)
     with col_s1:
-        st.metric("Peso IDEAL de Compra", f"{resultado_optimo['Peso_Compra_Optimo']} kg")
-        st.metric("Precio Est. Compra", f"${resultado_optimo['Precio_Compra_Estimado']:,.2f} /kg")
+        st.metric("Peso IDEAL Compra", f"{resultado_optimo['Peso_Compra_Optimo']} kg")
     with col_s2:
-        st.metric("Peso IDEAL de Venta", f"{resultado_optimo['Peso_Venta_Optimo']} kg")
-        st.metric("Precio Est. Venta", f"${resultado_optimo['Precio_Venta_Estimado']:,.2f} /kg")
+        st.metric("Peso IDEAL Venta", f"{resultado_optimo['Peso_Venta_Optimo']} kg")
     with col_s3:
-        st.metric("Utilidad Neta Máxima", f"${resultado_optimo['Utilidad_Neta_Maxima']:,.0f} /cab")
-        st.metric("Días en Corral", f"{resultado_optimo['Dias_En_Corral']:.0f} días")
+        st.metric("Utilidad Máxima", f"${resultado_optimo['Utilidad_Neta_Maxima']:,.0f} /cab")
     with col_s4:
-        ventaja = resultado_optimo['Utilidad_Neta_Maxima'] - (utilidad_neta_cab if resultado.success else 0)
-        st.metric("Diferencia vs Tu Escenario", f"${ventaja:,.0f}", delta=f"${ventaja:,.0f}", delta_color="normal")
+        st.metric("Días en Corral", f"{resultado_optimo['Dias_En_Corral']:.0f} días")
         
     st.markdown("---")
-    st.markdown("### 🗺️ Mapa de Calor de Rentabilidad (Zonas de Utilidad)")
-    st.markdown("Visualiza cómo cambia la ganancia dependiendo del peso al que compras y al que vendes.")
-    
     df_pivot = df_simulacion.pivot(index="Peso Compra (kg)", columns="Peso Venta (kg)", values="Utilidad Neta (MXN)")
-    
-    fig_heat = px.imshow(
-        df_pivot, 
-        labels=dict(x="Peso Venta al Mercado (kg)", y="Peso Compra del Becerro (kg)", color="Utilidad ($)"),
-        x=df_pivot.columns, 
-        y=df_pivot.index,
-        color_continuous_scale="Mint",
-        aspect="auto"
-    )
-    
-    fig_heat.update_layout(
-        font=dict(family="Calibri", size=12, color="#1e293b"),
-        plot_bgcolor="#ffffff", 
-        paper_bgcolor="#ffffff",
-        title=dict(font=dict(family="Calibri", size=14, color="#0f172a"))
-    )
-    
+    fig_heat = px.imshow(df_pivot, labels=dict(x="Peso Venta (kg)", y="Peso Compra (kg)", color="Utilidad ($)"), color_continuous_scale="Mint", aspect="auto")
+    fig_heat.update_layout(font=dict(family="Calibri", size=12, color="#1e293b"), plot_bgcolor="#ffffff", paper_bgcolor="#ffffff")
     st.plotly_chart(fig_heat, use_container_width=True)
 
 with tab7:
     st.subheader("📄 Generación y Descarga de Reporte Ejecutivo PDF Ultra")
-    st.markdown(
-        "Descarga un reporte profesional con todo el resumen zootécnico, financiero, telemetría IoT de collares y formulación lineal optimizada."
-    )
-    
     if resultado.success:
         pdf_bytes = generar_pdf_reporte()
         st.download_button(
@@ -1225,45 +1155,27 @@ with tab7:
         )
         st.success("¡El reporte PDF Ultra se ha generado correctamente!")
     else:
-        st.warning("⚠️ Resuelve las restricciones nutricionales en la pestaña **Nutrición Patrocinada** para habilitar la descarga.")
+        st.warning("⚠️ Resuelve las restricciones nutricionales para habilitar la descarga.")
 
 with tab8:
-    st.subheader("💬 Asistente Virtual Inteligente NutriON (IA Ultra)")
-    st.markdown("""
-        Bienvenido al canal de atención con IA de **NutriON 360 Ultra**. Pregunta sobre collares IoT, detección de animales 
-        enfermos, contratos de futuros, formulación o soporte técnico.
-    """)
-    
+    st.subheader("💬 Asistente Virtual Inteligente NutriON (IA Asistente)")
     chat_container = st.container()
     with chat_container:
         for message in st.session_state.nutrion_messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-    if user_query := st.chat_input("Escribe tu pregunta, reporte o comentario aquí..."):
+    if user_query := st.chat_input("Escribe tu pregunta o reporte aquí..."):
         st.session_state.nutrion_messages.append({"role": "user", "content": user_query})
         with st.chat_message("user"):
             st.markdown(user_query)
-
-        query_lower = user_query.lower()
-        if any(w in query_lower for w in ["collar", "masticacion", "rumia", "enfermo", "comedero", "visitas"]):
-            bot_response = "🩺 **Collares IoT y Salud Animal:** Los collares miden los minutos de rumia y visitas al comedero. Cuando un animal baja su actividad un 40% respecto al promedio, la IA activa una alerta roja para aislarlo y evitar ineficiencias en ganancia de peso."
-        elif any(w in query_lower for w in ["iot", "bascula", "carro", "mezclador", "bluetooth"]):
-            bot_response = "📶 **Telemetría IoT:** NutriON 360 se conecta mediante Bluetooth o API directa con indicadores de pesaje en carros mezcladores para garantizar precisión milimétrica en batea."
-        elif any(w in query_lower for w in ["renovacion", "automatica", "renovar", "cobro"]):
-            bot_response = "🔄 **Renovación Automática:** Puedes activar o desactivar la renovación automática en cualquier momento desde el panel lateral izquierdo (*Gestión de Suscripción Ultra*)."
-        elif any(w in query_lower for w in ["precio", "costo", "suscripcion", "plan"]):
-            bot_response = "💳 **Planes Ultra Disponibles:** Trimestral Pro ($3,000), Semestral Feedlot IoT ($5,400) y Anual Ultra AI & IoT ($9,600 MXN)."
-        else:
-            bot_response = f"🤖 He registrado tu consulta: *\"{user_query}\"*. Como asistente **NutriON Ultra AI**, he enviado este requerimiento al equipo técnico del Dr. Alejandro Castañeda."
-
+        bot_response = f"🤖 He registrado tu consulta: *\"{user_query}\"*. Como asistente **NutriON Ultra AI**, he enviado este requerimiento al equipo técnico del Dr. Alejandro Castañeda."
         st.session_state.nutrion_messages.append({"role": "assistant", "content": bot_response})
         with st.chat_message("assistant"):
             st.markdown(bot_response)
 
-    st.markdown("---")
-    st.markdown("### 🧭 Centro de Asesoría Virtual & Agendamiento de Consultoría ($475 MXN / 30 min)")
-    
+with tab9:
+    st.subheader("🧭 Centro de Asesoría Virtual & Agendamiento de Consultoría Elite")
     col_c1, col_c2 = st.columns(2)
     with col_c1:
         nombre_contacto = st.text_input("Nombre del Productor / Responsable", key="rem_nombre")
@@ -1271,29 +1183,153 @@ with tab8:
         contacto_email = st.text_input("Correo Electrónico o Teléfono de Contacto", key="rem_contacto")
     with col_c2:
         tipo_consulta = st.selectbox("Motivo de Asesoría Remota", [
-            "Interpretación de Alertas de Collares IoT y Salud",
+            "Interpretación de Alertas de Collares IoT y Sensores NIR",
             "Auditoría y Calibración de Planta de Alimentos", 
-            "Diagnóstico y Control de Acidosis / Salud Ruminal", 
-            "Optimización y Auditoría de Costos de Ración", 
-            "Evaluación Integral de Ganancia Diaria Esperada (GDE)"
+            "Diagnóstico y Control de Acidosis / Bolos de pH", 
+            "Optimización y Auditoría de Costos de Ración"
         ], key="rem_tipo")
         fecha_cita = st.date_input("Fecha Preferida para la Asesoría", min_value=datetime.now().date(), key="rem_fecha")
         hora_cita = st.selectbox("Horario Preferido", ["09:00 AM - 09:30 AM", "11:00 AM - 11:30 AM", "01:00 PM - 01:30 PM", "04:00 PM - 04:30 PM"], key="rem_hora")
         
-    st.markdown("##### 💳 Datos de Pago (Tarjeta de Crédito / Débito)")
+    st.markdown("##### 💳 Datos de Pago para la Consultoría ($475 MXN / 30 min)")
     col_p1, col_p2, col_p3 = st.columns([2, 1, 1])
     with col_p1:
-        tarjeta_asesoria = st.text_input("Número de Tarjeta de Crédito / Débito", placeholder="4000 1234 5678 9010", key="rem_card")
+        tarjeta_asesoria = st.text_input("Número de Tarjeta", placeholder="4000 1234 5678 9010", key="rem_card")
     with col_p2:
         exp_asesoria = st.text_input("Expiración (MM/AA)", placeholder="12/28", key="rem_exp")
     with col_p3:
         cvv_asesoria = st.text_input("CVV", type="password", placeholder="123", key="rem_cvv")
         
     st.markdown("")
-    if st.button("💳 Pagar $475 MXN y Agendar Asesoría Remota (30 min)", use_container_width=True):
+    if st.button("💳 Pagar $475 MXN y Agendar Asesoría Remota", use_container_width=True):
         if nombre_contacto and contacto_email and tarjeta_asesoria:
-            st.success(f"🎉 **¡Pago de $475.00 MXN Exitoso y Cita Agendada!**\n\nEstimado(a) **{nombre_contacto}**, tu asesoría de 30 minutos ha sido programada para el **{fecha_cita}** a las **{hora_cita}**.")
-            st.info(f"📧 **Notificación Enviada:** Se ha enviado la confirmación de la cita, el enlace de videollamada y el comprobante fiscal a: **{contacto_email}**. El Dr. Alejandro Castañeda se conectará puntualmente.")
+            st.success(f"🎉 **¡Pago Exitoso y Cita Agendada!** Estimado(a) **{nombre_contacto}**, tu asesoría ha sido programada para el **{fecha_cita}** a las **{hora_cita}**.")
             st.balloons()
         else:
-            st.warning("⚠️ Por favor, completa tu nombre, medio de contacto y los datos de tu tarjeta para procesar el pago y agendar la asesoría.")
+            st.warning("⚠️ Completa tu nombre, contacto y datos de tarjeta.")
+
+# --- NUEVA PESTAÑA 10: SENSORES NIR Y BOLOS RUMINALES IoT (pH) ---
+with tab10:
+    st.subheader("📡 Telemetría NIR en Tiempo Real & Bolos Ruminales de pH (SARA Prevention)")
+    st.markdown("""
+        **Tecnología Espectroscópica y Telemetría Interna:** Controla la variación de materia seca en ensilados mediante escaneo NIR 
+        y supervisa el pH ruminal 24/7 con bolos ingeribles para prevenir la Acidosis Ruminal Subclínica (SARA).
+    """)
+    
+    col_nir1, col_nir2 = st.columns(2)
+    with col_nir1:
+        st.markdown("#### 🔬 Escaneo NIR Portátil (Ensilado de Maíz)")
+        humedad_actual_nir = st.slider("Humedad Actual Detectada por Sensor NIR (%)", min_value=50.0, max_value=75.0, value=65.0, step=0.5)
+        ms_real_nir = 100.0 - humedad_actual_nir
+        st.metric("Materia Seca Real en Batea", f"{ms_real_nir:.1f}%", "Sensor NIR Activo 🟢")
+        if ms_real_nir < 33.0:
+            st.warning("⚠️ **Aviso NIR:** El ensilado está más húmedo de lo previsto. El sistema ajustó automáticamente los kilos en batea para evitar desbalances de energía.")
+        else:
+            st.success("🟢 **Aviso NIR:** Humedad dentro del rango óptimo para fermentación y estabilidad ruminal.")
+
+    with col_nir2:
+        st.markdown("#### 🌡️ Telemetría de Bolos Ruminales (pH en Vivo)")
+        ph_promedio_lote = st.slider("pH Ruminal Promedio del Lote (Bolos IoT)", min_value=5.2, max_value=7.0, value=6.2, step=0.05)
+        if ph_promedio_lote < 5.8:
+            st.error("🔴 **ALERTA SARA (Acidosis Subclínica):** El pH ruminal ha caído por debajo de 5.8. Riesgo inminente de laminitis y caída de consumo.")
+            st.metric("Estado Ruminal", "⚠️ Peligro de Acidosis", delta="Crítico", delta_color="inverse")
+        elif ph_promedio_lote < 6.0:
+            st.warning("🟡 **Precaución Ruminal:** pH en zona de transición ácida. Se recomienda incrementar fibra efectiva (peNDF) o añadir buffer.")
+            st.metric("Estado Ruminal", "🟡 Precaución", delta="Atención", delta_color="off")
+        else:
+            st.success("🟢 **Salud Ruminal Óptima:** pH estable en rango fisiológico normal (6.0 - 6.8).")
+            st.metric("Estado Ruminal", "🟢 Saludable", delta="Estable", delta_color="normal")
+
+    st.markdown("---")
+    st.markdown("#### 📈 Histórico de pH Ruminal en las Últimas 24 Horas (Monitoreo de Bolos IoT)")
+    horas_dia = [f"{h:02d}:00" for h in range(24)]
+    # Simulación de curva de pH diaria con caídas post-alimentación
+    curva_ph = [6.5, 6.6, 6.7, 6.6, 6.4, 6.2, 5.9, ph_promedio_lote, ph_promedio_lote - 0.2, ph_promedio_lote, 6.1, 6.3, 6.5, 6.6, 6.5, 6.3, 6.0, 5.9, ph_promedio_lote, 6.2, 6.4, 6.5, 6.6, 6.5]
+    
+    fig_ph = px.line(x=horas_dia, y=curva_ph, labels={"x": "Hora del Día", "y": "pH Ruminal Interno"}, markers=True)
+    fig_ph.add_hline(y=5.8, line_dash="dash", line_color="red", annotation_text="Umbral Crítico SARA (pH 5.8)")
+    fig_ph.update_layout(plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Calibri", size=12, color="#1e293b"))
+    st.plotly_chart(fig_ph, use_container_width=True)
+
+# --- NUEVA PESTAÑA 11: IA ACÚSTICA (TOS/BRD) & VISIÓN (COJERAS/BCS) ---
+with tab11:
+    st.subheader("🎙️ IA Acústica (Detección de Tos / BRD) & Visión Artificial (Cojeras y BCS)")
+    st.markdown("""
+        **Vigilancia Sanitaria No Invasiva:** Micrófonos inteligentes con IA detectan patrones acústicos de tos característicos 
+        de la Enfermedad Respiratoria Bovina (BRD) días antes de los síntomas clínicos. Asimismo, cámaras de visión cenital 
+        analizan la simetría de la marcha y la condición corporal (BCS).
+    """)
+    
+    col_ac1, col_ac2 = st.columns(2)
+    with col_ac1:
+        st.markdown("#### 🎙️ Monitoreo Acústico de Enfermedad Respiratoria (BRD)")
+        frecuencia_tos = st.slider("Eventos de Tos Detectados por Hora (Micrófonos Corral)", min_value=0, max_value=30, value=3, step=1)
+        if frecuencia_tos > 12:
+            st.error(f"🔴 **Alerta Biológica BRD:** Se registraron {frecuencia_tos} eventos de tos/hora en el corral. Alta probabilidad de brote respiratorio infeccioso.")
+            st.metric("Estatus Sanitario Respiratorio", "⚠️ Brote BRD Inminente", delta="Acción Inmediata", delta_color="inverse")
+        elif frecuencia_tos > 6:
+            st.warning(f"🟡 **Precaución Respiratoria:** {frecuencia_tos} tos/hora detectadas. Monitorear temperatura corporal de animales jóvenes.")
+            st.metric("Estatus Sanitario Respiratorio", "🟡 Vigilancia Activa", delta="Atención", delta_color="off")
+        else:
+            st.success("🟢 **Ambiente Respiratorio Limpio:** Tasa normal de eventos acústicos en corrales.")
+            st.metric("Estatus Sanitario Respiratorio", "🟢 Normal", delta="Seguro", delta_color="normal")
+
+    with col_ac2:
+        st.markdown("#### 📷 Visión Artificial para Cojeras y Condición Corporal (BCS)")
+        indice_cojera = st.selectbox("Evaluación de Marcha por Cámaras IA", ["Marcha Normal / Simétrica (Score 1)", "Leve Asimetría / Rigidez (Score 2 - Vigilar)", "Cojera Evidente / Postura Arqueada (Score 3 - Tratamiento URGENTE)"])
+        bcs_vision = st.slider("Condición Corporal Estimada por Visión Artificial (BCS)", min_value=1.0, max_value=5.0, value=condicion_corporal, step=0.25)
+        
+        st.metric("BCS Automatizado por IA", f"{bcs_vision:.2f} / 5.0")
+        if "Score 3" in indice_cojera:
+            st.error("🔴 **Alerta de Bienestar y Movimiento:** Animal detectado con cojera grado 3. Afecta drásticamente el acceso al agua y comedero.")
+        else:
+            st.success("🟢 **Movilidad y Marcha Lote:** Sin incidencias graves de cojeras detectadas por el sistema de cámaras.")
+
+    st.markdown("---")
+    st.markdown("#### 📊 Matriz de Riesgo Sanitario Combinado (Acústica + Visión + Collares)")
+    
+    df_matriz_riesgo = pd.DataFrame({
+        "Arete / Animal": [f"ID-{1000 + i}" for i in [1, 5, 12, 18, 22]],
+        "Tos Acústica (IA)": ["Normal", "Frecuente (⚠️)", "Normal", "Leve", "Alta (🚨)"],
+        "Cojera (Visión)": ["Grado 1", "Grado 1", "Grado 2 (⚠️)", "Grado 1", "Grado 3 (🚨)"],
+        "Rumia (Collar IoT)": ["580 min", "310 min (⚠️)", "540 min", "490 min", "190 min (🚨)"],
+        "Diagnóstico Sugerido": ["Sano", "Posible BRD / Neumonía", "Desgaste Podal", "Fatiga", "Aislamiento Inmediato URGENTE"]
+    })
+    st.dataframe(df_matriz_riesgo, use_container_width=True, hide_index=True)
+
+# --- NUEVA PESTAÑA 12: GEMELOS DIGITALES & BLOCKCHAIN CARBONO ---
+with tab12:
+    st.subheader("🌱 Gemelos Digitales (Whole-Farm Simulation) & Trazabilidad Blockchain de Carbono")
+    st.markdown("""
+        **Sostenibilidad y Futuro Ganadero:** Simula escenarios climáticos y económicos a largo plazo mediante un gemelo digital 
+        de todo el rancho. Además, audita y registra de forma inmutable la reducción de emisiones de metano para certificar 
+        y comercializar **Bonos de Carbono Verificables** en mercados internacionales.
+    """)
+    
+    col_gt1, col_gt2 = st.columns(2)
+    with col_gt1:
+        st.markdown("#### 🔮 Simulador Whole-Farm (Gemelo Digital)")
+        horizonte_sim = st.slider("Horizonte de Proyección (Años)", min_value=1, max_value=10, value=5, step=1)
+        escenario_climatico = st.selectbox("Escenario Climático Proyectado", ["Año Normal / Histórico", "Sequía Prolongada (Reducción Forraje -30%)", "Año de Alta Pluviosidad y Abundancia"])
+        
+        if "Sequía" in escenario_climatico:
+            proj_utilidad_total = utilidad_neta_cab * cantidad_animales * 0.75 * horizonte_sim
+            st.warning("⚠️ **Simulación de Sequía:** El gemelo digital proyecta una contracción del 25% en márgenes por mayor costo de forrajes externos. Se sugiere destete precoz anticipado.")
+        else:
+            proj_utilidad_total = utilidad_neta_cab * cantidad_animales * 1.10 * horizonte_sim
+            st.success("🟢 **Simulación Favorable:** El gemelo digital proyecta estabilidad y crecimiento acumulado en el flujo de caja del rancho.")
+            
+        st.metric(f"Utilidad Neta Proyectada ({horizonte_sim} Años)", f"${proj_utilidad_total:,.0f} MXN")
+
+    with col_gt2:
+        st.markdown("#### ⛓️ Certificación y Auditoría Blockchain (Bonos de Carbono)")
+        st.info(
+            "🔒 **Bloque Registrado en Red Inmutable (NutriON Chain):**\n\n"
+            f"* **Hash de Transacción:** `0x4f8a9c2...b19e3d7`\n"
+            f"* **Lote Auditado:** {cantidad_animales} cabezas | Estándar IPCC Tier 2\n"
+            f"* **Reducción Certificada de CO2e:** `{co2e_anual * cantidad_animales / 1000.0:,.2f} toneladas/año`\n"
+            f"* **Valor Estimado en Mercado Verde:** `$ {(co2e_anual * cantidad_animales / 1000.0) * 350.0:,.2f} MXN`"
+        )
+        if st.button("🔗 Emitir Certificado Blockchain Verificable de Sostenibilidad", use_container_width=True):
+            st.success("🎉 **¡Certificado Blockchain Emitido con Éxito!** El registro inmutable ha sido sellado con la firma criptográfica del Dr. Alejandro Castañeda y enviado al registro de compensación ambiental.")
+            st.balloons()
